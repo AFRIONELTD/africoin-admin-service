@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: africoin-service
+  profiles:
+    active: dev
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: 'UTC'
+        temp:
+          use_jdbc_metadata_default: false
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 20MB
+hibernate:
+  jdbc:
+    time_zone: 'UTC'
+server:
+  port: 8002
+  forward-headers-strategy: none
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+token:
+  expiry-time-in-minutes:
+    access: 10
+    refresh: 30
+logging:
+  level:
+    org.springframework: INFO
+    com.afrione.africoinservice: debug
+    org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
+
+jasypt:
+  password: ${ENCRYPTOR_PASSWORD:X9@f*GzA$4qL#dR1V!mNp7eY&UcWzBtQ}
+  algorithm: PBEWITHHMACSHA512ANDAES_256
+  key-obtention-iterations: 200000
+africoin:
+  client-key:
+    android: '138245b7d467fe06333292af44228d01'
+    ios: 'ec2f97eac62f523c33a1042adeec531e'
+    web: '8a26d5ddbb7ff954da3fefed3551088c'
+
+springdoc:
+  override-with-generic-response: false
+
+regulator_reporting:
+  service-url: https://api.emtech.com/integration/virtual-assets/v1/stablecoin/events
+  auth-url: https://api.emtech.com/integration/v1/auth/token
+admin-wallet:
+  address: '0xAfriCoinAdmilletAddress'
+
+
+ghs:
+  account-number: '1234567890'
+  bank-code: '058'
+  bank-name: 'GHS Bank'
+  account-name: 'AfriCoin Admin'
+
+coreapi:
+  base-url: https://oamarkets.cymonzdemo.com
+  client-id: QIb7npc8DWE3SF3AWqzsHDSianvmEWaVhpsC0FRsumQ
+  client-secret: aAwP9E6vQi5fN3EktTzU4bbBmnPBrEHuKjmw4LUgUWE
+
+
+isTestEnv: true

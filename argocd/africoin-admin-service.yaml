@@ -1,0 +1,61 @@
+name: africoin-admin-service
+project: afrione-api-project
+namespace: sandbox
+values: |-
+  fullnameOverride: africoin-admin-service
+  image:
+    repository: afrioneltd/africoin-admin-service:app-5
+  namespace: sandbox
+  containerPort: 8002
+  autoscaling:
+    enabled: false
+  role:
+    enabled: true
+  ingress:
+    host: api-staging
+    domain: afrione.co
+  resources:
+    requests:
+      memory: "500Mi"
+      cpu: "150m"
+    limits:
+      memory: "1000Mi"
+      cpu: "800m"
+  lProbe:
+    enabled: true
+    path: /actuator/health
+    failureThreshold: 5
+    periodSeconds: 15
+    initialDelaySeconds: 120
+  rProbe:
+    enabled: true
+    path: /actuator/health
+    failureThreshold: 5
+    periodSeconds: 15
+    initialDelaySeconds: 120
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: sandbox
+    - name: DATABASE_USERNAME
+      valueFrom:
+        configMapKeyRef:
+          name: configs
+          key: DATABASE_USERNAME
+    - name: DATABASE_PASSWORD
+      valueFrom:
+        configMapKeyRef:
+          name: configs
+          key: DATABASE_PASSWORD
+    - name: DATABASE_URL
+      valueFrom:
+        configMapKeyRef:
+          name: configs
+          key: DATABASE_URL
+  volumeMounts:
+    - name: config
+      mountPath: "/africoinadmin/config"
+      readOnly: true
+  volumes:
+    - name: config
+      configMap:
+        name: africoin-admin-service

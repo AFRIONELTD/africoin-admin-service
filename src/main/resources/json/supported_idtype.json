@@ -1,0 +1,54 @@
+{
+  "NG": [
+    {
+      "name": "DRIVERS_LICENSE",
+      "description": "Driver's License",
+      "displayName": "Driver's License",
+      "backImageRequired": true
+    },
+    {
+      "name": "IDENTITY_CARD",
+      "displayName": "National Identity card",
+      "description": "National Identity card",
+      "backImageRequired": false
+    },
+    {
+      "name": "VOTER_ID",
+      "displayName": "Voter's Card",
+      "description": "Voter's Card",
+      "backImageRequired": true
+    },
+    {
+      "name": "PASSPORT",
+      "displayName": "Passport",
+      "description": "Passport",
+      "backImageRequired": false
+    }
+  ],
+  "GH": [
+    {
+      "name": "IDENTITY_CARD",
+      "displayName": "Ghana Card",
+      "description": "Take a photo of a valid identity card",
+      "backImageRequired": false
+    },
+    {
+      "name": "PASSPORT",
+      "displayName": "Passport",
+      "description": "Take a photo of a valid passport",
+      "backImageRequired": false
+    },
+    {
+      "name": "DRIVERS_LICENSE",
+      "displayName": "Driver's License",
+      "description": "Take a photo of a valid driver's license",
+      "backImageRequired": true
+    },
+    {
+      "name": "VOTER_ID",
+      "displayName": "Voter's Card",
+      "description": "Take a photo of a valid voter's license",
+      "backImageRequired": false
+    }
+  ]
+}
