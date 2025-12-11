@@ -1,6 +1,6 @@
 spring:
   application:
-    name: africoin-service
+    name: africoin-admin-service
   profiles:
     active: dev
   jpa:
@@ -41,10 +41,6 @@ logging:
     com.afrione.africoinservice: debug
     org.springframework.security.config.annotation.authentication.configuration.InitializeUserDetailsBeanManagerConfigurer: ERROR
 
-jasypt:
-  password: ${ENCRYPTOR_PASSWORD:X9@f*GzA$4qL#dR1V!mNp7eY&UcWzBtQ}
-  algorithm: PBEWITHHMACSHA512ANDAES_256
-  key-obtention-iterations: 200000
 africoin:
   client-key:
     android: '138245b7d467fe06333292af44228d01'
@@ -53,24 +49,6 @@ africoin:
 
 springdoc:
   override-with-generic-response: false
-
-regulator_reporting:
-  service-url: https://api.emtech.com/integration/virtual-assets/v1/stablecoin/events
-  auth-url: https://api.emtech.com/integration/v1/auth/token
-admin-wallet:
-  address: '0xAfriCoinAdmilletAddress'
-
-
-ghs:
-  account-number: '1234567890'
-  bank-code: '058'
-  bank-name: 'GHS Bank'
-  account-name: 'AfriCoin Admin'
-
-coreapi:
-  base-url: https://oamarkets.cymonzdemo.com
-  client-id: QIb7npc8DWE3SF3AWqzsHDSianvmEWaVhpsC0FRsumQ
-  client-secret: aAwP9E6vQi5fN3EktTzU4bbBmnPBrEHuKjmw4LUgUWE
 
 
 isTestEnv: true

@@ -9,6 +9,7 @@ import java.util.Arrays;
 public class ApplicationProperty {
 
     private final EnvironmentService environmentService;
+
     public ApplicationProperty(EnvironmentService environmentService) {
         this.environmentService = environmentService;
     }
@@ -33,7 +34,9 @@ public class ApplicationProperty {
         return environmentService.getVariable("africoin.client-key.android");
     }
 
-    public String getClientKeyWeb() {return environmentService.getVariable("africoin.client-key.web");}
+    public String getClientKeyWeb() {
+        return environmentService.getVariable("africoin.client-key.web");
+    }
 
     public String getClientTokenSecretKey() {
         return environmentService.getVariable("TOKEN_CLIENT_SECRET_KEY", "");
@@ -63,7 +66,9 @@ public class ApplicationProperty {
         return environmentService.getVariable("store-test-email", "+2347061635710:+2348052441734:+233267200000");
     }
 
-    public String getAmazonS3AccessKey() {return environmentService.getVariable("AMAZON_KEY");}
+    public String getAmazonS3AccessKey() {
+        return environmentService.getVariable("AMAZON_KEY");
+    }
 
     public String getAmazonS3SecretKey() {
         return environmentService.getVariable("AMAZON_SECRET");
@@ -80,6 +85,7 @@ public class ApplicationProperty {
     public String getDojahSecretKey() {
         return environmentService.getVariable("DOJAH_SECRET_KEY", "");
     }
+
     public String getDojahAppId() {
         return environmentService.getVariable("DOJAH_APP_ID", "66f525861ceb127291bfda30");
     }
@@ -108,21 +114,27 @@ public class ApplicationProperty {
     public String getTheTellerBaseUrl() {
         return environmentService.getVariable("THETHELLER_BASE_URL", "https://test.theteller.net");
     }
+
     public String getTheTellerMobileMoneyBaseUrl() {
         return environmentService.getVariable("THETHELLER_MM_BASE_URL", "https://test.theteller.net");
     }
+
     public String getApiBaseUrl() {
         return environmentService.getVariable("API_BASE_URL", "https://api-staging.afrione.co");
     }
+
     public String getTheTellerApiKey() {
         return environmentService.getVariable("THETHELLER_API_KEY", "");
     }
+
     public String getTheTellerMerchantId() {
         return environmentService.getVariable("THETHELLER_MERCHANT_ID", "");
     }
+
     public String getTheTellerUsername() {
         return environmentService.getVariable("THETHELLER_USERNAME", "");
     }
+
     public String getTheTellerPassCode() {
         return environmentService.getVariable("THETHELLER_PASSCODE", "0488");
     }
@@ -130,6 +142,7 @@ public class ApplicationProperty {
     public String getTheTellerSMSUsername() {
         return environmentService.getVariable("THETHELLER_SMS_USERNAME", "");
     }
+
     public String getTheTellerSMSPassword() {
         return environmentService.getVariable("THETHELLER_SMS_API_KEY", "");
     }
@@ -182,27 +195,34 @@ public class ApplicationProperty {
     }
 
     public String getCymonzBaseUrl() {
-        return environmentService.getVariable("coreapi.base-url");}
+        return environmentService.getVariable("coreapi.base-url");
+    }
 
     public String getCymonzClientId() {
-        return environmentService.getVariable("coreapi.client-id");}
+        return environmentService.getVariable("coreapi.client-id");
+    }
 
     public String getCymonzClientSecret() {
-        return environmentService.getVariable("coreapi.client-secret");}
+        return environmentService.getVariable("coreapi.client-secret");
+    }
 
 
     public String getPayAzaBaseUrl() {
         return environmentService.getVariable("PAYAZA_BASE_URL", "https://test.theteller.net");
     }
+
     public String getPayAzaPublicKey() {
         return environmentService.getVariable("PAYAZA_PUBLIC_KEY", "https://test.theteller.net");
     }
+
     public String getPayAzaNGNAccountReference() {
         return environmentService.getVariable("PAYAZA_NGN_ACCOUNT_REFERENCE", "https://api-staging.afrione.co");
     }
+
     public String getPayAzaGHSAccountReference() {
         return environmentService.getVariable("PAYAZA_GHS_ACCOUNT_REFERENCE", "");
     }
+
     public String getPayAzaMerchantTransactionPin() {
         return environmentService.getVariable("PAYAZA_MERCHANT_TRANSACTION_PIN", "");
     }
@@ -214,17 +234,24 @@ public class ApplicationProperty {
     public String getUniwalletApiKey() {
         return environmentService.getVariable("UNIWALLET_API_KEY", "https://test.theteller.net");
     }
+
     public String getUniwalletCreditProductId() {
         return environmentService.getVariable("UNIWALLET_CREDIT_PRODUCT_ID", "https://api-staging.afrione.co");
     }
+
     public String getUniwalletDebitProductId() {
         return environmentService.getVariable("UNIWALLET_DEBIT_PRODUCT_ID", "");
     }
+
     public String getUniwalletTransFlowId() {
         return environmentService.getVariable("UNIWALLET_TRANSFLOW_ID", "");
     }
 
     public String getB2BRequestClientKey() {
         return environmentService.getVariable("B2B_REQUEST_CLIENT_KEY", "8a26d5ddbb7ff954da3fefed3551088c");
+    }
+
+    public String merchangetServiceUrl() {
+        return environmentService.getVariable("MERCHANT_SERVICE_URL", "https://api-merchant-staging.afrione.co");
     }
 }

@@ -6,7 +6,6 @@ import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
-import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.request.KycApprovalRequest;
@@ -15,7 +14,6 @@ import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
@@ -40,9 +38,6 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
     private final ApplicationProperty applicationProperty;
     private final AppUserEntityDao appUserEntityDao;
 
-    @Value("${merchant.service.url:http://localhost:8001}")
-    private String merchantServiceUrl;
-
 
     @Override
     public void updateRates(List<ExchangeRateUpdateRequest> requests, Long accountId) {
@@ -51,7 +46,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
                 throw new BadRequestException("At least one exchange rate update is required");
             }
 
-            String url = String.format("%s/api/admin/v1/update-exchange-rate/update", merchantServiceUrl);
+            String url = String.format("%s/api/admin/v1/update-exchange-rate/update", applicationProperty.merchangetServiceUrl());
 
             String requestPayload = objectMapper.writeValueAsString(requests);
 
@@ -79,7 +74,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
     @Override
     public void approveOrDeclineMerchantDocument(KycApprovalRequest request, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/approve-or-decline-document/kyc/approve-or-decline", merchantServiceUrl);
+            String url = String.format("%s/api/admin/v1/approve-or-decline-document/kyc/approve-or-decline", applicationProperty.merchangetServiceUrl());
 
             String requestPayload = objectMapper.writeValueAsString(request);
 

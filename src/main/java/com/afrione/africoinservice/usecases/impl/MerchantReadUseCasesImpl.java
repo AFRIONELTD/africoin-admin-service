@@ -41,13 +41,11 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     private final ApplicationProperty applicationProperty;
     private final AppUserEntityDao appUserEntityDao;
 
-    @Value("${merchant.service.url:http://localhost:8001}")
-    private String merchantServiceUrl;
 
     @Override
     public PagedResponse<AdminMerchantResponse> retrieveMerchants(int pageNo, int pageSize, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/retrieve-merchants?pageNo=%d&pageSize=%d", merchantServiceUrl, pageNo, pageSize);
+            String url = String.format("%s/api/admin/v1/retrieve-merchants?pageNo=%d&pageSize=%d", applicationProperty.merchangetServiceUrl(), pageNo, pageSize);
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
@@ -75,7 +73,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     @Override
     public AdminMerchantResponse retrieveMerchant(String merchantId, AdminMerchantResponse.DetailLevel detailLevel, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/retrieve-merchant/%s?detailLevel=%s", merchantServiceUrl, merchantId, detailLevel.name());
+            String url = String.format("%s/api/admin/v1/retrieve-merchant/%s?detailLevel=%s", applicationProperty.merchangetServiceUrl(), merchantId, detailLevel.name());
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
@@ -109,7 +107,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 throw new BadRequestException("Unsupported crypto currency type: " + cryptoCurrency);
             }
 
-            String url = String.format("%s/api/admin/v1/retrieve-rate/%s", merchantServiceUrl, cryptoCurrencyTypeConstant.name());
+            String url = String.format("%s/api/admin/v1/retrieve-rate/%s", applicationProperty.merchangetServiceUrl(), cryptoCurrencyTypeConstant.name());
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
