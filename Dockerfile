@@ -10,17 +10,17 @@ RUN mvn -f /home/app/pom.xml clean package
 FROM eclipse-temurin:21-jre
 #FROM khipu/openjdk17-alpine:latest
 
-WORKDIR /africoin
+WORKDIR /africoinadmin
 
-COPY --from=build /home/app/target/africoin-service.jar .
+COPY --from=build /home/app/target/africoin-admin-service.jar .
 
 ENV TZ=Africa/Lagos
 
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-EXPOSE 8002
+EXPOSE 8012
 
-ENTRYPOINT [ "sh", "-c", "java -jar /africoin/africoin-service.jar --spring.config.additional-location=$CONFIG_LOCATION"]
+ENTRYPOINT [ "sh", "-c", "java -jar /africoinadmin/africoin-admin-service.jar --spring.config.additional-location=$CONFIG_LOCATION"]
 
 
 

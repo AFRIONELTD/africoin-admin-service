@@ -6,13 +6,13 @@ values: |-
   image:
     repository: afrioneltd/africoin-admin-service:app-5
   namespace: sandbox
-  containerPort: 8002
+  containerPort: 8012
   autoscaling:
     enabled: false
   role:
     enabled: true
   ingress:
-    host: api-staging
+    host: api-admin-staging
     domain: afrione.co
   resources:
     requests:

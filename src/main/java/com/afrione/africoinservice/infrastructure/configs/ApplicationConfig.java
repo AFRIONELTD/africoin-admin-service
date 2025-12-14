@@ -44,10 +44,10 @@ public class ApplicationConfig {
     @Value("${database.password}")
     private String databasePassword;
 
-    @Value("${database.pool-name:AfriCoinDBPool}")
+    @Value("${database.pool-name:AfriCoinADBPool}")
     private String databasePoolName;
 
-    @Value("${database.pool-size:10}")
+    @Value("${database.pool-size:8}")
     private int databasePoolSize;
 
     @Bean

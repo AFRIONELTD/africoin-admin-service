@@ -24,7 +24,7 @@ hibernate:
   jdbc:
     time_zone: 'UTC'
 server:
-  port: 8002
+  port: 8012
   forward-headers-strategy: none
 management:
   endpoints:
