@@ -45,7 +45,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     @Override
     public PagedResponse<AdminMerchantResponse> retrieveMerchants(int pageNo, int pageSize, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/retrieve-merchants?pageNo=%d&pageSize=%d", applicationProperty.merchangetServiceUrl(), pageNo, pageSize);
+            String url = String.format("%s/api/admin/v1/retrieve-merchants?pageNo=%d&pageSize=%d", applicationProperty.merchantServiceUrl(), pageNo, pageSize);
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
@@ -73,7 +73,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     @Override
     public AdminMerchantResponse retrieveMerchant(String merchantId, AdminMerchantResponse.DetailLevel detailLevel, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/retrieve-merchant/%s?detailLevel=%s", applicationProperty.merchangetServiceUrl(), merchantId, detailLevel.name());
+            String url = String.format("%s/api/admin/v1/retrieve-merchant/%s?detailLevel=%s", applicationProperty.merchantServiceUrl(), merchantId, detailLevel.name());
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
@@ -107,7 +107,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 throw new BadRequestException("Unsupported crypto currency type: " + cryptoCurrency);
             }
 
-            String url = String.format("%s/api/admin/v1/retrieve-rate/%s", applicationProperty.merchangetServiceUrl(), cryptoCurrencyTypeConstant.name());
+            String url = String.format("%s/api/admin/v1/retrieve-rate/%s", applicationProperty.merchantServiceUrl(), cryptoCurrencyTypeConstant.name());
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 

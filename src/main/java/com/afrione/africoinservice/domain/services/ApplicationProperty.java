@@ -46,6 +46,10 @@ public class ApplicationProperty {
         return environmentService.getVariable("TOKEN_B2B_SECRET_KEY", "");
     }
 
+    public String geCustomerTokenSecretKey() {
+        return environmentService.getVariable("TOKEN_B2C_SECRET_KEY", "");
+    }
+
     public String getMsTokenSecretKey() {
         return environmentService.getVariable("TOKEN_MS_SECRET_KEY", "");
     }
@@ -251,7 +255,15 @@ public class ApplicationProperty {
         return environmentService.getVariable("B2B_REQUEST_CLIENT_KEY", "8a26d5ddbb7ff954da3fefed3551088c");
     }
 
-    public String merchangetServiceUrl() {
+    public String getB2CRequestClientKey() {
+        return environmentService.getVariable("B2C_REQUEST_CLIENT_KEY", "8a26d5ddbb7ff954da3fefed3551088c");
+    }
+
+    public String merchantServiceUrl() {
         return environmentService.getVariable("MERCHANT_SERVICE_URL", "https://api-merchant-staging.afrione.co");
+    }
+
+    public String customerServiceUrl() {
+        return environmentService.getVariable("CUSTOMER_SERVICE_URL", "https://api-staging.afrione.co");
     }
 }

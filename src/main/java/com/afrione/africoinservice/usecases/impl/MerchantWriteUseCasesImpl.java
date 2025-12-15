@@ -46,7 +46,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
                 throw new BadRequestException("At least one exchange rate update is required");
             }
 
-            String url = String.format("%s/api/admin/v1/update-exchange-rate/update", applicationProperty.merchangetServiceUrl());
+            String url = String.format("%s/api/admin/v1/update-exchange-rate/update", applicationProperty.merchantServiceUrl());
 
             String requestPayload = objectMapper.writeValueAsString(requests);
 
@@ -74,7 +74,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
     @Override
     public void approveOrDeclineMerchantDocument(KycApprovalRequest request, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/approve-or-decline-document/kyc/approve-or-decline", applicationProperty.merchangetServiceUrl());
+            String url = String.format("%s/api/admin/v1/approve-or-decline-document/kyc/approve-or-decline", applicationProperty.merchantServiceUrl());
 
             String requestPayload = objectMapper.writeValueAsString(request);
 
