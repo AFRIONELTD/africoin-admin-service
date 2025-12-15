@@ -14,25 +14,9 @@ import java.util.Optional;
 public class AppUserEntityDaoImpl extends CrudDaoImpl<AppUserEntity, Long> implements AppUserEntityDao {
 
     private final AppUserRepository repository;
-    private final SequenceGenerator sequenceGenerator;
-    public AppUserEntityDaoImpl(AppUserRepository repository, SequenceGenerator sequenceGenerator) {
+    public AppUserEntityDaoImpl(AppUserRepository repository) {
         super(repository);
         this.repository = repository;
-        this.sequenceGenerator = sequenceGenerator;
-    }
-
-    @Override
-    public Optional<AppUserEntity> findRecordByUserId(String userId) {
-        return repository.findTopByUserId(userId);
-    }
-
-    @Override
-    public String generateUserId() {
-        String userId = sequenceGenerator.generateID(2, 6);
-        while(repository.existsByUserId(userId)) {
-            userId = sequenceGenerator.generateID(2, 6);
-        }
-        return userId;
     }
 
     @Override

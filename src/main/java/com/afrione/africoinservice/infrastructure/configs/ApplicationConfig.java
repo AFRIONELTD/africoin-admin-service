@@ -38,7 +38,7 @@ public class ApplicationConfig {
     @Value("${database.username}")
     private String databaseUsername;
 
-    @Value("${DATABASE_NAME}")
+    @Value("${database.name}")
     private String databaseName;
 
     @Value("${database.password}")
