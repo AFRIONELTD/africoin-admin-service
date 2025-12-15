@@ -11,5 +11,6 @@ import java.util.List;
 public class PortalUserModel {
     private String fullName;
     private String email;
+    private boolean requirePasswordChange;
     private List<String> roles;
 }

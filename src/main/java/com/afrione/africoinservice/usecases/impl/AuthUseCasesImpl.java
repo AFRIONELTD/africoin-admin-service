@@ -121,6 +121,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
             PortalUserModel portalUserModel = PortalUserModel.builder()
                     .fullName(fullName)
                     .email(user.getEmail())
+                    .requirePasswordChange(user.isRequiresPasswordChange())
                     .roles(roles)
                     .build();
 
