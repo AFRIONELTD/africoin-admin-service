@@ -52,31 +52,6 @@ public class AppClientFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_ACCEPTED);
             return;
         }
-
-        if (!url.startsWith("/api/v1/") && !url.startsWith("/api/v1/admin/")) {
-            filterChain.doFilter(request, response);
-            return;
-        } else {
-
-            String clientKeyIOS = applicationProperty.getClientKeyIOS();
-            String clientKeyAndroid = applicationProperty.getClientKeyAndroid();
-            String clientKeyWeb = applicationProperty.getClientKeyWeb();
-
-            String clientKey = StringUtils.defaultString(request.getHeader("x-request-client-key"));
-            if (clientKeyIOS.equalsIgnoreCase(clientKey)) {
-                request.setAttribute(AppConstant.CLIENT_TYPE, AppConstant.CLIENT_TYPE_IOS);
-            } else if (clientKeyAndroid.equalsIgnoreCase(clientKey)) {
-                request.setAttribute(AppConstant.CLIENT_TYPE, AppConstant.CLIENT_TYPE_ANDROID);
-            } else if (clientKeyWeb.equalsIgnoreCase(clientKey)) {
-                request.setAttribute(AppConstant.CLIENT_TYPE, AppConstant.CLIENT_TYPE_WEB);
-            } else {
-                ApiResponseJSON<String> apiResponse = new ApiResponseJSON<>("Unauthorised Access: Invalid client credential");
-                response.setHeader("Content-Type", "application/json");
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                response.getOutputStream().write(new ObjectMapper().writeValueAsString(apiResponse).getBytes());
-                return;
-            }
-        }
         filterChain.doFilter(request, response);
     }
 
