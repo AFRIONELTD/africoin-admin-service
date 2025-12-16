@@ -2,18 +2,26 @@ package com.afrione.africoinservice.usecases.impl;
 
 import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
 import com.afrione.africoinservice.domain.dao.RoleEntityDao;
+import com.afrione.africoinservice.domain.dao.SessionDataEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.entities.RoleEntity;
+import com.afrione.africoinservice.domain.entities.SessionDataEntity;
+import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
 import com.afrione.africoinservice.usecases.AccountSetupUseCases;
 import com.afrione.africoinservice.usecases.data.request.AccountSetupRequest;
+import com.afrione.africoinservice.usecases.data.request.ForgotPasswordSD;
 import com.afrione.africoinservice.usecases.data.response.account_setup.AccountSetupResponse;
+import com.afrione.africoinservice.usecases.data.response.auth.ForgotPasswordResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.RandomPasswordGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -33,6 +41,8 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
     private final Random random = new Random();
     private final PasswordEncoder passwordEncoder;
     private final RoleEntityDao rolesDao;
+    private final SessionDataEntityDao sessionDataEntityDao;
+    private final Gson gson = new Gson();
 
     @Override
     public AccountSetupResponse setupAccount(AccountSetupRequest request, Long userId) {
@@ -70,6 +80,44 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
                 .phoneNumber(appUserEntity.getPhoneNumber())
                 .defaultPassword(password)
                 .build();
+    }
+
+    @Override
+    public ForgotPasswordResponse initiateForgotPassword(String emailAddress) {
+        AppUserEntity appUserEntity = appUserEntityDao.findRecordByEmail(emailAddress).orElseThrow(() -> new BadRequestException("User with email address not found"));
+        int exp = 300;
+        SessionDataEntity sessionDataEntity = new SessionDataEntity();
+        sessionDataEntity.setSessionId(sessionDataEntityDao.generateSessionId());
+        sessionDataEntity.setSessionDataType(SessionDataTypeConstant.FORGOT_PASSWORD.name());
+        sessionDataEntity.setExpiryTime(LocalDateTime.now().plusSeconds(exp));
+
+        ForgotPasswordSD forgotPasswordSD = new ForgotPasswordSD();
+        forgotPasswordSD.setEncryptedToken(passwordEncoder.encode("123456"));
+        forgotPasswordSD.setUserId(appUserEntity.getId());
+        forgotPasswordSD.setExpiryInSeconds(exp);
+        sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
+        sessionDataEntityDao.saveRecord(sessionDataEntity);
+        return new ForgotPasswordResponse(sessionDataEntity.getSessionId(), exp);
+    }
+
+    @Override
+    public void finaliseForgotPassword(String sessionId, String otp, String newPassword) {
+        sessionDataEntityDao.findBySessionIdAndType(sessionId, SessionDataTypeConstant.FORGOT_PASSWORD).ifPresentOrElse(sessionDataEntity -> {
+            ForgotPasswordSD forgotPasswordSD = gson.fromJson(sessionDataEntity.getPayload(), ForgotPasswordSD.class);
+            if (forgotPasswordSD.getExpiryInSeconds() <= 0 || forgotPasswordSD.getExpiryInSeconds() + sessionDataEntity.getDateCreated().toEpochSecond() < LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC)) {
+                throw new BadRequestException("Session has expired");
+            }
+            if (!passwordEncoder.matches(otp, forgotPasswordSD.getEncryptedToken())) {
+                throw new BadRequestException("Invalid OTP");
+            }
+            forgotPasswordSD.setVerified(true);
+            sessionDataEntityDao.saveRecord(sessionDataEntity);
+            AppUserEntity appUserEntity = appUserEntityDao.getRecordById(forgotPasswordSD.getUserId());
+            appUserEntity.setPassword(passwordEncoder.encode(newPassword));
+            appUserEntityDao.saveRecord(appUserEntity);
+        }, () -> {
+            throw new BadRequestException("Invalid session ID");
+        });
     }
 
 }
