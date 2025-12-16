@@ -58,10 +58,6 @@ public class AuthUseCasesImpl implements AuthUseCases {
                 throw new BadRequestException("Account is locked due to too many failed login attempts. Please contact support.");
             }
 
-            if (user.isRequiresPasswordChange()) {
-                throw new BadRequestException("Password change required. Please reset your password.");
-            }
-
             if (user.getRecordStatus() != RecordStatusConstant.ACTIVE) {
                 log.warn("Login attempt for inactive user: {}", request.getEmail());
                 throw new BadRequestException("User account is not active");

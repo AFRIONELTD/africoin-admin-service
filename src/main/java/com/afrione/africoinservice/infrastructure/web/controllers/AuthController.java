@@ -9,7 +9,6 @@ import com.afrione.africoinservice.usecases.data.request.Toggle2FARequest;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
 import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -22,6 +21,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
