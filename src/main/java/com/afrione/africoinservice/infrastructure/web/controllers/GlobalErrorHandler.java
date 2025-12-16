@@ -23,7 +23,7 @@ import java.util.NoSuchElementException;
 
 
 @Slf4j
-@ControllerAdvice(basePackages = {"com.afrione.africoinservice.infrastructure.web.controllers.admin", "com.afrione.africoinservice.infrastructure.web.controllers.customer"})
+@ControllerAdvice(basePackages = {"com.afrione.africoinservice.infrastructure.web.controllers"})
 public class GlobalErrorHandler {
 
     private final ApplicationProperty applicationProperty;
