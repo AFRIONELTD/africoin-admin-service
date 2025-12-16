@@ -41,8 +41,8 @@ public class AuthController {
     }
 
     @PostMapping("login/2fa")
-    public ApiResponseJSON<LoginResponse> login(@RequestHeader String sessionId, @RequestBody @Valid String token) {
-        LoginResponse response = authUseCases.completeLogin(sessionId, token);
+    public ApiResponseJSON<LoginResponse> login(@RequestHeader String sessionId, @RequestBody @Valid Token2FaRequestJSON requestJSON) {
+        LoginResponse response = authUseCases.completeLogin(sessionId, requestJSON.token);
         return new ApiResponseJSON<>("Login successful", response);
     }
 
@@ -111,5 +111,13 @@ public class AuthController {
         public Toggle2FARequest toRequest() {
             return new Toggle2FARequest(twoFAMethod);
         }
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Token2FaRequestJSON {
+        @NotBlank(message = "Token cannot be empty")
+        private String token;
     }
 }
