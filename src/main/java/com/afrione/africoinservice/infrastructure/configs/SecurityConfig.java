@@ -45,6 +45,7 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/v3/api-docs"),
             new AntPathRequestMatcher("/actuator/**"),
             new AntPathRequestMatcher("/api/v*/common/**"),
+            new AntPathRequestMatcher("/api/v*/account-setup/forgot-password/**"),
             new AntPathRequestMatcher("/app/v*/common/**"),
             new AntPathRequestMatcher("/api/v*/auth/**"),
             new AntPathRequestMatcher("/api/webhooks/**"),

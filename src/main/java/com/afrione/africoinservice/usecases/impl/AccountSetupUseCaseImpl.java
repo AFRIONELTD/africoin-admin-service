@@ -6,6 +6,7 @@ import com.afrione.africoinservice.domain.dao.SessionDataEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.domain.entities.SessionDataEntity;
+import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
 import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
 import com.afrione.africoinservice.usecases.AccountSetupUseCases;
 import com.afrione.africoinservice.usecases.data.request.AccountSetupRequest;
@@ -27,6 +28,7 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
+
 /**
  * Created by felixadewale on
  * 08/12/2025
@@ -36,6 +38,9 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
+
+    private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
+
 
     private final AppUserEntityDao appUserEntityDao;
     private final Random random = new Random();
@@ -104,13 +109,26 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
     public void finaliseForgotPassword(String sessionId, String otp, String newPassword) {
         sessionDataEntityDao.findBySessionIdAndType(sessionId, SessionDataTypeConstant.FORGOT_PASSWORD).ifPresentOrElse(sessionDataEntity -> {
             ForgotPasswordSD forgotPasswordSD = gson.fromJson(sessionDataEntity.getPayload(), ForgotPasswordSD.class);
-            if (forgotPasswordSD.getExpiryInSeconds() <= 0 || forgotPasswordSD.getExpiryInSeconds() + sessionDataEntity.getDateCreated().toEpochSecond() < LocalDateTime.now().toEpochSecond(java.time.ZoneOffset.UTC)) {
+
+            if(forgotPasswordSD.isVerified()){
+                throw new BadRequestException("Token has already been used");
+            }
+
+            if (forgotPasswordSD.getTokenTrial() >= MAX_FAILED_LOGIN_ATTEMPTS) {
+                sessionDataEntity.setRecordStatus(RecordStatusConstant.DELETED);
+                throw new BadRequestException("Maximum token attempts exceeded");
+            }
+
+            if (!passwordEncoder.matches(otp, forgotPasswordSD.getEncryptedToken())) {
+                forgotPasswordSD.setTokenTrial(forgotPasswordSD.getTokenTrial() + 1);
+                throw new BadRequestException("Invalid token");
+            }
+            if (forgotPasswordSD.getExpiryInSeconds() <= 0 || sessionDataEntity.getExpiryTime().isBefore(LocalDateTime.now())) {
                 throw new BadRequestException("Session has expired");
             }
-            if (!passwordEncoder.matches(otp, forgotPasswordSD.getEncryptedToken())) {
-                throw new BadRequestException("Invalid OTP");
-            }
+
             forgotPasswordSD.setVerified(true);
+            sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
             sessionDataEntityDao.saveRecord(sessionDataEntity);
             AppUserEntity appUserEntity = appUserEntityDao.getRecordById(forgotPasswordSD.getUserId());
             appUserEntity.setPassword(passwordEncoder.encode(newPassword));
