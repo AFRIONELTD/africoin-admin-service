@@ -131,6 +131,7 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
             sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
             sessionDataEntityDao.saveRecord(sessionDataEntity);
             AppUserEntity appUserEntity = appUserEntityDao.getRecordById(forgotPasswordSD.getUserId());
+            appUserEntity.setRequiresPasswordChange(false);
             appUserEntity.setPassword(passwordEncoder.encode(newPassword));
             appUserEntityDao.saveRecord(appUserEntity);
         }, () -> {

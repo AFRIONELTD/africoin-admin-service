@@ -5,6 +5,8 @@ import com.afrione.africoinservice.domain.dao.RoleEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
+import com.afrione.africoinservice.domain.services.ApplicationProperty;
+import com.afrione.africoinservice.domain.services.EnvironmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -26,10 +28,14 @@ public class AdminInitializer implements CommandLineRunner {
     private final AppUserEntityDao appUserEntityDao;
     private final RoleEntityDao roleEntityDao;
     private final PasswordEncoder passwordEncoder;
+    private final ApplicationProperty applicationProperty;
+
 
     @Override
     public void run(String... args) {
         try {
+            System.out.println(applicationProperty.getMerchantTokenSecretKey());
+            System.out.println(applicationProperty.geCustomerTokenSecretKey());
             if (appUserEntityDao.findRecordByEmail("admin@africoin.com").isEmpty()) {
                 log.info("No admin user found. Creating default admin user...");
                 createDefaultAdmin();

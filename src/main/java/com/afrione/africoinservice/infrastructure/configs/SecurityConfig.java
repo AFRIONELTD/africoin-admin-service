@@ -47,7 +47,7 @@ public class SecurityConfig {
             new AntPathRequestMatcher("/api/v*/common/**"),
             new AntPathRequestMatcher("/api/v*/account-setup/forgot-password/**"),
             new AntPathRequestMatcher("/app/v*/common/**"),
-            new AntPathRequestMatcher("/api/v*/auth/**"),
+            new AntPathRequestMatcher("/api/v*/auth/login/**"),
             new AntPathRequestMatcher("/api/webhooks/**"),
             new AntPathRequestMatcher("/swagger-ui.html"),
             new AntPathRequestMatcher("/v3/api-docs.yaml"),

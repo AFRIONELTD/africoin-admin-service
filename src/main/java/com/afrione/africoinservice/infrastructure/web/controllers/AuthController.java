@@ -7,6 +7,7 @@ import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.request.Toggle2FARequest;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
+import com.afrione.africoinservice.usecases.models.admin.PortalUserModel;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -37,13 +38,14 @@ public class AuthController {
     @PostMapping("login")
     public ApiResponseJSON<String> login(@RequestBody @Valid LoginRequestJSON request) {
         String sessionId = authUseCases.login(request.toRequest());
-        return new ApiResponseJSON<>("Login successful", sessionId);
+        return new ApiResponseJSON<>("Login initiated successfully. Input your 2FA token to continue", sessionId);
     }
 
     @PostMapping("login/2fa")
     public ApiResponseJSON<LoginResponse> login(@RequestHeader String sessionId, @RequestBody @Valid Token2FaRequestJSON requestJSON) {
         LoginResponse response = authUseCases.completeLogin(sessionId, requestJSON.token);
-        return new ApiResponseJSON<>("Login successful", response);
+        PortalUserModel user = response.getUser();
+        return new ApiResponseJSON<>(user.isRequirePasswordChange() ? "Password change required! Please reset password ":"Login successful", response);
     }
 
     @PostMapping("change-password")
