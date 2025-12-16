@@ -11,8 +11,9 @@ import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse
  * 08/12/2025
  */
 public interface AuthUseCases {
-    LoginResponse login(LoginRequest request);
+    String login(LoginRequest request);
     void changePassword(ChangePasswordRequest request, Long userId);
     Toggle2FAResponse enable2FA(Toggle2FARequest request, Long userId);
     Toggle2FAResponse disable2FA(Long userId);
+    LoginResponse completeLogin(String sessionId, String token);
 }

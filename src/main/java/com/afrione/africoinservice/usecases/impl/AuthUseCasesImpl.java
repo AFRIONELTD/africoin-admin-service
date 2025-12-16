@@ -1,12 +1,16 @@
 package com.afrione.africoinservice.usecases.impl;
 
 import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
+import com.afrione.africoinservice.domain.dao.SessionDataEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.entities.RoleEntity;
+import com.afrione.africoinservice.domain.entities.SessionDataEntity;
 import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
+import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.usecases.AuthUseCases;
+import com.afrione.africoinservice.usecases.data.request.LoginPasswordSD;
 import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse;
@@ -17,11 +21,13 @@ import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.usecases.exceptions.UnauthorisedAccessException;
 import com.afrione.africoinservice.usecases.models.admin.PortalUserModel;
 import com.afrione.africoinservice.usecases.data.request.Toggle2FARequest;
+import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,11 +46,13 @@ public class AuthUseCasesImpl implements AuthUseCases {
     private final JWTService jwtService;
     private final ApplicationProperty applicationProperty;
     private final PasswordEncoder passwordEncoder;
+    private final SessionDataEntityDao sessionDataEntityDao;
+    private final Gson gson;
 
     private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
 
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public String login(LoginRequest request) {
         AppUserEntity user = appUserEntityDao.findRecordByEmail(request.getEmail())
                 .orElseThrow(() -> {
                     log.warn("Login attempt with non-existent email: {}", request.getEmail());
@@ -72,63 +80,18 @@ public class AuthUseCasesImpl implements AuthUseCases {
                 throw new UnauthorisedAccessException("Invalid email or password. Remaining attempts: " + remainingAttempts);
             }
 
-            user.setFailedLoginAttempts(0);
-            user.setLastLoginAt(OffsetDateTime.now());
+            LoginPasswordSD loginPasswordSD = new LoginPasswordSD();
+            loginPasswordSD.setUserId(user.getId());
+            loginPasswordSD.setEncryptedToken(passwordEncoder.encode("123456")); //to be changed
 
-            Map<String, String> tokenAttributes = new HashMap<>();
-            tokenAttributes.put("userId", user.getId().toString());
-            tokenAttributes.put("email", user.getEmail());
+            SessionDataEntity sessionDataEntity = new SessionDataEntity();
+            sessionDataEntity.setSessionId(sessionDataEntityDao.generateSessionId());
+            sessionDataEntity.setSessionDataType(SessionDataTypeConstant.WEB_LOGIN.name());
+            sessionDataEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+            sessionDataEntity.setPayload(gson.toJson(loginPasswordSD));
+            sessionDataEntityDao.saveRecord(sessionDataEntity);
+            return sessionDataEntity.getSessionId();
 
-            int accessTokenExpiryTime = applicationProperty.getAccessTokenExpiryTimeInMinutes();
-            int refreshTokenExpiryTime = applicationProperty.getRefreshTokenExpiryTimeInMinutes();
-
-            String accessTokenString = jwtService.expiringToken(
-                    applicationProperty.getClientTokenSecretKey(),
-                    tokenAttributes,
-                    accessTokenExpiryTime
-            );
-
-            String refreshTokenString = jwtService.expiringToken(
-                    applicationProperty.getClientTokenSecretKey(),
-                    tokenAttributes,
-                    refreshTokenExpiryTime
-            );
-
-            AppToken accessToken = AppToken.builder()
-                    .token(accessTokenString)
-                    .expiryTimeInMinutes(accessTokenExpiryTime)
-                    .build();
-
-            AppToken refreshToken = AppToken.builder()
-                    .token(refreshTokenString)
-                    .expiryTimeInMinutes(refreshTokenExpiryTime)
-                    .build();
-
-            CustomerToken customerToken = CustomerToken.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-
-            String fullName = user.getFirstName() + " " + user.getLastName();
-            java.util.List<String> roles = user.getRoles().stream()
-                    .map(RoleEntity::getRoleName)
-                    .collect(Collectors.toList());
-
-            PortalUserModel portalUserModel = PortalUserModel.builder()
-                    .fullName(fullName)
-                    .email(user.getEmail())
-                    .requirePasswordChange(user.isRequiresPasswordChange())
-                    .roles(roles)
-                    .build();
-
-            LoginResponse response = new LoginResponse();
-            if (!user.isRequiresPasswordChange()) {
-                response.setUserToken(customerToken);
-            }
-            response.setUser(portalUserModel);
-
-            log.info("User logged in successfully: {}", request.getEmail());
-            return response;
         } finally {
             appUserEntityDao.saveRecord(user);
         }
@@ -215,4 +178,118 @@ public class AuthUseCasesImpl implements AuthUseCases {
                 .message("2FA disabled successfully")
                 .build();
     }
+
+    @Override
+    public LoginResponse completeLogin(String sessionId, String token) {
+
+        SessionDataEntity sd = sessionDataEntityDao
+                .findBySessionIdAndType(sessionId, SessionDataTypeConstant.WEB_LOGIN)
+                .orElseThrow(() -> new BadRequestException("Invalid or expired session"));
+
+        LoginPasswordSD loginPasswordSD = null;
+        AppUserEntity user = null;
+
+        try {
+            if (sd.getExpiryTime().isBefore(LocalDateTime.now())) {
+                throw new BadRequestException("Session has expired");
+            }
+
+            loginPasswordSD = gson.fromJson(sd.getPayload(), LoginPasswordSD.class);
+
+            if(loginPasswordSD.isVerified()){
+                throw new BadRequestException("Token has already been used");
+            }
+
+            if (loginPasswordSD.getTokenTrial() >= MAX_FAILED_LOGIN_ATTEMPTS) {
+                sd.setRecordStatus(RecordStatusConstant.DELETED);
+                throw new BadRequestException("Maximum token attempts exceeded");
+            }
+
+            if (!passwordEncoder.matches(token, loginPasswordSD.getEncryptedToken())) {
+                loginPasswordSD.setTokenTrial(loginPasswordSD.getTokenTrial() + 1);
+                throw new BadRequestException("Invalid token");
+            }
+
+            loginPasswordSD.setVerified(true);
+
+            user = appUserEntityDao.findById(loginPasswordSD.getUserId())
+                    .orElseThrow(() -> new BadRequestException("User not found"));
+
+            user.setFailedLoginAttempts(0);
+            user.setLastLoginAt(OffsetDateTime.now());
+
+            Map<String, String> tokenAttributes = new HashMap<>();
+            tokenAttributes.put("userId", user.getId().toString());
+            tokenAttributes.put("email", user.getEmail());
+
+            int accessTokenExpiryTime =
+                    applicationProperty.getAccessTokenExpiryTimeInMinutes();
+            int refreshTokenExpiryTime =
+                    applicationProperty.getRefreshTokenExpiryTimeInMinutes();
+
+            String accessTokenString = jwtService.expiringToken(
+                    applicationProperty.getClientTokenSecretKey(),
+                    tokenAttributes,
+                    accessTokenExpiryTime
+            );
+
+            String refreshTokenString = jwtService.expiringToken(
+                    applicationProperty.getClientTokenSecretKey(),
+                    tokenAttributes,
+                    refreshTokenExpiryTime
+            );
+
+            AppToken accessToken = AppToken.builder()
+                    .token(accessTokenString)
+                    .expiryTimeInMinutes(accessTokenExpiryTime)
+                    .build();
+
+            AppToken refreshToken = AppToken.builder()
+                    .token(refreshTokenString)
+                    .expiryTimeInMinutes(refreshTokenExpiryTime)
+                    .build();
+
+            CustomerToken customerToken = CustomerToken.builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+
+            PortalUserModel portalUserModel = PortalUserModel.builder()
+                    .fullName(user.getFirstName() + " " + user.getLastName())
+                    .email(user.getEmail())
+                    .requirePasswordChange(user.isRequiresPasswordChange())
+                    .roles(
+                            user.getRoles().stream()
+                                    .map(RoleEntity::getRoleName)
+                                    .collect(Collectors.toList())
+                    )
+                    .build();
+
+            LoginResponse response = new LoginResponse();
+
+            if (!user.isRequiresPasswordChange()) {
+                response.setUserToken(customerToken);
+            }
+
+            response.setUser(portalUserModel);
+
+            log.info("User logged in successfully: {}", user.getEmail());
+
+            return response;
+
+        } finally {
+
+            if (loginPasswordSD != null) {
+                sd.setPayload(gson.toJson(loginPasswordSD));
+            }
+
+            sessionDataEntityDao.saveRecord(sd);
+
+            if (user != null) {
+                appUserEntityDao.saveRecord(user);
+            }
+        }
+    }
+
+
 }

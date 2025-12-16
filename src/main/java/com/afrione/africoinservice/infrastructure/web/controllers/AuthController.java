@@ -7,7 +7,6 @@ import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.request.Toggle2FARequest;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
-import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -20,16 +19,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by felixadewale on
  * 08/12/2025
  */
-@Transactional
+@Transactional(dontRollbackOn = Exception.class)
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/v1/auth/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
@@ -39,8 +35,14 @@ public class AuthController {
     private final AuthUseCases authUseCases;
 
     @PostMapping("login")
-    public ApiResponseJSON<LoginResponse> login(@RequestBody @Valid LoginRequestJSON request) {
-        LoginResponse response = authUseCases.login(request.toRequest());
+    public ApiResponseJSON<String> login(@RequestBody @Valid LoginRequestJSON request) {
+        String sessionId = authUseCases.login(request.toRequest());
+        return new ApiResponseJSON<>("Login successful", sessionId);
+    }
+
+    @PostMapping("login/2fa")
+    public ApiResponseJSON<LoginResponse> login(@RequestHeader String sessionId, @RequestBody @Valid String token) {
+        LoginResponse response = authUseCases.completeLogin(sessionId, token);
         return new ApiResponseJSON<>("Login successful", response);
     }
 
@@ -50,17 +52,17 @@ public class AuthController {
         return new ApiResponseJSON<>("Password changed successfully", "Password updated");
     }
 
-    @PostMapping("2fa/enable")
-    public ApiResponseJSON<Toggle2FAResponse> enable2FA(@RequestBody @Valid Toggle2FARequestJSON request, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
-        Toggle2FAResponse response = authUseCases.enable2FA(request.toRequest(), authenticatedUser.getUserId());
-        return new ApiResponseJSON<>("2FA enabled successfully", response);
-    }
-
-    @PostMapping("2fa/disable")
-    public ApiResponseJSON<Toggle2FAResponse> disable2FA(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
-        Toggle2FAResponse response = authUseCases.disable2FA(authenticatedUser.getUserId());
-        return new ApiResponseJSON<>("2FA disabled successfully", response);
-    }
+//    @PostMapping("2fa/enable")
+//    public ApiResponseJSON<Toggle2FAResponse> enable2FA(@RequestBody @Valid Toggle2FARequestJSON request, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+//        Toggle2FAResponse response = authUseCases.enable2FA(request.toRequest(), authenticatedUser.getUserId());
+//        return new ApiResponseJSON<>("2FA enabled successfully", response);
+//    }
+//
+//    @PostMapping("2fa/disable")
+//    public ApiResponseJSON<Toggle2FAResponse> disable2FA(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+//        Toggle2FAResponse response = authUseCases.disable2FA(authenticatedUser.getUserId());
+//        return new ApiResponseJSON<>("2FA disabled successfully", response);
+//    }
 
     @Data
     @NoArgsConstructor
