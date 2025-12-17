@@ -2,12 +2,13 @@ package com.afrione.africoinservice.usecases.data.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 
-@Data
+@Data @NoArgsConstructor
 public class PagedResponse<T> {
 
     private long totalRecords;

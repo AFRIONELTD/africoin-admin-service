@@ -54,12 +54,15 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 throw new BadRequestException("Failed to retrieve merchants");
             }
 
+            String responseBody = response.getResponseBody();
+            System.out.println(responseBody);
             @SuppressWarnings("unchecked")
-            PagedResponse<AdminMerchantResponse> pagedResponse = objectMapper.convertValue(
-                    response.getResponseObject(),
-                    objectMapper.getTypeFactory().constructParametricType(PagedResponse.class, AdminMerchantResponse.class)
+            ApiResponseJSON<PagedResponse<AdminMerchantResponse>> apiResponseJSON = objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<PagedResponse<AdminMerchantResponse>>>() {}
             );
 
+            PagedResponse<AdminMerchantResponse> pagedResponse = apiResponseJSON.getData();
             log.info("Successfully retrieved {} merchants", pagedResponse.getRecords().size());
             return pagedResponse;
         } catch (BadRequestException e) {
