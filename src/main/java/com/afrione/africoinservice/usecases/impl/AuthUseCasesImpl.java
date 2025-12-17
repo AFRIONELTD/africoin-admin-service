@@ -15,6 +15,7 @@ import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
+import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.data.value_objects.AppToken;
 import com.afrione.africoinservice.usecases.data.value_objects.CustomerToken;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
@@ -27,10 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -221,6 +224,28 @@ public class AuthUseCasesImpl implements AuthUseCases {
             Map<String, String> tokenAttributes = new HashMap<>();
             tokenAttributes.put("userId", user.getId().toString());
             tokenAttributes.put("email", user.getEmail());
+            tokenAttributes.put("authKey", user.getAuthenticationKey());
+            tokenAttributes.put("accountType", AppConstant.ACCOUNT_TYPE_ADMIN);
+            tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
+            // Additional claims to include in the token
+            // roles as CSV
+            String rolesCsv = user.getRoles().stream().map(RoleEntity::getRoleName).collect(Collectors.joining(","));
+            tokenAttributes.put("roles", rolesCsv);
+            // privileges aggregated from roles as CSV (distinct)
+            String privilegesCsv = user.getRoles().stream()
+                    .flatMap(r -> r.getPrivileges().stream())
+                    .map(p -> p.getType().name())
+                    .distinct()
+                    .collect(Collectors.joining(","));
+            tokenAttributes.put("privileges", privilegesCsv);
+            // flags and metadata
+            tokenAttributes.put("requiresPasswordChange", String.valueOf(user.isRequiresPasswordChange()));
+            tokenAttributes.put("twoFAEnabled", String.valueOf(user.isTwoFAEnabled()));
+            tokenAttributes.put("twoFAMethod", user.getTwoFAMethod() == null ? "" : user.getTwoFAMethod());
+            tokenAttributes.put("lastLoginAt", user.getLastLoginAt() == null ? "" : user.getLastLoginAt().toString());
+            // token identifiers
+            tokenAttributes.put("jti", UUID.randomUUID().toString());
+            tokenAttributes.put("iat", String.valueOf(Instant.now().getEpochSecond()));
 
             int accessTokenExpiryTime =
                     applicationProperty.getAccessTokenExpiryTimeInMinutes();
@@ -232,6 +257,8 @@ public class AuthUseCasesImpl implements AuthUseCases {
                     tokenAttributes,
                     accessTokenExpiryTime
             );
+
+            tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_REFRESH);
 
             String refreshTokenString = jwtService.expiringToken(
                     applicationProperty.getClientTokenSecretKey(),

@@ -7,6 +7,7 @@ import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -74,7 +75,6 @@ public class UserAuthenticationConfig {
             return Optional.empty();
         }
 
-        final long accountId = Long.parseLong(attributes.get("accountId"));
         final long userId = Long.parseLong(attributes.get("userId"));
         final String authKey = attributes.get("authKey");
         String privilegeCodes = attributes.getOrDefault("privilegeCodes", "");
@@ -91,7 +91,7 @@ public class UserAuthenticationConfig {
                 return Optional.empty();
             }
             AppUserEntity appUser = appUserOptional.get();
-            if (!appUser.getAuthenticationKey().equalsIgnoreCase(authKey)) {
+            if (StringUtils.isNotEmpty(appUser.getAuthenticationKey()) && !appUser.getAuthenticationKey().equalsIgnoreCase(authKey)) {
                 System.out.println("auth key mismatch - " + authKey + " " + appUser.getAuthenticationKey());
                 return Optional.empty();
             }

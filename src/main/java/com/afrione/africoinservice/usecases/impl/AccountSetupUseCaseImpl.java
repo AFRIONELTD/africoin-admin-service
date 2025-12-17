@@ -15,7 +15,6 @@ import com.afrione.africoinservice.usecases.data.response.account_setup.AccountS
 import com.afrione.africoinservice.usecases.data.response.auth.ForgotPasswordResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.RandomPasswordGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -65,8 +64,10 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .gender(request.getGender())
+                .email(request.getEmail())
                 .phoneNumber(request.getPhoneNumber())
                 .createdBy(creator)
+                .authenticationKey("admin-auth-key-" + System.currentTimeMillis())
                 .password(passwordEncoder.encode(password))
                 .build();
 

@@ -53,6 +53,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         }catch (Exception ex) {
+            logger.error("JWT Authentication failed:", ex);
             String message = ex.getMessage();
             System.out.println("JWT Authentication Failed: " + message);
             ApiResponseJSON<String> apiResponse = new ApiResponseJSON<>(message);

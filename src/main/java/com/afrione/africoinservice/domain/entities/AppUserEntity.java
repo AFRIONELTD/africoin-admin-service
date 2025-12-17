@@ -39,10 +39,14 @@ public class AppUserEntity extends AbstractBaseEntity<Long> {
     @JoinColumn(name = "created_by")
     private AppUserEntity createdBy;
 
-    @Builder.Default
     private boolean requiresPasswordChange  = true;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "app_user_role",
+            joinColumns = @JoinColumn(name = "user_fk"),
+            inverseJoinColumns = @JoinColumn(name = "role_fk")
+    )
     private List<RoleEntity> roles = new ArrayList<>();
 
     @Builder.Default

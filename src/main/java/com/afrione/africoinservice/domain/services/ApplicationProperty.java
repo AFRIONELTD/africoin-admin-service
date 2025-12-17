@@ -43,7 +43,7 @@ public class ApplicationProperty {
     }
 
     public String getMerchantTokenSecretKey() {
-        return environmentService.getVariable("TOKEN_B2B_SECRET_KEY", "");
+        return environmentService.getVariable("TOKEN_B2B_SECRET_KEY", "7c6107b16e149cdadceef8cbd889ac19ccf7925c242103d27ad234b444e326aa022e4a0cb7e22255bd36247d7a255b3444009a7f7a2c80f52f0638b354b2af30");
     }
 
     public String geCustomerTokenSecretKey() {
