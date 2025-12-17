@@ -39,6 +39,7 @@ public class AppUserEntity extends AbstractBaseEntity<Long> {
     @JoinColumn(name = "created_by")
     private AppUserEntity createdBy;
 
+    @Builder.Default
     private boolean requiresPasswordChange  = true;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -60,7 +61,8 @@ public class AppUserEntity extends AbstractBaseEntity<Long> {
     @Column(name = "two_fa_enabled")
     private boolean twoFAEnabled = false;
 
+    @Builder.Default
     @Column(name = "two_fa_method")
-    private String twoFAMethod;
+    private String twoFAMethod = "OTP";
 
 }

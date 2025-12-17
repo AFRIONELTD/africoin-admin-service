@@ -227,23 +227,18 @@ public class AuthUseCasesImpl implements AuthUseCases {
             tokenAttributes.put("authKey", user.getAuthenticationKey());
             tokenAttributes.put("accountType", AppConstant.ACCOUNT_TYPE_ADMIN);
             tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
-            // Additional claims to include in the token
-            // roles as CSV
             String rolesCsv = user.getRoles().stream().map(RoleEntity::getRoleName).collect(Collectors.joining(","));
             tokenAttributes.put("roles", rolesCsv);
-            // privileges aggregated from roles as CSV (distinct)
             String privilegesCsv = user.getRoles().stream()
                     .flatMap(r -> r.getPrivileges().stream())
                     .map(p -> p.getType().name())
                     .distinct()
                     .collect(Collectors.joining(","));
             tokenAttributes.put("privileges", privilegesCsv);
-            // flags and metadata
             tokenAttributes.put("requiresPasswordChange", String.valueOf(user.isRequiresPasswordChange()));
             tokenAttributes.put("twoFAEnabled", String.valueOf(user.isTwoFAEnabled()));
             tokenAttributes.put("twoFAMethod", user.getTwoFAMethod() == null ? "" : user.getTwoFAMethod());
             tokenAttributes.put("lastLoginAt", user.getLastLoginAt() == null ? "" : user.getLastLoginAt().toString());
-            // token identifiers
             tokenAttributes.put("jti", UUID.randomUUID().toString());
             tokenAttributes.put("iat", String.valueOf(Instant.now().getEpochSecond()));
 
