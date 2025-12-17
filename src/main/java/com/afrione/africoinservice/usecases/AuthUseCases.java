@@ -16,4 +16,6 @@ public interface AuthUseCases {
     Toggle2FAResponse enable2FA(Toggle2FARequest request, Long userId);
     Toggle2FAResponse disable2FA(Long userId);
     LoginResponse completeLogin(String sessionId, String token);
+
+    LoginResponse changePasswordOnLogin(String sessionId, String newPassword);
 }

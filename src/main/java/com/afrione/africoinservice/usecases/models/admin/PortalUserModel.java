@@ -11,6 +11,8 @@ import java.util.List;
 public class PortalUserModel {
     private String fullName;
     private String email;
+    private boolean twoFAEnabled;
+    private String twoFAMethod;
     private boolean requirePasswordChange;
     private List<String> roles;
 }

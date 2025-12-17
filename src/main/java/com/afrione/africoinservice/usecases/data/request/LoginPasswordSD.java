@@ -15,4 +15,5 @@ public class LoginPasswordSD {
     private String encryptedToken;
     private int tokenTrial;
     private boolean verified;
+    private boolean eligibleForPasswordReset;
 }

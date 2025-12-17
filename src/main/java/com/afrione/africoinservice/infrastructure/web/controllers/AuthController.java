@@ -13,6 +13,7 @@ import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -46,6 +47,12 @@ public class AuthController {
         LoginResponse response = authUseCases.completeLogin(sessionId, requestJSON.token);
         PortalUserModel user = response.getUser();
         return new ApiResponseJSON<>(user.isRequirePasswordChange() ? "Password change required! Please reset password ":"Login successful", response);
+    }
+
+    @PostMapping("login/change-password")
+    public ApiResponseJSON<LoginResponse> login(@RequestHeader String sessionId, @RequestBody @Valid ChangePasswordOnLoginRequestJSON requestJSON) {
+        LoginResponse response = authUseCases.changePasswordOnLogin(sessionId, requestJSON.newPassword);
+        return new ApiResponseJSON<>("Password change successful", response);
     }
 
     @PostMapping("change-password")
@@ -121,5 +128,13 @@ public class AuthController {
     public static class Token2FaRequestJSON {
         @NotBlank(message = "Token cannot be empty")
         private String token;
+    }
+
+    @Data
+    public static class ChangePasswordOnLoginRequestJSON{
+        @NotBlank(message = "New password cannot be empty")
+        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+                 message = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")
+        String newPassword;
     }
 }

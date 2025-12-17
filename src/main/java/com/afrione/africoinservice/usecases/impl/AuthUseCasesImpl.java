@@ -199,7 +199,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
 
             loginPasswordSD = gson.fromJson(sd.getPayload(), LoginPasswordSD.class);
 
-            if(loginPasswordSD.isVerified()){
+            if (loginPasswordSD.isVerified()) {
                 throw new BadRequestException("Token has already been used");
             }
 
@@ -214,90 +214,12 @@ public class AuthUseCasesImpl implements AuthUseCases {
             }
 
             loginPasswordSD.setVerified(true);
+            loginPasswordSD.setEligibleForPasswordReset(true);
 
             user = appUserEntityDao.findById(loginPasswordSD.getUserId())
                     .orElseThrow(() -> new BadRequestException("User not found"));
 
-            user.setFailedLoginAttempts(0);
-            user.setLastLoginAt(OffsetDateTime.now());
-
-            Map<String, String> tokenAttributes = new HashMap<>();
-            tokenAttributes.put("userId", user.getId().toString());
-            tokenAttributes.put("email", user.getEmail());
-            tokenAttributes.put("authKey", user.getAuthenticationKey());
-            tokenAttributes.put("accountType", AppConstant.ACCOUNT_TYPE_ADMIN);
-            tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
-            String rolesCsv = user.getRoles().stream().map(RoleEntity::getRoleName).collect(Collectors.joining(","));
-            tokenAttributes.put("roles", rolesCsv);
-            String privilegesCsv = user.getRoles().stream()
-                    .flatMap(r -> r.getPrivileges().stream())
-                    .map(p -> p.getType().name())
-                    .distinct()
-                    .collect(Collectors.joining(","));
-            tokenAttributes.put("privileges", privilegesCsv);
-            tokenAttributes.put("requiresPasswordChange", String.valueOf(user.isRequiresPasswordChange()));
-            tokenAttributes.put("twoFAEnabled", String.valueOf(user.isTwoFAEnabled()));
-            tokenAttributes.put("twoFAMethod", user.getTwoFAMethod() == null ? "" : user.getTwoFAMethod());
-            tokenAttributes.put("lastLoginAt", user.getLastLoginAt() == null ? "" : user.getLastLoginAt().toString());
-            tokenAttributes.put("jti", UUID.randomUUID().toString());
-            tokenAttributes.put("iat", String.valueOf(Instant.now().getEpochSecond()));
-
-            int accessTokenExpiryTime =
-                    applicationProperty.getAccessTokenExpiryTimeInMinutes();
-            int refreshTokenExpiryTime =
-                    applicationProperty.getRefreshTokenExpiryTimeInMinutes();
-
-            String accessTokenString = jwtService.expiringToken(
-                    applicationProperty.getClientTokenSecretKey(),
-                    tokenAttributes,
-                    accessTokenExpiryTime
-            );
-
-            tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_REFRESH);
-
-            String refreshTokenString = jwtService.expiringToken(
-                    applicationProperty.getClientTokenSecretKey(),
-                    tokenAttributes,
-                    refreshTokenExpiryTime
-            );
-
-            AppToken accessToken = AppToken.builder()
-                    .token(accessTokenString)
-                    .expiryTimeInMinutes(accessTokenExpiryTime)
-                    .build();
-
-            AppToken refreshToken = AppToken.builder()
-                    .token(refreshTokenString)
-                    .expiryTimeInMinutes(refreshTokenExpiryTime)
-                    .build();
-
-            CustomerToken customerToken = CustomerToken.builder()
-                    .accessToken(accessToken)
-                    .refreshToken(refreshToken)
-                    .build();
-
-            PortalUserModel portalUserModel = PortalUserModel.builder()
-                    .fullName(user.getFirstName() + " " + user.getLastName())
-                    .email(user.getEmail())
-                    .requirePasswordChange(user.isRequiresPasswordChange())
-                    .roles(
-                            user.getRoles().stream()
-                                    .map(RoleEntity::getRoleName)
-                                    .collect(Collectors.toList())
-                    )
-                    .build();
-
-            LoginResponse response = new LoginResponse();
-
-            if (!user.isRequiresPasswordChange()) {
-                response.setUserToken(customerToken);
-            }
-
-            response.setUser(portalUserModel);
-
-            log.info("User logged in successfully: {}", user.getEmail());
-
-            return response;
+            return buildUserLoginDetails(user);
 
         } finally {
 
@@ -311,6 +233,117 @@ public class AuthUseCasesImpl implements AuthUseCases {
                 appUserEntityDao.saveRecord(user);
             }
         }
+    }
+
+    private LoginResponse buildUserLoginDetails(AppUserEntity user) {
+        user.setFailedLoginAttempts(0);
+        user.setLastLoginAt(OffsetDateTime.now());
+
+        Map<String, String> tokenAttributes = new HashMap<>();
+        tokenAttributes.put("userId", user.getId().toString());
+        tokenAttributes.put("email", user.getEmail());
+        tokenAttributes.put("authKey", user.getAuthenticationKey());
+        tokenAttributes.put("accountType", AppConstant.ACCOUNT_TYPE_ADMIN);
+        tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
+        String rolesCsv = user.getRoles().stream().map(RoleEntity::getRoleName).collect(Collectors.joining(","));
+        tokenAttributes.put("roles", rolesCsv);
+        String privilegesCsv = user.getRoles().stream()
+                .flatMap(r -> r.getPrivileges().stream())
+                .map(p -> p.getType().name())
+                .distinct()
+                .collect(Collectors.joining(","));
+        tokenAttributes.put("privileges", privilegesCsv);
+        tokenAttributes.put("requiresPasswordChange", String.valueOf(user.isRequiresPasswordChange()));
+        tokenAttributes.put("twoFAEnabled", String.valueOf(user.isTwoFAEnabled()));
+        tokenAttributes.put("twoFAMethod", user.getTwoFAMethod() == null ? "" : user.getTwoFAMethod());
+        tokenAttributes.put("lastLoginAt", user.getLastLoginAt() == null ? "" : user.getLastLoginAt().toString());
+        tokenAttributes.put("jti", UUID.randomUUID().toString());
+        tokenAttributes.put("iat", String.valueOf(Instant.now().getEpochSecond()));
+
+        int accessTokenExpiryTime =
+                applicationProperty.getAccessTokenExpiryTimeInMinutes();
+        int refreshTokenExpiryTime =
+                applicationProperty.getRefreshTokenExpiryTimeInMinutes();
+
+        String accessTokenString = jwtService.expiringToken(
+                applicationProperty.getClientTokenSecretKey(),
+                tokenAttributes,
+                accessTokenExpiryTime
+        );
+
+        tokenAttributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_REFRESH);
+
+        String refreshTokenString = jwtService.expiringToken(
+                applicationProperty.getClientTokenSecretKey(),
+                tokenAttributes,
+                refreshTokenExpiryTime
+        );
+
+        AppToken accessToken = AppToken.builder()
+                .token(accessTokenString)
+                .expiryTimeInMinutes(accessTokenExpiryTime)
+                .build();
+
+        AppToken refreshToken = AppToken.builder()
+                .token(refreshTokenString)
+                .expiryTimeInMinutes(refreshTokenExpiryTime)
+                .build();
+
+        CustomerToken customerToken = CustomerToken.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+
+        PortalUserModel portalUserModel = PortalUserModel.builder()
+                .fullName(user.getFirstName() + " " + user.getLastName())
+                .email(user.getEmail())
+                .requirePasswordChange(user.isRequiresPasswordChange())
+                .twoFAEnabled(user.isTwoFAEnabled())
+                .twoFAMethod(user.getTwoFAMethod())
+                .roles(
+                        user.getRoles().stream()
+                                .map(RoleEntity::getRoleName)
+                                .collect(Collectors.toList())
+                )
+                .build();
+
+        LoginResponse response = new LoginResponse();
+
+        if (!user.isRequiresPasswordChange()) {
+            response.setUserToken(customerToken);
+        }
+
+        response.setUser(portalUserModel);
+
+        log.info("User logged in successfully: {}", user.getEmail());
+
+        return response;
+    }
+
+    @Override
+    public LoginResponse changePasswordOnLogin(String sessionId, String newPassword) {
+        SessionDataEntity sd = sessionDataEntityDao
+                .findBySessionIdAndType(sessionId, SessionDataTypeConstant.WEB_LOGIN)
+                .orElseThrow(() -> new BadRequestException("Invalid or expired session"));
+
+        String payload = sd.getPayload();
+        LoginPasswordSD loginPasswordSD = gson.fromJson(sd.getPayload(), LoginPasswordSD.class);
+        if (!loginPasswordSD.isVerified()) {
+            throw new BadRequestException("2FA verification is required before changing password");
+        }
+
+        if (!loginPasswordSD.isEligibleForPasswordReset()) {
+            throw new BadRequestException("Password change not required!");
+        }
+
+        AppUserEntity user = appUserEntityDao.findById(loginPasswordSD.getUserId())
+                .orElseThrow(() -> new BadRequestException("User not found"));
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setRequiresPasswordChange(false);
+        appUserEntityDao.saveRecord(user);
+
+        return buildUserLoginDetails(user);
+
     }
 
 }

@@ -7,21 +7,21 @@ import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
+import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoFiatRateResponse;
 import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +102,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
         try {
             CryptoCurrencyTypeConstant cryptoCurrencyTypeConstant;
             try {
-                cryptoCurrencyTypeConstant = CryptoCurrencyTypeConstant.valueOf(cryptoCurrency.toUpperCase());
+                cryptoCurrencyTypeConstant = CryptoCurrencyTypeConstant.valueOf(cryptoCurrency);
             } catch (IllegalArgumentException e) {
                 throw new BadRequestException("Unsupported crypto currency type: " + cryptoCurrency);
             }
@@ -116,13 +116,18 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 throw new BadRequestException("Failed to retrieve rates");
             }
 
-            CryptoFiatRateResponse[] rates = objectMapper.convertValue(
-                    response.getResponseObject(),
-                    CryptoFiatRateResponse[].class
-            );
+            String responseBody = response.getResponseBody();
+            System.out.println(responseBody);
+            ApiResponseJSON<List<CryptoFiatRateResponse>> apiResponseJSON =
+                    objectMapper.readValue(
+                            responseBody,
+                            new TypeReference<ApiResponseJSON<List<CryptoFiatRateResponse>>>() {}
+                    );
 
-            log.info("Successfully retrieved {} rates for {}", rates.length, cryptoCurrencyTypeConstant);
-            return Arrays.asList(rates);
+            List<CryptoFiatRateResponse> rates = apiResponseJSON.getData();
+
+            log.info("Successfully retrieved {} rates for {}", rates.size(), cryptoCurrencyTypeConstant);
+            return rates;
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
