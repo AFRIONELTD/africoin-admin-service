@@ -85,13 +85,14 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 throw new BadRequestException("Merchant not found");
             }
 
-            AdminMerchantResponse merchantResponse = objectMapper.convertValue(
-                    response.getResponseObject(),
-                    AdminMerchantResponse.class
+            ApiResponseJSON<AdminMerchantResponse> merchantResponse = objectMapper.readValue(
+                    response.getResponseBody(),
+                    new TypeReference<ApiResponseJSON<AdminMerchantResponse>>() {}
             );
 
+
             log.info("Successfully retrieved merchant: {}", merchantId);
-            return merchantResponse;
+            return merchantResponse.getData();
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
