@@ -67,14 +67,9 @@ public class RateController {
         @PositiveOrZero(message = "Markup must be zero or positive")
         BigDecimal markup;
 
-        public ExchangeRateUpdateRequest toRequest(String cryptoCurrency) {
-            CryptoCurrencyTypeConstant currencyTypeConstant;
-            try {
-                currencyTypeConstant = CryptoCurrencyTypeConstant.valueOf(cryptoCurrency);
-            } catch (Exception e) {
-                throw new BadRequestException("Unsupported crypto currency type " + cryptoCurrency);
-            }
-            return new ExchangeRateUpdateRequest(currencyTypeConstant,
+        public ExchangeRateUpdateRequest toRequest() {
+
+            return new ExchangeRateUpdateRequest(
                     CurrencyTypeConstant.valueOf(fiatCurrency),
                     newRate,
                     markup);

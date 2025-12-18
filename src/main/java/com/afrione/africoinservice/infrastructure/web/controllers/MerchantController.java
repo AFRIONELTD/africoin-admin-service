@@ -6,6 +6,7 @@ import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
+import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
@@ -19,6 +20,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -85,8 +87,6 @@ public class MerchantController {
     public static class KycApprovalRequestJSON {
         private boolean approved;
         private boolean director;
-
-        @NotBlank(message = "Comment cannot be empty")
         private String comment;
 
         @NotBlank(message = "File ID cannot be empty")
@@ -96,6 +96,9 @@ public class MerchantController {
         private String merchantId;
 
         public KycApprovalRequest toRequest() {
+            if(!approved && StringUtils.isBlank(comment)){
+                throw new BadRequestException("Comment is required when declining a document");
+            }
             return KycApprovalRequest.builder()
                     .approved(approved)
                     .comment(comment)
