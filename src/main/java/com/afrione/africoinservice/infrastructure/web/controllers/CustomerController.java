@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/customer/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/customer/", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
 @RestController
 @Validated
 @Slf4j

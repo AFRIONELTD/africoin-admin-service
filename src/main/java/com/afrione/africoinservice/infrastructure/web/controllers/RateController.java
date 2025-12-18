@@ -31,7 +31,7 @@ import java.util.List;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/rate", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/rate", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
 @RestController
 @Validated
 public class RateController {

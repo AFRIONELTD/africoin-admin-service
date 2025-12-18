@@ -40,18 +40,15 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
 
 
     @Override
-    public void updateRates(List<ExchangeRateUpdateRequest> requests, Long accountId) {
+    public void updateRates(List<ExchangeRateUpdateRequest> requests, String cryptoCurrency, Long accountId) {
         try {
             if (requests == null || requests.isEmpty()) {
                 throw new BadRequestException("At least one exchange rate update is required");
             }
 
-            String url = String.format("%s/api/admin/v1/update-exchange-rate/update", applicationProperty.merchantServiceUrl());
+            String url = String.format("%s/api/admin/v1/update-exchange-rate/" + cryptoCurrency, applicationProperty.merchantServiceUrl());
 
             String requestPayload = objectMapper.writeValueAsString(requests);
-
-            Map<String, String> headers = new HashMap<>();
-
 
             log.info("Sending exchange rate update request for {} currency pairs", requests.size());
 

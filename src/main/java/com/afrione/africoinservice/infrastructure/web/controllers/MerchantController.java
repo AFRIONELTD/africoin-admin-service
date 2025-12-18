@@ -38,7 +38,7 @@ import com.afrione.africoinservice.usecases.data.request.KycApprovalRequest;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/merchant/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/merchant/", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
 @RestController
 @Validated
 @Slf4j

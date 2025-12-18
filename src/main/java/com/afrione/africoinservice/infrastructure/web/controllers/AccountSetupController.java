@@ -27,7 +27,7 @@ import java.util.Set;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/account-setup/", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/account-setup/", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
 @RestController
 @Validated
 public class AccountSetupController {

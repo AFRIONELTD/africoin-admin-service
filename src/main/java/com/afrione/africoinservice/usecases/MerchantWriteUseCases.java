@@ -15,7 +15,7 @@ import java.util.List;
  */
 public interface MerchantWriteUseCases {
 
-    void updateRates(List<ExchangeRateUpdateRequest> list, Long accountId);
+    void updateRates(List<ExchangeRateUpdateRequest> list, String cryptoCurrency, Long accountId);
 
     void approveOrDeclineMerchantDocument(KycApprovalRequest request, Long accountId);
 }
