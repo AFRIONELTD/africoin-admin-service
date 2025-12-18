@@ -9,16 +9,12 @@ import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.request.KycApprovalRequest;
-import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -98,24 +94,14 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
         }
     }
 
-    private boolean isSuccessful(HttpStatusCode statusCode) {
-        return statusCode != null && statusCode.is2xxSuccessful();
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
 
-    private Map<String, String> generateHeader(String adminUser) {
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
-        attributes.put("accountType", "merchant_user");
-        attributes.put("merchantUserId", adminUser);
-        attributes.put("merchantId", adminUser);
-
-        String token = jwtService.expiringToken(applicationProperty.getMerchantTokenSecretKey(), attributes, 3);
-
-        Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + token);
-        headers.put("x-request-client-key", applicationProperty.getB2BRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
+    @Override
+    public JWTService getJwtService() {
+        return jwtService;
     }
 
     private String getAdminUsername(Long accountId) {

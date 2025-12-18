@@ -6,6 +6,6 @@ import com.afrione.africoinservice.usecases.data.response.customer.UserDocReview
  * Created by felixadewale on
  * 15/12/2025
  */
-public interface CustomerWriteUseCases {
+public interface CustomerWriteUseCases extends ExternalRequestUseCases {
     void reviewUserDocument(UserDocReviewRequest request, Long accountId);
 }

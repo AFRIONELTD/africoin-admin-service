@@ -16,7 +16,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -122,7 +121,4 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         return headers;
     }
 
-    private boolean isSuccessful(HttpStatusCode statusCode) {
-        return statusCode != null && statusCode.is2xxSuccessful();
-    }
 }

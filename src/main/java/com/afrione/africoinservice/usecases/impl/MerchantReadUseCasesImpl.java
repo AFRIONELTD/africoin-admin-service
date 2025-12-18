@@ -157,10 +157,6 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
         return headers;
     }
 
-    private boolean isSuccessful(HttpStatusCode statusCode) {
-        return statusCode != null && statusCode.is2xxSuccessful();
-    }
-
     private String getAdminUsername(Long accountId) {
         AppUserEntity user = appUserEntityDao.findById(accountId)
                 .orElseThrow(() -> new BadRequestException("Admin user not found for account: " + accountId));

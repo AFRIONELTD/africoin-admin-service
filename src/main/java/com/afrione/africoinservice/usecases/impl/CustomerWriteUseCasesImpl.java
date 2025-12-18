@@ -67,10 +67,6 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
         }
     }
 
-    private boolean isSuccessful(HttpStatusCode statusCode) {
-        return statusCode != null && statusCode.is2xxSuccessful();
-    }
-
 
     private String getAdminUsername(Long accountId) {
         AppUserEntity user = appUserEntityDao.findById(accountId)
