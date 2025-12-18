@@ -8,6 +8,7 @@ import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.domain.entities.SessionDataEntity;
 import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
 import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
+import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.usecases.AccountSetupUseCases;
 import com.afrione.africoinservice.usecases.data.request.AccountSetupRequest;
 import com.afrione.africoinservice.usecases.data.request.ForgotPasswordSD;
@@ -46,6 +47,7 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
     private final PasswordEncoder passwordEncoder;
     private final RoleEntityDao rolesDao;
     private final SessionDataEntityDao sessionDataEntityDao;
+    private final SequenceGenerator sequenceGenerator;
     private final Gson gson = new Gson();
 
     @Override
@@ -96,13 +98,14 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         sessionDataEntity.setSessionId(sessionDataEntityDao.generateSessionId());
         sessionDataEntity.setSessionDataType(SessionDataTypeConstant.FORGOT_PASSWORD.name());
         sessionDataEntity.setExpiryTime(LocalDateTime.now().plusSeconds(exp));
-
+        String generatedCode = sequenceGenerator.generateCode(6);
         ForgotPasswordSD forgotPasswordSD = new ForgotPasswordSD();
-        forgotPasswordSD.setEncryptedToken(passwordEncoder.encode("123456"));
+        forgotPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode));
         forgotPasswordSD.setUserId(appUserEntity.getId());
         forgotPasswordSD.setExpiryInSeconds(exp);
         sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
         sessionDataEntityDao.saveRecord(sessionDataEntity);
+        //publish the generated code to user's email address
         return new ForgotPasswordResponse(sessionDataEntity.getSessionId(), exp);
     }
 

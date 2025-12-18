@@ -10,11 +10,15 @@ import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 @Slf4j
 @Service
 public class SequenceGeneratorImpl implements SequenceGenerator {
+
+    private static final AtomicLong SEQ = new AtomicLong(123456);
+
 
     private static final int NODE_ID_BITS = 10;
     private static final int SEQUENCE_BITS = 12;
@@ -50,9 +54,11 @@ public class SequenceGeneratorImpl implements SequenceGenerator {
     @Override
     public String generateCode(int size) {
 
-        if(!applicationProperty.isProductionEnvironment()) {
-            return "123456";
+        if (!applicationProperty.isProductionEnvironment()) {
+            long next = SEQ.getAndIncrement();
+            return String.format("%0" + size + "d", next);
         }
+
         return RandomStringUtils.randomNumeric(size);
     }
 

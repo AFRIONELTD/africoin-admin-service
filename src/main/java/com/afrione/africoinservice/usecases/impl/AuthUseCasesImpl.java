@@ -9,6 +9,7 @@ import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
 import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
+import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.usecases.AuthUseCases;
 import com.afrione.africoinservice.usecases.data.request.LoginPasswordSD;
 import com.afrione.africoinservice.usecases.data.request.LoginRequest;
@@ -51,6 +52,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
     private final PasswordEncoder passwordEncoder;
     private final SessionDataEntityDao sessionDataEntityDao;
     private final Gson gson;
+    private final SequenceGenerator sequenceGenerator;
 
     private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
 
@@ -83,9 +85,11 @@ public class AuthUseCasesImpl implements AuthUseCases {
                 throw new UnauthorisedAccessException("Invalid email or password. Remaining attempts: " + remainingAttempts);
             }
 
+            String generatedCode = sequenceGenerator.generateCode(6);
+
             LoginPasswordSD loginPasswordSD = new LoginPasswordSD();
             loginPasswordSD.setUserId(user.getId());
-            loginPasswordSD.setEncryptedToken(passwordEncoder.encode("123456")); //to be changed
+            loginPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode)); //to be changed
 
             SessionDataEntity sessionDataEntity = new SessionDataEntity();
             sessionDataEntity.setSessionId(sessionDataEntityDao.generateSessionId());
@@ -97,6 +101,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
 
         } finally {
             appUserEntityDao.saveRecord(user);
+            //publish the generated code to user's 2FA method
         }
     }
 
