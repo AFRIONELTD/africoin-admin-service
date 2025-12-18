@@ -6,11 +6,13 @@ import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
+import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.customer.AppUserModel;
 import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,13 +51,15 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
                 throw new BadRequestException("Merchant not found");
             }
 
-            PagedResponse<AppUserModel> pagedResponse = objectMapper.convertValue(
-                    response.getResponseObject(),
-                    objectMapper.getTypeFactory().constructParametricType(PagedResponse.class, AppUserModel.class)
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+            ApiResponseJSON<PagedResponse<AppUserModel>> apiResponseJSON = objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<PagedResponse<AppUserModel>>>() {
+                    }
             );
-
             log.info("Successfully retrieved customers");
-            return pagedResponse;
+            return apiResponseJSON.getData();
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -67,7 +71,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     @Override
     public AppUserModel getAppUser(String userId, Long accountId) {
         try {
-            String url = String.format("%s/api/v1/admin/verification/users/%s", applicationProperty.customerServiceUrl(), userId);
+            String url = String.format("%s/api/v1/admin/verification/user/%s", applicationProperty.customerServiceUrl(), userId);
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
@@ -76,13 +80,16 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
                 throw new BadRequestException("Merchant not found");
             }
 
-            AppUserModel appUserModel = objectMapper.convertValue(
-                    response.getResponseObject(),
-                    AppUserModel.class
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+            ApiResponseJSON<AppUserModel> apiResponseJSON = objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<AppUserModel>>() {
+                    }
             );
 
             log.info("Successfully retrieved customer: {}", userId);
-            return appUserModel;
+            return apiResponseJSON.getData();
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -106,7 +113,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         attributes.put("userId", adminUser);
         attributes.put("accountId", adminUser);
 
-        String token = jwtService.expiringToken(applicationProperty.geCustomerTokenSecretKey(), attributes, 3);
+        String token = adminUser+applicationProperty.getClientTokenSecretKey();
 
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", "Bearer " + token);
