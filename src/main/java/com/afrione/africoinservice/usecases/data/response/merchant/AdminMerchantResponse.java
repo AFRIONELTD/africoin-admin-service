@@ -25,8 +25,7 @@ public class AdminMerchantResponse {
     private FileModel statusReport;
     private FileModel moA;
     private DirectorDetailResponse director;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ssXXX")
-    LocalDateTime dateJoined;
+    String dateJoined;
 
     public enum DetailLevel {BASIC, FULL}
 
