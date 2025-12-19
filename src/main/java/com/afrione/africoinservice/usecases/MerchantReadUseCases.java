@@ -2,7 +2,7 @@ package com.afrione.africoinservice.usecases;
 
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
-import com.afrione.africoinservice.usecases.data.response.merchant.CryptoFiatRateResponse;
+import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 
 import java.util.List;
 
@@ -13,5 +13,5 @@ import java.util.List;
 public interface MerchantReadUseCases extends ExternalRequestUseCases {
     PagedResponse<AdminMerchantResponse> retrieveMerchants(int pageNo, int pageSize, Long accountId);
     AdminMerchantResponse retrieveMerchant(String merchantId, AdminMerchantResponse.DetailLevel detailLevel, Long accountId);
-    List<CryptoFiatRateResponse> retrieveRate(String cryptoCurrency, Long accountId);
+    List<CryptoRateResponse> retrieveRate(Long accountId);
 }

@@ -11,14 +11,13 @@ import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
-import com.afrione.africoinservice.usecases.data.response.merchant.CryptoFiatRateResponse;
+import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
@@ -102,40 +101,33 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     }
 
     @Override
-    public List<CryptoFiatRateResponse> retrieveRate(String cryptoCurrency, Long accountId) {
+    public List<CryptoRateResponse> retrieveRate(Long accountId) {
         try {
-            CryptoCurrencyTypeConstant cryptoCurrencyTypeConstant;
-            try {
-                cryptoCurrencyTypeConstant = CryptoCurrencyTypeConstant.valueOf(cryptoCurrency);
-            } catch (IllegalArgumentException e) {
-                throw new BadRequestException("Unsupported crypto currency type: " + cryptoCurrency);
-            }
-
-            String url = String.format("%s/api/admin/v1/retrieve-rate/%s", applicationProperty.merchantServiceUrl(), cryptoCurrencyTypeConstant.name());
+            String url = String.format("%s/api/admin/v1/retrieve-rates", applicationProperty.merchantServiceUrl());
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("Failed to retrieve rates for {} from service. Status: {}", cryptoCurrencyTypeConstant, response.getStatusCode());
+                log.warn("Failed to retrieve rates from service. Status: {}", response.getStatusCode());
                 throw new BadRequestException("Failed to retrieve rates");
             }
 
             String responseBody = response.getResponseBody();
             System.out.println(responseBody);
-            ApiResponseJSON<List<CryptoFiatRateResponse>> apiResponseJSON =
+            ApiResponseJSON<List<CryptoRateResponse>> apiResponseJSON =
                     objectMapper.readValue(
                             responseBody,
-                            new TypeReference<ApiResponseJSON<List<CryptoFiatRateResponse>>>() {}
+                            new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {}
                     );
 
-            List<CryptoFiatRateResponse> rates = apiResponseJSON.getData();
+            List<CryptoRateResponse> rates = apiResponseJSON.getData();
 
-            log.info("Successfully retrieved {} rates for {}", rates.size(), cryptoCurrencyTypeConstant);
+            log.info("Successfully retrieved rates for {}", rates.size());
             return rates;
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Error retrieving rates for: {}", cryptoCurrency, e);
+            log.error("Error retrieving rates for", e);
             throw new BadRequestException("Error retrieving rates: " + e.getMessage());
         }
     }

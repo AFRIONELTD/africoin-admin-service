@@ -1,14 +1,12 @@
 package com.afrione.africoinservice.infrastructure.web.controllers;
 
-import com.afrione.africoinservice.domain.entities.enums.CryptoCurrencyTypeConstant;
 import com.afrione.africoinservice.domain.entities.enums.CurrencyTypeConstant;
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
-import com.afrione.africoinservice.usecases.data.response.merchant.CryptoFiatRateResponse;
-import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
@@ -39,9 +37,9 @@ public class RateController {
     private final MerchantWriteUseCases merchantWriteUseCases;
     private final MerchantReadUseCases merchantReadUseCases;
 
-    @GetMapping(value = "{cryptoCurrency}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ApiResponseJSON<List<CryptoFiatRateResponse>> retrieveRate(@PathVariable @Pattern(regexp = "AFRi_TRC20|AFRi_ERC20") String cryptoCurrency, @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
-        List<CryptoFiatRateResponse> response = merchantReadUseCases.retrieveRate(cryptoCurrency, authenticatedUser.getAccountId());
+    @GetMapping(value = "retrieve", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResponseJSON<List<CryptoRateResponse>> retrieveRate(@Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        List<CryptoRateResponse> response = merchantReadUseCases.retrieveRate(authenticatedUser.getAccountId());
         return new ApiResponseJSON<>("Data fetched successfully", response);
     }
 

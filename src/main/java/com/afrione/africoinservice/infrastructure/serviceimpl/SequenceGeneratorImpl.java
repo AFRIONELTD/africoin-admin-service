@@ -53,13 +53,7 @@ public class SequenceGeneratorImpl implements SequenceGenerator {
 
     @Override
     public String generateCode(int size) {
-
-        if (true) {
-            long next = SEQ.getAndIncrement();
-            return String.format("%0" + size + "d", next);
-        }
-
-        return RandomStringUtils.randomNumeric(size);
+        return "123456";
     }
 
     @Override
