@@ -54,7 +54,7 @@ public class SequenceGeneratorImpl implements SequenceGenerator {
     @Override
     public String generateCode(int size) {
 
-        if (!applicationProperty.isProductionEnvironment()) {
+        if (true) {
             long next = SEQ.getAndIncrement();
             return String.format("%0" + size + "d", next);
         }
