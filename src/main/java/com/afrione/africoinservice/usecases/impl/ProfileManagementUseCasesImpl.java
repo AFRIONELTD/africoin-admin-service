@@ -1,7 +1,6 @@
 package com.afrione.africoinservice.usecases.impl;
 
 import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
-import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.usecases.ProfileManagementUseCases;
 import com.afrione.africoinservice.usecases.exceptions.UnauthorisedAccessException;

@@ -3,6 +3,7 @@ package com.afrione.africoinservice.usecases;
 import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.request.Toggle2FARequest;
+import com.afrione.africoinservice.usecases.data.response.login.LoginInitiationResponse;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
 import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse;
 
@@ -11,11 +12,12 @@ import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse
  * 08/12/2025
  */
 public interface AuthUseCases {
-    String login(LoginRequest request);
+    LoginInitiationResponse login(LoginRequest request);
     void changePassword(ChangePasswordRequest request, Long userId);
     Toggle2FAResponse enable2FA(Toggle2FARequest request, Long userId);
     Toggle2FAResponse disable2FA(Long userId);
     LoginResponse completeLogin(String sessionId, String token);
 
     LoginResponse changePasswordOnLogin(String sessionId, String newPassword);
+    LoginInitiationResponse resendToken(String sessionId);
 }

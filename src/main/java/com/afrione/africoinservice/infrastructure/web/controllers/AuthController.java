@@ -6,6 +6,7 @@ import com.afrione.africoinservice.usecases.AuthUseCases;
 import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.request.Toggle2FARequest;
+import com.afrione.africoinservice.usecases.data.response.login.LoginInitiationResponse;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
 import com.afrione.africoinservice.usecases.models.admin.PortalUserModel;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,9 +38,9 @@ public class AuthController {
     private final AuthUseCases authUseCases;
 
     @PostMapping("login")
-    public ApiResponseJSON<String> login(@RequestBody @Valid LoginRequestJSON request) {
-        String sessionId = authUseCases.login(request.toRequest());
-        return new ApiResponseJSON<>("Login initiated successfully. Input your 2FA token to continue", sessionId);
+    public ApiResponseJSON<LoginInitiationResponse> login(@RequestBody @Valid LoginRequestJSON request) {
+        LoginInitiationResponse response = authUseCases.login(request.toRequest());
+        return new ApiResponseJSON<>("Login initiated successfully. Input your 2FA token to continue", response);
     }
 
     @PostMapping("login/2fa")
@@ -53,6 +54,12 @@ public class AuthController {
     public ApiResponseJSON<LoginResponse> login(@RequestHeader String sessionId, @RequestBody @Valid ChangePasswordOnLoginRequestJSON requestJSON) {
         LoginResponse response = authUseCases.changePasswordOnLogin(sessionId, requestJSON.newPassword);
         return new ApiResponseJSON<>("Password change successful", response);
+    }
+
+    @PostMapping("login/resend-token")
+    public ApiResponseJSON<LoginInitiationResponse> resendToken(@RequestHeader String sessionId) {
+        LoginInitiationResponse response = authUseCases.resendToken(sessionId);
+        return new ApiResponseJSON<>("Token resent successfully", response);
     }
 
     @PostMapping("change-password")

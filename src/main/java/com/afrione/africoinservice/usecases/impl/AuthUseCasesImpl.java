@@ -15,6 +15,7 @@ import com.afrione.africoinservice.usecases.data.request.LoginPasswordSD;
 import com.afrione.africoinservice.usecases.data.request.LoginRequest;
 import com.afrione.africoinservice.usecases.data.request.ChangePasswordRequest;
 import com.afrione.africoinservice.usecases.data.response.auth.Toggle2FAResponse;
+import com.afrione.africoinservice.usecases.data.response.login.LoginInitiationResponse;
 import com.afrione.africoinservice.usecases.data.response.login.LoginResponse;
 import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.data.value_objects.AppToken;
@@ -29,9 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -57,7 +60,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
     private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
 
     @Override
-    public String login(LoginRequest request) {
+    public LoginInitiationResponse login(LoginRequest request) {
         AppUserEntity user = appUserEntityDao.findRecordByEmail(request.getEmail())
                 .orElseThrow(() -> {
                     log.warn("Login attempt with non-existent email: {}", request.getEmail());
@@ -97,7 +100,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
             sessionDataEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
             sessionDataEntity.setPayload(gson.toJson(loginPasswordSD));
             sessionDataEntityDao.saveRecord(sessionDataEntity);
-            return sessionDataEntity.getSessionId();
+            return new LoginInitiationResponse(sessionDataEntity.getSessionId(), Math.abs(Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
 
         } finally {
             appUserEntityDao.saveRecord(user);
@@ -331,7 +334,6 @@ public class AuthUseCasesImpl implements AuthUseCases {
                 .findBySessionIdAndType(sessionId, SessionDataTypeConstant.WEB_LOGIN)
                 .orElseThrow(() -> new BadRequestException("Invalid or expired session"));
 
-        String payload = sd.getPayload();
         LoginPasswordSD loginPasswordSD = gson.fromJson(sd.getPayload(), LoginPasswordSD.class);
         if (!loginPasswordSD.isVerified()) {
             throw new BadRequestException("2FA verification is required before changing password");
@@ -349,6 +351,22 @@ public class AuthUseCasesImpl implements AuthUseCases {
 
         return buildUserLoginDetails(user);
 
+    }
+
+    @Override
+    public LoginInitiationResponse resendToken(String sessionId) {
+        SessionDataEntity sessionDataEntity = sessionDataEntityDao.findBySessionIdAndType(sessionId, SessionDataTypeConstant.WEB_LOGIN)
+                .orElseThrow(() -> new BadRequestException("Invalid or expired session"));
+        String payload = sessionDataEntity.getPayload();
+        LoginPasswordSD loginPasswordSD = gson.fromJson(payload, LoginPasswordSD.class);
+        String generatedCode = sequenceGenerator.generateCode(6);
+        loginPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode));
+        loginPasswordSD.setTokenTrial(0);
+        sessionDataEntity.setPayload(gson.toJson(loginPasswordSD));
+        sessionDataEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
+        sessionDataEntityDao.saveRecord(sessionDataEntity);
+        //publish the generated code to user's 2FA method
+        return new LoginInitiationResponse(sessionDataEntity.getSessionId(), Math.abs(Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
     }
 
 }

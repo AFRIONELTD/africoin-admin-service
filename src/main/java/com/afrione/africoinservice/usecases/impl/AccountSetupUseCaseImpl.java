@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +142,18 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         }, () -> {
             throw new BadRequestException("Invalid session ID");
         });
+    }
+
+    @Override
+    public ForgotPasswordResponse resendToken(String sessionId) {
+        SessionDataEntity sessionDataEntity = sessionDataEntityDao.findBySessionIdAndType(sessionId, SessionDataTypeConstant.FORGOT_PASSWORD).orElseThrow(() -> new BadRequestException("Invalid session ID"));
+        ForgotPasswordSD forgotPasswordSD = gson.fromJson(sessionDataEntity.getPayload(), ForgotPasswordSD.class);
+        String generatedCode = sequenceGenerator.generateCode(6);
+        forgotPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode));
+        sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
+        sessionDataEntityDao.saveRecord(sessionDataEntity);
+
+        return new ForgotPasswordResponse(sessionDataEntity.getSessionId(), Math.abs((int) Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
     }
 
 }

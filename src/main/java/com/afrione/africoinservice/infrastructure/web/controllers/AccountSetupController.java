@@ -27,14 +27,14 @@ import java.util.Set;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/account-setup/", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
+@RequestMapping(value = "/api/v1/account-setup/", produces = MediaType.APPLICATION_JSON_VALUE)
 @RestController
 @Validated
 public class AccountSetupController {
 
     private final AccountSetupUseCases accountSetupUseCases;
 
-    @PostMapping("setup-account")
+    @PostMapping(value = "setup-account", headers = {"Authorization"})
     public ApiResponseJSON<AccountSetupResponse> setupAccount(@RequestBody @Valid AccountSetupRequestJSON request, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
         AccountSetupResponse accountSetupResponse = accountSetupUseCases.setupAccount(request.toRequest(), authenticatedUser.getUserId());
         return new ApiResponseJSON<>("Account setup successful", accountSetupResponse);
@@ -50,6 +50,12 @@ public class AccountSetupController {
     public ApiResponseJSON<ForgotPasswordResponse> finaliseForgotPassword(@RequestBody @Valid ForgotPasswordRequest forgotPasswordRequest, @PathVariable String sessionId) {
         accountSetupUseCases.finaliseForgotPassword(sessionId, forgotPasswordRequest.otp, forgotPasswordRequest.newPassword);
         return new ApiResponseJSON<>("Password changed successfully");
+    }
+
+    @PostMapping("forgot-password/resend-token/{sessionId}")
+    public ApiResponseJSON<ForgotPasswordResponse> resendToken(@PathVariable String sessionId) {
+        ForgotPasswordResponse response =  accountSetupUseCases.resendToken(sessionId);
+        return new ApiResponseJSON<>("Token resent successfully", response);
     }
 
 
