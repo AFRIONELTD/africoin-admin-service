@@ -19,6 +19,7 @@ public class AppUserModel {
     String gender;
     String phoneNumber;
     String dateOfBirth;
+    String dateJoined;
     boolean passwordUpdateRequired;
     String verificationStatus;
     List<FileModel> files;
