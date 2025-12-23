@@ -10,4 +10,5 @@ import lombok.Data;
 public class LoginResponse {
     private CustomerToken userToken;
     private PortalUserModel user;
+    private String changePasswordSessionId;
 }
