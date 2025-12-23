@@ -59,7 +59,7 @@ public class AppUserEntity extends AbstractBaseEntity<Long> {
 
     @Builder.Default
     @Column(name = "two_fa_enabled")
-    private boolean twoFAEnabled = false;
+    private boolean twoFAEnabled = true;
 
     @Builder.Default
     @Column(name = "two_fa_method")
