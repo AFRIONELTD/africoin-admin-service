@@ -34,7 +34,6 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -227,7 +226,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
             user = appUserEntityDao.findById(loginPasswordSD.getUserId())
                     .orElseThrow(() -> new BadRequestException("User not found"));
 
-            return buildUserLoginDetails(user, sessionId);
+            return buildUserLoginDetails(user);
 
         } finally {
 
@@ -243,7 +242,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
         }
     }
 
-    private LoginResponse buildUserLoginDetails(AppUserEntity user, String sessionId) {
+    private LoginResponse buildUserLoginDetails(AppUserEntity user) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginAt(OffsetDateTime.now());
 
@@ -317,11 +316,8 @@ public class AuthUseCasesImpl implements AuthUseCases {
 
         LoginResponse response = new LoginResponse();
 
-        if (user.isRequiresPasswordChange()) {
-            response.setChangePasswordSessionId(sessionId);
-        } else {
+        if (!user.isRequiresPasswordChange()) {
             response.setUserToken(customerToken);
-
         }
 
         response.setUser(portalUserModel);
@@ -352,7 +348,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
         user.setRequiresPasswordChange(false);
         appUserEntityDao.saveRecord(user);
 
-        return buildUserLoginDetails(user, sessionId);
+        return buildUserLoginDetails(user);
 
     }
 
