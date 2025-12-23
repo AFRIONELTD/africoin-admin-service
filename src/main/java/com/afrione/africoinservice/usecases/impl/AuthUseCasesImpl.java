@@ -243,7 +243,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
         }
     }
 
-    private LoginResponse buildUserLoginDetails(AppUserEntity user) {
+    private LoginResponse buildUserLoginDetails(AppUserEntity user, String sessionId) {
         user.setFailedLoginAttempts(0);
         user.setLastLoginAt(OffsetDateTime.now());
 
