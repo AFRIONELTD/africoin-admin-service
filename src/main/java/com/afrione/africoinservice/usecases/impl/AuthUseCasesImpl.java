@@ -227,7 +227,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
             user = appUserEntityDao.findById(loginPasswordSD.getUserId())
                     .orElseThrow(() -> new BadRequestException("User not found"));
 
-            return buildUserLoginDetails(user);
+            return buildUserLoginDetails(user, sessionId);
 
         } finally {
 
@@ -317,8 +317,11 @@ public class AuthUseCasesImpl implements AuthUseCases {
 
         LoginResponse response = new LoginResponse();
 
-        if (!user.isRequiresPasswordChange()) {
+        if (user.isRequiresPasswordChange()) {
+            setChangePasswordSessionId(sessionId);
+        } else {
             response.setUserToken(customerToken);
+
         }
 
         response.setUser(portalUserModel);
@@ -349,7 +352,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
         user.setRequiresPasswordChange(false);
         appUserEntityDao.saveRecord(user);
 
-        return buildUserLoginDetails(user);
+        return buildUserLoginDetails(user, sessionId);
 
     }
 
