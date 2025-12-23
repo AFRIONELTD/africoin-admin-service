@@ -318,7 +318,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
         LoginResponse response = new LoginResponse();
 
         if (user.isRequiresPasswordChange()) {
-            setChangePasswordSessionId(sessionId);
+            response.setChangePasswordSessionId(sessionId);
         } else {
             response.setUserToken(customerToken);
 
