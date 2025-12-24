@@ -53,7 +53,7 @@ public class MerchantController {
             @RequestParam(required = false) @Pattern(
                     regexp = "^(UNVERIFIED|UPLOAD_IN_PROGRESS|PENDING_VERIFICATION|VERIFIED|REJECTED)$",
                     message = "Invalid verification status"
-            )
+            ) @Parameter(description = "UNVERIFIED|UPLOAD_IN_PROGRESS|PENDING_VERIFICATION|VERIFIED|REJECTED")
             String searchStatus,
             @RequestParam(required = false) String countryCode,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
