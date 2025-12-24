@@ -56,7 +56,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customers service. Status:", response.getStatusCode());
-                throw new BadRequestException("Merchant not found");
+                throw new BadRequestException("Error retrieving users");
             }
 
             String responseBody = response.getResponseBody();
@@ -85,7 +85,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customer service. Status: {}", userId, response.getStatusCode());
-                throw new BadRequestException("Merchant not found");
+                throw new BadRequestException("user not found");
             }
 
             String responseBody = response.getResponseBody();
