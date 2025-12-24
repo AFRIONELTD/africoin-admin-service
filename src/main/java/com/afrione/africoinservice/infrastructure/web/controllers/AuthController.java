@@ -105,9 +105,13 @@ public class AuthController {
         @NotBlank(message = "Current password cannot be empty")
         private String currentPassword;
 
+        @Pattern(regexp = "^[A-Z](?=.*[a-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{7,}$",
+                message = "Password must start with an uppercase letter, be at least 8 characters long, and contain at least one lowercase letter, one digit and one special character.")
         @NotBlank(message = "New password cannot be empty")
         private String newPassword;
 
+        @Pattern(regexp = "^[A-Z](?=.*[a-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{7,}$",
+                message = "Password must start with an uppercase letter, be at least 8 characters long, and contain at least one lowercase letter, one digit and one special character.")
         @NotBlank(message = "Password confirmation cannot be empty")
         private String confirmPassword;
 
@@ -140,8 +144,8 @@ public class AuthController {
     @Data
     public static class ChangePasswordOnLoginRequestJSON{
         @NotBlank(message = "New password cannot be empty")
-        @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
-                 message = "Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")
+        @Pattern(regexp = "^[A-Z](?=.*[a-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{7,}$",
+                 message = "Password must start with an uppercase letter, be at least 8 characters long, and contain at least one lowercase letter, one digit and one special character.")
         String newPassword;
     }
 }
