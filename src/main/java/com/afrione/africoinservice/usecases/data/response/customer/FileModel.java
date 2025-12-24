@@ -15,4 +15,5 @@ public class FileModel {
     private String remoteUrl;
     private String fileType;
     private Long verificationId;
+    private String status;
 }

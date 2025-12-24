@@ -10,7 +10,6 @@ import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.customer.AppUserModel;
-import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -106,16 +105,8 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
 
     private Map<String, String> generateHeader(String adminUser) {
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
-        attributes.put("accountType", "merchant_admin_app");
-        attributes.put("userId", adminUser);
-        attributes.put("accountId", adminUser);
-
-        String token = adminUser+applicationProperty.getClientTokenSecretKey();
-
+        log.info("Generating headers for admin user: {}", adminUser);
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + token);
         headers.put("x-request-client-key", applicationProperty.getB2CRequestClientKey());
         headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         return headers;

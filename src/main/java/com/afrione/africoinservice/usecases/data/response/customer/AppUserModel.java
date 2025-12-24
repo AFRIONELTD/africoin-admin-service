@@ -12,9 +12,9 @@ import java.util.List;
 @Value
 @Builder
 public class AppUserModel {
+    Long id;
     String firstName;
     String lastName;
-    String userId;
     String email;
     String gender;
     String phoneNumber;

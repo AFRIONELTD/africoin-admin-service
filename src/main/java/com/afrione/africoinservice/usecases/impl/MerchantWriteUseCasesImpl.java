@@ -67,7 +67,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
     @Override
     public void approveOrDeclineMerchantDocument(KycApprovalRequest request, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/approve-or-decline-document/kyc/approve-or-decline", applicationProperty.merchantServiceUrl());
+            String url = String.format("%s/api/admin/v1/approve-or-decline-document", applicationProperty.merchantServiceUrl());
 
             String requestPayload = objectMapper.writeValueAsString(request);
 
@@ -97,11 +97,6 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
     @Override
     public ApplicationProperty getApplicationProperty() {
         return applicationProperty;
-    }
-
-    @Override
-    public JWTService getJwtService() {
-        return jwtService;
     }
 
     private String getAdminUsername(Long accountId) {

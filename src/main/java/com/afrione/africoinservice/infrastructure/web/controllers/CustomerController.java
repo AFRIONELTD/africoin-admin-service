@@ -63,8 +63,8 @@ public class CustomerController {
         @NotNull
         @Positive
         Long verificationId;
-        @NotNull @Positive
-        Long userId;
+        @NotBlank
+        String userId;
         String reviewComment;
         @NotNull
         Boolean isApproved;

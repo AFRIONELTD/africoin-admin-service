@@ -1,6 +1,5 @@
 package com.afrione.africoinservice.usecases.data.response.customer;
 
-import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Value;
 
@@ -12,9 +11,8 @@ import lombok.Value;
 @Value
 public class UserDocReviewRequest {
     Long verificationId;
-    Long userId;
+    String userId;
     String reviewComment;
     Boolean isApproved;
-    @Pattern(regexp = "SELFIE|ID")
     String fileType;
 }

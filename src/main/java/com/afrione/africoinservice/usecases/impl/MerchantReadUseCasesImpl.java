@@ -134,16 +134,8 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     
 
     private Map<String, String> generateHeader(String adminUser) {
-        Map<String, String> attributes = new HashMap<>();
-        attributes.put(AppConstant.TOKEN_TYPE, AppConstant.TOKEN_TYPE_ACCESS);
-        attributes.put("accountType", "merchant_user");
-        attributes.put("merchantUserId", adminUser);
-        attributes.put("merchantId", adminUser);
-
-        String token = jwtService.expiringToken(applicationProperty.getMerchantTokenSecretKey(), attributes, 3);
-
+        log.info("Generating headers for admin user: {}", adminUser);
         Map<String, String> headers = new HashMap<>();
-        headers.put("Authorization", "Bearer " + token);
         headers.put("x-request-client-key", applicationProperty.getB2BRequestClientKey());
         headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         return headers;
