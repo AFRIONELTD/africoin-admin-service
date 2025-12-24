@@ -41,7 +41,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     private final AppUserEntityDao appUserEntityDao;
 
     @Override
-    public PagedResponse<AppUserModel> listUsers(String searchTerm, int pageNo, int pageSize, Long accountId) {
+    public PagedResponse<AppUserModel> listUsers(String searchTerm, String searchStatus, int pageNo, int pageSize, Long accountId) {
         try {
             StringBuilder urlBuilder = new StringBuilder(applicationProperty.customerServiceUrl() + "/api/v1/admin/verification/users");
             urlBuilder.append("?pageNo=").append(pageNo)
@@ -50,6 +50,11 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             if (StringUtils.isNotBlank(searchTerm)) {
                 urlBuilder.append("&searchTerm=").append(URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
             }
+
+            if(StringUtils.isNotBlank(searchStatus)){
+                urlBuilder.append("&searchStatus=").append(URLEncoder.encode(searchStatus, StandardCharsets.UTF_8));
+            }
+
             String url = urlBuilder.toString();
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));

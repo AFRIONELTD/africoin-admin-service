@@ -19,7 +19,7 @@ public class ApplicationProperty {
     }
 
     public int getAccessTokenExpiryTimeInMinutes() {
-        return Integer.parseInt(environmentService.getVariable("token.expiry-time-in-minutes.access", "5"));
+        return Integer.parseInt(environmentService.getVariable("token.expiry-time-in-minutes.access", "500"));
     }
 
     public int getRefreshTokenExpiryTimeInMinutes() {
