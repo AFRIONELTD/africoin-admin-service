@@ -26,6 +26,7 @@ public class AdminMerchantResponse {
     private FileModel moA;
     private DirectorDetailResponse director;
     String dateJoined;
+    String country;
 
     public enum DetailLevel {BASIC, FULL}
 
