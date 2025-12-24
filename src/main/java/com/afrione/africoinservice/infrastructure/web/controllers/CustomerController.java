@@ -36,10 +36,11 @@ public class CustomerController {
 
 
     @GetMapping("/users")
-    public ApiResponseJSON<PagedResponse<AppUserModel>> getAppUsers(@RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
+    public ApiResponseJSON<PagedResponse<AppUserModel>> getAppUsers(@RequestParam(required = false) String searchTerm,
+                                                                    @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
                                                                     @RequestParam(defaultValue = "10") @Max(value = 50, message = "Max page size is 50") @Positive int pageSize, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
 
-        PagedResponse<AppUserModel> pagedResponse = readUseCases.listUsers(pageNo, pageSize, authenticatedUser.getAccountId());
+        PagedResponse<AppUserModel> pagedResponse = readUseCases.listUsers(searchTerm, pageNo, pageSize, authenticatedUser.getAccountId());
         return new ApiResponseJSON<>("Users fetched successfully", pagedResponse);
 
     }
@@ -82,8 +83,6 @@ public class CustomerController {
                     .build();
         }
     }
-
-
 
 
 }

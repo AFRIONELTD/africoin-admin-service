@@ -38,7 +38,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     private final AppUserEntityDao appUserEntityDao;
 
     @Override
-    public PagedResponse<AppUserModel> listUsers(int pageNo, int pageSize, Long accountId) {
+    public PagedResponse<AppUserModel> listUsers(String searchTerm, int pageNo, int pageSize, Long accountId) {
         try {
             String url = String.format("%s/api/v1/admin/verification/users", applicationProperty.customerServiceUrl());
 

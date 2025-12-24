@@ -11,7 +11,7 @@ import java.util.List;
  * 10/12/2025
  */
 public interface MerchantReadUseCases extends ExternalRequestUseCases {
-    PagedResponse<AdminMerchantResponse> retrieveMerchants(int pageNo, int pageSize, Long accountId);
+    PagedResponse<AdminMerchantResponse> retrieveMerchants(String searchTerm, String searchStatus, String countryCode, int pageNo, int pageSize, Long accountId);
     AdminMerchantResponse retrieveMerchant(String merchantId, AdminMerchantResponse.DetailLevel detailLevel, Long accountId);
     List<CryptoRateResponse> retrieveRate(Long accountId);
 }

@@ -2,7 +2,6 @@ package com.afrione.africoinservice.usecases.impl;
 
 import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
-import com.afrione.africoinservice.domain.entities.enums.CryptoCurrencyTypeConstant;
 import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
@@ -12,7 +11,6 @@ import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
-import com.afrione.africoinservice.usecases.data.value_objects.AppConstant;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,17 +36,36 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
 
     private final RestClientService restClientService;
     private final ObjectMapper objectMapper;
-    private final JWTService jwtService;
     private final ApplicationProperty applicationProperty;
     private final AppUserEntityDao appUserEntityDao;
 
 
     @Override
-    public PagedResponse<AdminMerchantResponse> retrieveMerchants(int pageNo, int pageSize, Long accountId) {
+    public PagedResponse<AdminMerchantResponse> retrieveMerchants(String searchTerm, String searchStatus, String countryCode, int pageNo, int pageSize, Long accountId) {
         try {
-            String url = String.format("%s/api/admin/v1/retrieve-merchants?pageNo=%d&pageSize=%d", applicationProperty.merchantServiceUrl(), pageNo, pageSize);
 
-            RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
+            StringBuilder url = new StringBuilder(
+                    String.format(
+                            "%s/api/admin/v1/retrieve-merchants?pageNo=%d&pageSize=%d",
+                            applicationProperty.merchantServiceUrl(),
+                            pageNo,
+                            pageSize
+                    )
+            );
+
+            if (searchTerm != null && !searchTerm.isBlank()) {
+                url.append("&searchTerm=").append(URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
+            }
+
+            if (searchStatus != null && !searchStatus.isBlank()) {
+                url.append("&searchStatus=").append(searchStatus);
+            }
+
+            if (countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve merchants from service. Status: {}", response.getStatusCode());
@@ -58,7 +77,8 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
             @SuppressWarnings("unchecked")
             ApiResponseJSON<PagedResponse<AdminMerchantResponse>> apiResponseJSON = objectMapper.readValue(
                     responseBody,
-                    new TypeReference<ApiResponseJSON<PagedResponse<AdminMerchantResponse>>>() {}
+                    new TypeReference<ApiResponseJSON<PagedResponse<AdminMerchantResponse>>>() {
+                    }
             );
 
             PagedResponse<AdminMerchantResponse> pagedResponse = apiResponseJSON.getData();
@@ -86,7 +106,8 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
 
             ApiResponseJSON<AdminMerchantResponse> merchantResponse = objectMapper.readValue(
                     response.getResponseBody(),
-                    new TypeReference<ApiResponseJSON<AdminMerchantResponse>>() {}
+                    new TypeReference<ApiResponseJSON<AdminMerchantResponse>>() {
+                    }
             );
 
 
@@ -117,7 +138,8 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
             ApiResponseJSON<List<CryptoRateResponse>> apiResponseJSON =
                     objectMapper.readValue(
                             responseBody,
-                            new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {}
+                            new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {
+                            }
                     );
 
             List<CryptoRateResponse> rates = apiResponseJSON.getData();
@@ -131,7 +153,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
             throw new BadRequestException("Error retrieving rates: " + e.getMessage());
         }
     }
-    
+
 
     private Map<String, String> generateHeader(String adminUser) {
         log.info("Generating headers for admin user: {}", adminUser);

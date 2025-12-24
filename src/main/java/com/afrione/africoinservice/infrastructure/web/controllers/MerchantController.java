@@ -11,10 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -52,10 +49,17 @@ public class MerchantController {
     @GetMapping(value = "retrieve", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseJSON<PagedResponse<AdminMerchantResponse>> retrieveMerchants(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
+            @RequestParam(required = false) String searchTerm,
+            @RequestParam(required = false) @Pattern(
+                    regexp = "^(UNVERIFIED|UPLOAD_IN_PROGRESS|PENDING_VERIFICATION|VERIFIED|REJECTED)$",
+                    message = "Invalid verification status"
+            )
+            String searchStatus,
+            @RequestParam(required = false) String countryCode,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @Max(value = 50, message = "Max page size is 50") @Positive int pageSize
     ) {
-        PagedResponse<AdminMerchantResponse> response = readUseCases.retrieveMerchants(pageNo, pageSize, authenticatedUser.getAccountId());
+        PagedResponse<AdminMerchantResponse> response = readUseCases.retrieveMerchants(searchTerm, searchStatus, countryCode, pageNo, pageSize, authenticatedUser.getAccountId());
         return new ApiResponseJSON<>("Data fetched successfully", response);
     }
 
@@ -96,7 +100,7 @@ public class MerchantController {
         private String merchantId;
 
         public KycApprovalRequest toRequest() {
-            if(!approved && StringUtils.isBlank(comment)){
+            if (!approved && StringUtils.isBlank(comment)) {
                 throw new BadRequestException("Comment is required when declining a document");
             }
             return KycApprovalRequest.builder()
