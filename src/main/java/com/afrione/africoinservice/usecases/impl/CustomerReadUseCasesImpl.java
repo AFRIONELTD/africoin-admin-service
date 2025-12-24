@@ -15,9 +15,12 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,7 +43,14 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     @Override
     public PagedResponse<AppUserModel> listUsers(String searchTerm, int pageNo, int pageSize, Long accountId) {
         try {
-            String url = String.format("%s/api/v1/admin/verification/users", applicationProperty.customerServiceUrl());
+            StringBuilder urlBuilder = new StringBuilder(applicationProperty.customerServiceUrl() + "/api/v1/admin/verification/users");
+            urlBuilder.append("?pageNo=").append(pageNo)
+                    .append("&pageSize=").append(pageSize);
+
+            if (StringUtils.isNotBlank(searchTerm)) {
+                urlBuilder.append("&searchTerm=").append(URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
+            }
+            String url = urlBuilder.toString();
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
 
