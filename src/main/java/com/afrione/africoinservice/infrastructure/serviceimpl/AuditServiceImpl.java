@@ -37,8 +37,8 @@ public class AuditServiceImpl implements AuditService {
                     .accountId(authenticatedUser.getAccountId())
                     .actionUserName(authenticatedUser.getUsername())
                     .description(actionDescription)
-                    .entityId(entity.getId())
-                    .entityName(entity.getClass().getSimpleName())
+                    .entityId(entity == null ? null : entity.getId())
+                    .entityName(entity == null ? null : entity.getClass().getSimpleName())
                     .build();
 
             auditTrailEntityRepository.save(auditTrail);
