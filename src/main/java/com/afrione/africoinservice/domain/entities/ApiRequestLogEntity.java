@@ -37,4 +37,6 @@ public class ApiRequestLogEntity extends AbstractBaseEntity<Long> {
     private String provider;
 
     private long timeTakenInSeconds;
+
+    private String httpMethod;
 }
