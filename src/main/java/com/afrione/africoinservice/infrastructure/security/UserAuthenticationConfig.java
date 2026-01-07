@@ -98,6 +98,7 @@ public class UserAuthenticationConfig {
             AuthenticatedUser authenticatedUser = new AuthenticatedUser();
             authenticatedUser.setAccountId(userId);
             authenticatedUser.setUserId(userId);
+            authenticatedUser.setUsername(attributes.get("email"));
 
             authenticatedUser.addAuthority(accountType);
             return Optional.of(authenticatedUser);

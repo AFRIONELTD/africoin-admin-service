@@ -27,7 +27,7 @@ public class AuditTrailEntity extends AbstractBaseEntity<Long> {
 
     private String actionUserName;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
     @Column(nullable = false)
