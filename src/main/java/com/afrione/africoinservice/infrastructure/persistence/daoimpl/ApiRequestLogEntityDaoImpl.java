@@ -46,7 +46,7 @@ public class ApiRequestLogEntityDaoImpl extends CrudDaoImpl<ApiRequestLogEntity,
     @Override
     public void updateLog(ApiRequestLogEntity restClientLogEntity, RestClientResponse clientResponse) {
         restClientLogEntity.setResponsePayload(clientResponse.getResponseBody());
-        restClientLogEntity.setTimeTakenInSeconds(clientResponse.getTimeTakenInSeconds());
+        restClientLogEntity.setTimeTakenInMs(clientResponse.getTimeTakenInMs());
         saveRecord(restClientLogEntity);
     }
 

@@ -13,6 +13,6 @@ import org.springframework.http.HttpStatusCode;
 public class RestClientResponse {
     private String responseBody;
     private HttpStatusCode statusCode;
-    private long timeTakenInSeconds;
+    private long timeTakenInMs;
     private Object responseObject;
 }

@@ -60,7 +60,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(result.getStatusCode())
                     .responseBody(StringUtils.defaultString(result.getBody()))
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.MILLIS))
                     .build();
 
             // update log with response
@@ -75,7 +75,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(httpClientErrorException.getStatusCode())
                     .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -88,7 +88,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
                     .responseBody("")
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -123,7 +123,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(result.getStatusCode())
                     .responseObject(result.getBody())
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
 
             try {
@@ -137,7 +137,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(httpClientErrorException.getStatusCode())
                     .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -150,7 +150,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
                     .responseBody("")
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -185,7 +185,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(result.getStatusCode())
                     .responseObject(result.getBody())
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
 
             try {
@@ -199,7 +199,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(httpClientErrorException.getStatusCode())
                     .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -212,7 +212,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
                     .responseBody("")
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -242,7 +242,7 @@ public class RestClientServiceImpl implements RestClientService {
                     .exchange((request, response2) -> RestClientResponse.builder()
                             .responseBody(response2.bodyTo(String.class))
                             .statusCode(response2.getStatusCode())
-                            .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                            .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                             .build());
 
             try {
@@ -256,7 +256,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
                     .responseBody("")
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -287,7 +287,7 @@ public class RestClientServiceImpl implements RestClientService {
                     .exchange((request, response2) -> RestClientResponse.builder()
                             .responseObject(response2.bodyTo(responseType))
                             .statusCode(response2.getStatusCode())
-                            .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                            .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                             .build());
 
             try {
@@ -301,7 +301,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
                     .responseBody("")
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
@@ -329,7 +329,7 @@ public class RestClientServiceImpl implements RestClientService {
                     .exchange((request, response2) -> RestClientResponse.builder()
                             .responseBody(response2.bodyTo(String.class))
                             .statusCode(response2.getStatusCode())
-                            .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                            .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                             .build());
 
             try {
@@ -343,7 +343,7 @@ public class RestClientServiceImpl implements RestClientService {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
                     .responseBody("")
-                    .timeTakenInSeconds(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
                     .build();
             try {
                 if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
