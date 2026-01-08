@@ -43,7 +43,7 @@ public class RestClientServiceImpl implements RestClientService {
         ApiRequestLogEntity logEntity = null;
         try {
             try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, requestPayload, ApiLogTypeConstant.GENERIC);
+                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, requestPayload);
                 if (logEntity != null) logEntity.setHttpMethod("POST");
             } catch (Exception e) {
                 log.warn("Failed to create API request log for url {}", serviceUrl, e);
@@ -107,7 +107,7 @@ public class RestClientServiceImpl implements RestClientService {
         try {
             try {
                 String payload = requestPayload == null ? null : requestPayload.toString();
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, payload, ApiLogTypeConstant.GENERIC);
+                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, payload);
                 if (logEntity != null) logEntity.setHttpMethod("POST");
             } catch (Exception e) {
                 log.warn("Failed to create API request log for url {}", serviceUrl, e);
@@ -169,7 +169,7 @@ public class RestClientServiceImpl implements RestClientService {
         try {
             try {
                 String payload = requestPayload == null ? null : requestPayload.toString();
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, payload, ApiLogTypeConstant.GENERIC);
+                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, payload);
                 if (logEntity != null) logEntity.setHttpMethod("POST");
             } catch (Exception e) {
                 log.warn("Failed to create API request log for url {}", serviceUrl, e);
@@ -230,7 +230,7 @@ public class RestClientServiceImpl implements RestClientService {
         ApiRequestLogEntity logEntity = null;
         try {
             try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, null, ApiLogTypeConstant.GENERIC);
+                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, null);
                 if (logEntity != null) logEntity.setHttpMethod("GET");
             } catch (Exception e) {
                 log.warn("Failed to create API request log for url {}", serviceUrl, e);
@@ -275,7 +275,7 @@ public class RestClientServiceImpl implements RestClientService {
         ApiRequestLogEntity logEntity = null;
         try {
             try {
-                logEntity = apiRequestLogEntityDao.createLog(url, null, ApiLogTypeConstant.GENERIC);
+                logEntity = apiRequestLogEntityDao.createLog(url, null);
                 if (logEntity != null) logEntity.setHttpMethod("GET");
             } catch (Exception e) {
                 log.warn("Failed to create API request log for url {}", url, e);
@@ -318,7 +318,7 @@ public class RestClientServiceImpl implements RestClientService {
         ApiRequestLogEntity logEntity = null;
         try {
             try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, null, ApiLogTypeConstant.GENERIC);
+                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, null);
                 if (logEntity != null) logEntity.setHttpMethod("GET");
             } catch (Exception e) {
                 log.warn("Failed to create API request log for url {}", serviceUrl, e);
