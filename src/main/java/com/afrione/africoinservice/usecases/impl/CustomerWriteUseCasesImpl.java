@@ -9,6 +9,7 @@ import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.usecases.CustomerWriteUseCases;
 import com.afrione.africoinservice.usecases.data.response.customer.UserDocReviewRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +50,14 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to process KYC approval for customer {} and verificationId {}. Status: {}",
                         request.getUserId(), request.getVerificationId(), response.getStatusCode());
-                throw new BadRequestException("Failed to process Customer KYC approval");
+
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to process Customer KYC approval");
+                }
+
             }
 
             log.info("KYC document {} for customer {} has been successfully {}",
@@ -80,4 +88,3 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
         return headers;
     }
 }
-

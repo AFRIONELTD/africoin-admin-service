@@ -12,6 +12,7 @@ import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +70,12 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve merchants from service. Status: {}", response.getStatusCode());
-                throw new BadRequestException("Failed to retrieve merchants");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve merchants");
+                }
             }
 
             String responseBody = response.getResponseBody();
@@ -101,7 +107,12 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve merchant {} from service. Status: {}", merchantId, response.getStatusCode());
-                throw new BadRequestException("Merchant not found");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Merchant not found");
+                }
             }
 
             ApiResponseJSON<AdminMerchantResponse> merchantResponse = objectMapper.readValue(
@@ -130,7 +141,12 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve rates from service. Status: {}", response.getStatusCode());
-                throw new BadRequestException("Failed to retrieve rates");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve rates");
+                }
             }
 
             String responseBody = response.getResponseBody();

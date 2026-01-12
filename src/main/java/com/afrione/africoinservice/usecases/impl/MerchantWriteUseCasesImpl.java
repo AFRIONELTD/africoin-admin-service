@@ -10,6 +10,7 @@ import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.request.KycApprovalRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -52,7 +53,12 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to update exchange rates. Status: {}", response.getStatusCode());
-                throw new BadRequestException("Failed to update exchange rates");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to update exchange rates");
+                }
             }
 
             log.info("Successfully updated {} exchange rates", requests.size());
@@ -78,7 +84,12 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to process KYC approval for merchant {} and fileId {}. Status: {}",
                         request.getMerchantId(), request.getFileId(), response.getStatusCode());
-                throw new BadRequestException("Failed to process KYC approval");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to process KYC approval");
+                }
             }
 
             log.info("KYC document {} for merchant {} has been successfully {}",

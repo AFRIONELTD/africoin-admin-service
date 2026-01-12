@@ -11,6 +11,7 @@ import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.customer.AppUserModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +62,12 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customers service. Status:", response.getStatusCode());
-                throw new BadRequestException("Error retrieving users");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Error retrieving users");
+                }
             }
 
             String responseBody = response.getResponseBody();
@@ -90,7 +96,12 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customer service. Status: {}", userId, response.getStatusCode());
-                throw new BadRequestException("user not found");
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("user not found");
+                }
             }
 
             String responseBody = response.getResponseBody();

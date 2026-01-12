@@ -38,7 +38,6 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    //org.springframework.http.converter.
 
     @ExceptionHandler(value = {MissingServletRequestParameterException.class, ConstraintViolationException.class})
     public ResponseEntity<ApiResponseJSON<String>> handleMissingServletRequestParameterException(Exception exception) {
@@ -94,7 +93,12 @@ public class GlobalErrorHandler {
         return new ResponseEntity<>(apiResponse, HttpStatus.CONFLICT);
     }
 
-    //
+    @ExceptionHandler(APIRequestException.class)
+    public ResponseEntity<ApiResponseJSON<String>> handleAPIRequestExceptions(APIRequestException e) {
+        log.info("error message: {}", e.getMessage());
+        ApiResponseJSON<String> apiResponse = new ApiResponseJSON<>(e.getMessage());
+        return new ResponseEntity<>(apiResponse, e.getHttpStatus());
+    }
 
     @ExceptionHandler({NotFoundException.class, NoSuchElementException.class})
     public ResponseEntity<ApiResponseJSON<String>> handleNotFoundException(RuntimeException e) {
