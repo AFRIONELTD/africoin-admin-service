@@ -51,8 +51,8 @@ public class SystemSettingsController {
     public ApiResponseJSON<PagedResponse<SystemSettingsResponse>> getSystemSettingsUseCase(
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser,
             @PathVariable @Pattern(regexp = "OTC|MERCHANT") @Parameter(description = "OTC|MERCHANT") String system,
-            @Parameter(name = "No. of records per page. Min:1, Max:20") @Valid @Min(value = 1) @Max(value = 500) @RequestParam(value = "size", defaultValue = "20") int size,
-            @Parameter(name = "The index of the page to return. Min: 0") @Valid @Min(value = 0) @RequestParam(value = "page", defaultValue = "0") int page) {
+            @Parameter(description = "No. of records per page. Min:1, Max:20") @Valid @Min(value = 1) @Max(value = 500) @RequestParam(value = "size", defaultValue = "20") int size,
+            @Parameter(description = "The index of the page to return. Min: 0") @Valid @Min(value = 0) @RequestParam(value = "page", defaultValue = "0") int page) {
         PagedResponse<SystemSettingsResponse> response = systemSettingsUseCase.getSystemSettings(authenticatedUser.getAccountId(), system, page, size);
         return new ApiResponseJSON<>("Settings returned successfully.", response);
     }
