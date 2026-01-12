@@ -21,7 +21,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.function.Supplier;
 
 @Service
 @RequiredArgsConstructor
@@ -33,412 +33,208 @@ public class RestClientServiceImpl implements RestClientService {
 
     @Override
     public RestClientResponse postRequest(String serviceUrl, String requestPayload) {
-        Map<String, String> emptyMap = new HashMap<>();
-        return postRequest(serviceUrl, requestPayload, emptyMap);
+        return postRequest(serviceUrl, requestPayload, new HashMap<>());
     }
 
     @Override
     public RestClientResponse putRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiRequestLogEntity logEntity = null;
-        try {
-            try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, requestPayload);
-                if (logEntity != null) logEntity.setHttpMethod("POST");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", serviceUrl, e);
-            }
-
-            ResponseEntity<String> result = restClient.put()
-                    .uri(serviceUrl)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .headers(httpHeaders -> headerMap.forEach(httpHeaders::set))
-                    .body(requestPayload)
-                    .retrieve()
-                    .toEntity(String.class);
-
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(result.getStatusCode())
-                    .responseBody(StringUtils.defaultString(result.getBody()))
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.MILLIS))
-                    .build();
-
-            // update log with response
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
-            }
-
-            return response;
-        } catch (HttpClientErrorException httpClientErrorException) {
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(httpClientErrorException.getStatusCode())
-                    .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
-            }
-            return response;
-        } catch (Exception exception) {
-            System.out.println(exception.getClass());
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, e);
-            }
-            return response;
-        }
+        return executeRequest(serviceUrl, requestPayload, "PUT", () ->
+                restClient.put()
+                        .uri(serviceUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(h -> headerMap.forEach(h::set))
+                        .body(requestPayload)
+                        .retrieve()
+                        .toEntity(String.class));
     }
 
     @Override
     public RestClientResponse postRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiRequestLogEntity logEntity = null;
-        try {
-            try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, requestPayload);
-                if (logEntity != null) logEntity.setHttpMethod("POST");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", serviceUrl, e);
-            }
-
-            ResponseEntity<String> result = restClient.post()
-                    .uri(serviceUrl)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .headers(httpHeaders -> headerMap.forEach(httpHeaders::set))
-                    .body(requestPayload)
-                    .retrieve()
-                    .toEntity(String.class);
-
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(result.getStatusCode())
-                    .responseBody(StringUtils.defaultString(result.getBody()))
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.MILLIS))
-                    .build();
-
-            // update log with response
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
-            }
-
-            return response;
-        } catch (HttpClientErrorException httpClientErrorException) {
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(httpClientErrorException.getStatusCode())
-                    .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
-            }
-            return response;
-        } catch (Exception exception) {
-            System.out.println(exception.getClass());
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, e);
-            }
-            return response;
-        }
+        return executeRequest(serviceUrl, requestPayload, "POST", () ->
+                restClient.post()
+                        .uri(serviceUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(h -> headerMap.forEach(h::set))
+                        .body(requestPayload)
+                        .retrieve()
+                        .toEntity(String.class));
     }
 
     @Override
-    public <T, K> RestClientResponse postRequest(String serviceUrl, T requestPayload, Map<String, String> headerMap,
-                                                 Class<K> responseType) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiRequestLogEntity logEntity = null;
-        try {
-            try {
-                String payload = requestPayload == null ? null : requestPayload.toString();
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, payload);
-                if (logEntity != null) logEntity.setHttpMethod("POST");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", serviceUrl, e);
-            }
-
-            ResponseEntity<K> result = restClient.post()
-                    .uri(serviceUrl)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .headers(httpHeaders -> headerMap.forEach(httpHeaders::set))
-                    .body(requestPayload)
-                    .retrieve()
-                    .toEntity(responseType);
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(result.getStatusCode())
-                    .responseObject(result.getBody())
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
-            }
-
-            return response;
-        } catch (HttpClientErrorException httpClientErrorException) {
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(httpClientErrorException.getStatusCode())
-                    .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
-            }
-            return response;
-        } catch (Exception exception) {
-            System.out.println(exception.getClass());
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, e);
-            }
-            return response;
-        }
+    public <T, K> RestClientResponse postRequest(String serviceUrl, T requestPayload,
+                                                 Map<String, String> headerMap, Class<K> responseType) {
+        String payload = requestPayload == null ? null : requestPayload.toString();
+        return executeRequestWithObject(serviceUrl, payload, "POST", () ->
+                restClient.post()
+                        .uri(serviceUrl)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .headers(h -> headerMap.forEach(h::set))
+                        .body(requestPayload)
+                        .retrieve()
+                        .toEntity(responseType));
     }
-
 
     @Override
     public <T, K> RestClientResponse postFormRequest(String serviceUrl, T requestPayload, Class<K> responseType) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiRequestLogEntity logEntity = null;
-        try {
-            try {
-                String payload = requestPayload == null ? null : requestPayload.toString();
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, payload);
-                if (logEntity != null) logEntity.setHttpMethod("POST");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", serviceUrl, e);
-            }
-
-            ResponseEntity<K> result = restClient.post()
-                    .uri(serviceUrl)
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .body(requestPayload)
-                    .retrieve()
-                    .toEntity(responseType);
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(result.getStatusCode())
-                    .responseObject(result.getBody())
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
-            }
-
-            return response;
-        } catch (HttpClientErrorException httpClientErrorException) {
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(httpClientErrorException.getStatusCode())
-                    .responseBody(httpClientErrorException.getResponseBodyAsString())
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
-            }
-            return response;
-        } catch (Exception exception) {
-            System.out.println(exception.getClass());
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, e);
-            }
-            return response;
-        }
+        String payload = requestPayload == null ? null : requestPayload.toString();
+        return executeRequestWithObject(serviceUrl, payload, "POST", () ->
+                restClient.post()
+                        .uri(serviceUrl)
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .body(requestPayload)
+                        .retrieve()
+                        .toEntity(responseType));
     }
-
 
     @Override
     public RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiRequestLogEntity logEntity = null;
-        try {
-            try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, null);
-                if (logEntity != null) logEntity.setHttpMethod("GET");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", serviceUrl, e);
-            }
-
-            RestClientResponse response = restClient.get()
-                    .uri(serviceUrl)
-                    .headers(httpHeaders -> headerMap.forEach(httpHeaders::set))
-                    .exchange((request, response2) -> RestClientResponse.builder()
-                            .responseBody(response2.bodyTo(String.class))
-                            .statusCode(response2.getStatusCode())
-                            .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                            .build());
-
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
-            }
-
-            return response;
-        } catch (Exception e) {
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception ex) {
-                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, ex);
-            }
-            return response;
-        }
+        return executeGetRequest(serviceUrl, headerMap, null, null);
     }
 
     @Override
-    public <T> RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap, Class<T> responseType, Map<String, Object> params) {
-        LocalDateTime now = LocalDateTime.now();
-
-        String url = buildUrlSpring(serviceUrl, params);
-        ApiRequestLogEntity logEntity = null;
-        try {
-            try {
-                logEntity = apiRequestLogEntityDao.createLog(url, null);
-                if (logEntity != null) logEntity.setHttpMethod("GET");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", url, e);
-            }
-
-            RestClientResponse response = restClient.get()
-                    .uri(url)
-                    .headers(httpHeaders -> headerMap.forEach(httpHeaders::set))
-                    .exchange((request, response2) -> RestClientResponse.builder()
-                            .responseObject(response2.bodyTo(responseType))
-                            .statusCode(response2.getStatusCode())
-                            .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                            .build());
-
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", url, e);
-            }
-
-            return response;
-        } catch (Exception e) {
-            RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                    .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception ex) {
-                log.warn("Failed to update API request log (exception) for url {}", url, ex);
-            }
-            return response;
-        }
+    public <T> RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap,
+                                             Class<T> responseType, Map<String, Object> params) {
+        return executeGetRequest(buildUrlSpring(serviceUrl, params), headerMap, responseType, null);
     }
 
     @Override
     public RestClientResponse getRequest(String serviceUrl) {
-        LocalDateTime now = LocalDateTime.now();
-        ApiRequestLogEntity logEntity = null;
+        return executeGetRequest(serviceUrl, new HashMap<>(), null, null);
+    }
+
+    private RestClientResponse executeRequest(String serviceUrl, String requestPayload,
+                                              String httpMethod, Supplier<ResponseEntity<String>> requestSupplier) {
+        LocalDateTime start = LocalDateTime.now();
+        ApiRequestLogEntity logEntity = createLog(serviceUrl, requestPayload, httpMethod);
+
         try {
-            try {
-                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, null);
-                if (logEntity != null) logEntity.setHttpMethod("GET");
-            } catch (Exception e) {
-                log.warn("Failed to create API request log for url {}", serviceUrl, e);
-            }
-
-            RestClientResponse response = restClient.get()
-                    .uri(serviceUrl)
-                    .exchange((request, response2) -> RestClientResponse.builder()
-                            .responseBody(response2.bodyTo(String.class))
-                            .statusCode(response2.getStatusCode())
-                            .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
-                            .build());
-
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception e) {
-                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
-            }
-
-            return response;
-        } catch (Exception e) {
+            ResponseEntity<String> result = requestSupplier.get();
             RestClientResponse response = RestClientResponse.builder()
-                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
-                    .responseBody("")
-                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .statusCode(result.getStatusCode())
+                    .responseBody(StringUtils.defaultString(result.getBody()))
+                    .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
                     .build();
-            try {
-                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
-            } catch (Exception ex) {
-                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, ex);
-            }
+            updateLog(logEntity, response, serviceUrl);
             return response;
+        } catch (HttpClientErrorException e) {
+            return handleHttpClientError(e, start, logEntity, serviceUrl);
+        } catch (Exception e) {
+            return handleGenericError(e, start, logEntity, serviceUrl);
         }
     }
 
+    private <K> RestClientResponse executeRequestWithObject(String serviceUrl, String requestPayload,
+                                                            String httpMethod, Supplier<ResponseEntity<K>> requestSupplier) {
+        LocalDateTime start = LocalDateTime.now();
+        ApiRequestLogEntity logEntity = createLog(serviceUrl, requestPayload, httpMethod);
+
+        try {
+            ResponseEntity<K> result = requestSupplier.get();
+            RestClientResponse response = RestClientResponse.builder()
+                    .statusCode(result.getStatusCode())
+                    .responseObject(result.getBody())
+                    .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
+                    .build();
+            updateLog(logEntity, response, serviceUrl);
+            return response;
+        } catch (HttpClientErrorException e) {
+            return handleHttpClientError(e, start, logEntity, serviceUrl);
+        } catch (Exception e) {
+            return handleGenericError(e, start, logEntity, serviceUrl);
+        }
+    }
+
+    private <T> RestClientResponse executeGetRequest(String serviceUrl, Map<String, String> headerMap,
+                                                     Class<T> responseType, Map<String, Object> params) {
+        LocalDateTime start = LocalDateTime.now();
+        ApiRequestLogEntity logEntity = createLog(serviceUrl, null, "GET");
+
+        try {
+            RestClientResponse response = restClient.get()
+                    .uri(serviceUrl)
+                    .headers(h -> headerMap.forEach(h::set))
+                    .exchange((req, res) -> RestClientResponse.builder()
+                            .responseBody(responseType == null ? res.bodyTo(String.class) : null)
+                            .responseObject(responseType != null ? res.bodyTo(responseType) : null)
+                            .statusCode(res.getStatusCode())
+                            .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
+                            .build());
+            updateLog(logEntity, response, serviceUrl);
+            return response;
+        } catch (Exception e) {
+            return handleGenericError(e, start, logEntity, serviceUrl);
+        }
+    }
+
+    private ApiRequestLogEntity createLog(String serviceUrl, String requestPayload, String httpMethod) {
+        try {
+            ApiRequestLogEntity logEntity = apiRequestLogEntityDao.createLog(serviceUrl, requestPayload);
+            if (logEntity != null) {
+                logEntity.setHttpMethod(httpMethod);
+            }
+            return logEntity;
+        } catch (Exception e) {
+            log.warn("Failed to create API request log for url {}", serviceUrl, e);
+            return null;
+        }
+    }
+
+    private void updateLog(ApiRequestLogEntity logEntity, RestClientResponse response, String serviceUrl) {
+        try {
+            if (logEntity != null) {
+                apiRequestLogEntityDao.updateLog(logEntity, response);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to update API request log for url {}", serviceUrl, e);
+        }
+    }
+
+    private RestClientResponse handleHttpClientError(HttpClientErrorException e, LocalDateTime start,
+                                                     ApiRequestLogEntity logEntity, String serviceUrl) {
+        RestClientResponse response = RestClientResponse.builder()
+                .statusCode(e.getStatusCode())
+                .responseBody(e.getResponseBodyAsString())
+                .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
+                .build();
+        updateLog(logEntity, response, serviceUrl);
+        return response;
+    }
+
+    private RestClientResponse handleGenericError(Exception e, LocalDateTime start,
+                                                  ApiRequestLogEntity logEntity, String serviceUrl) {
+        log.error("Exception occurred for url {}: {}", serviceUrl, e.getClass().getName());
+        RestClientResponse response = RestClientResponse.builder()
+                .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
+                .responseBody("")
+                .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
+                .build();
+        updateLog(logEntity, response, serviceUrl);
+        return response;
+    }
 
     private String buildUrlSpring(String baseUrl, Map<String, Object> params) {
         if (params == null || params.isEmpty()) {
             return baseUrl;
         }
 
-        UriComponentsBuilder b = UriComponentsBuilder.fromUriString(baseUrl);
-        params.forEach((k, v) -> {
-            if (v == null) return;
-            if (v instanceof Collection<?> coll) {
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(baseUrl);
+        params.forEach((key, value) -> {
+            if (value == null) return;
+            if (value instanceof Collection<?> coll) {
                 coll.forEach(item -> {
-                    if (item != null) b.queryParam(k, item);
+                    if (item != null) builder.queryParam(key, item);
                 });
-            } else if (v.getClass().isArray()) {
-                int len = java.lang.reflect.Array.getLength(v);
+            } else if (value.getClass().isArray()) {
+                int len = java.lang.reflect.Array.getLength(value);
                 for (int i = 0; i < len; i++) {
-                    Object item = java.lang.reflect.Array.get(v, i);
-                    if (item != null) b.queryParam(k, item);
+                    Object item = java.lang.reflect.Array.get(value, i);
+                    if (item != null) builder.queryParam(key, item);
                 }
             } else {
-                b.queryParam(k, v);
+                builder.queryParam(key, value);
             }
         });
-        return b.build(true).toUriString(); // true = encode
+        return builder.build(true).toUriString();
     }
 }
