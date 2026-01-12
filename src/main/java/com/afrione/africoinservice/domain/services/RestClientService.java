@@ -11,6 +11,7 @@ import java.util.Map;
  */
 public interface RestClientService {
     RestClientResponse postRequest(String serviceUrl, String requestPayload);
+    RestClientResponse putRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap);
     RestClientResponse postRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap);
     RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap);
     RestClientResponse getRequest(String serviceUrl);

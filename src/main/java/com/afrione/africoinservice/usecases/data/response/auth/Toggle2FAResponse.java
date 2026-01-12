@@ -14,5 +14,3 @@ public class Toggle2FAResponse {
     private String twoFAMethod;
     private String message;
 }
-
-

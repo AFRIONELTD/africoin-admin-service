@@ -59,19 +59,18 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             String url = urlBuilder.toString();
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customers service. Status:", response.getStatusCode());
-                String body = response.getResponseBody();
-                if (body != null && !body.isBlank()) {
+                if (responseBody != null && !responseBody.isBlank()) {
                     APIRequestErrorHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error retrieving users");
                 }
             }
 
-            String responseBody = response.getResponseBody();
-            log.info("Response Body: {}", responseBody);
             ApiResponseJSON<PagedResponse<AppUserModel>> apiResponseJSON = objectMapper.readValue(
                     responseBody,
                     new TypeReference<ApiResponseJSON<PagedResponse<AppUserModel>>>() {

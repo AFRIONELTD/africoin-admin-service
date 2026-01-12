@@ -38,6 +38,68 @@ public class RestClientServiceImpl implements RestClientService {
     }
 
     @Override
+    public RestClientResponse putRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap) {
+        LocalDateTime now = LocalDateTime.now();
+        ApiRequestLogEntity logEntity = null;
+        try {
+            try {
+                logEntity = apiRequestLogEntityDao.createLog(serviceUrl, requestPayload);
+                if (logEntity != null) logEntity.setHttpMethod("POST");
+            } catch (Exception e) {
+                log.warn("Failed to create API request log for url {}", serviceUrl, e);
+            }
+
+            ResponseEntity<String> result = restClient.put()
+                    .uri(serviceUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .headers(httpHeaders -> headerMap.forEach(httpHeaders::set))
+                    .body(requestPayload)
+                    .retrieve()
+                    .toEntity(String.class);
+
+            RestClientResponse response = RestClientResponse.builder()
+                    .statusCode(result.getStatusCode())
+                    .responseBody(StringUtils.defaultString(result.getBody()))
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.MILLIS))
+                    .build();
+
+            // update log with response
+            try {
+                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
+            } catch (Exception e) {
+                log.warn("Failed to update API request log (success) for url {}", serviceUrl, e);
+            }
+
+            return response;
+        } catch (HttpClientErrorException httpClientErrorException) {
+            RestClientResponse response = RestClientResponse.builder()
+                    .statusCode(httpClientErrorException.getStatusCode())
+                    .responseBody(httpClientErrorException.getResponseBodyAsString())
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .build();
+            try {
+                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
+            } catch (Exception e) {
+                log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
+            }
+            return response;
+        } catch (Exception exception) {
+            System.out.println(exception.getClass());
+            RestClientResponse response = RestClientResponse.builder()
+                    .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
+                    .responseBody("")
+                    .timeTakenInMs(now.until(LocalDateTime.now(), ChronoUnit.SECONDS))
+                    .build();
+            try {
+                if (logEntity != null) apiRequestLogEntityDao.updateLog(logEntity, response);
+            } catch (Exception e) {
+                log.warn("Failed to update API request log (exception) for url {}", serviceUrl, e);
+            }
+            return response;
+        }
+    }
+
+    @Override
     public RestClientResponse postRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap) {
         LocalDateTime now = LocalDateTime.now();
         ApiRequestLogEntity logEntity = null;
@@ -71,7 +133,7 @@ public class RestClientServiceImpl implements RestClientService {
             }
 
             return response;
-        }catch (HttpClientErrorException httpClientErrorException) {
+        } catch (HttpClientErrorException httpClientErrorException) {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(httpClientErrorException.getStatusCode())
                     .responseBody(httpClientErrorException.getResponseBodyAsString())
@@ -83,7 +145,7 @@ public class RestClientServiceImpl implements RestClientService {
                 log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
             }
             return response;
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             System.out.println(exception.getClass());
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
@@ -133,7 +195,7 @@ public class RestClientServiceImpl implements RestClientService {
             }
 
             return response;
-        }catch (HttpClientErrorException httpClientErrorException) {
+        } catch (HttpClientErrorException httpClientErrorException) {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(httpClientErrorException.getStatusCode())
                     .responseBody(httpClientErrorException.getResponseBodyAsString())
@@ -145,7 +207,7 @@ public class RestClientServiceImpl implements RestClientService {
                 log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
             }
             return response;
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             System.out.println(exception.getClass());
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
@@ -163,7 +225,7 @@ public class RestClientServiceImpl implements RestClientService {
 
 
     @Override
-    public <T,K> RestClientResponse postFormRequest(String serviceUrl, T requestPayload, Class<K> responseType) {
+    public <T, K> RestClientResponse postFormRequest(String serviceUrl, T requestPayload, Class<K> responseType) {
         LocalDateTime now = LocalDateTime.now();
         ApiRequestLogEntity logEntity = null;
         try {
@@ -195,7 +257,7 @@ public class RestClientServiceImpl implements RestClientService {
             }
 
             return response;
-        }catch (HttpClientErrorException httpClientErrorException) {
+        } catch (HttpClientErrorException httpClientErrorException) {
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(httpClientErrorException.getStatusCode())
                     .responseBody(httpClientErrorException.getResponseBodyAsString())
@@ -207,7 +269,7 @@ public class RestClientServiceImpl implements RestClientService {
                 log.warn("Failed to update API request log (client error) for url {}", serviceUrl, e);
             }
             return response;
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             System.out.println(exception.getClass());
             RestClientResponse response = RestClientResponse.builder()
                     .statusCode(HttpStatusCode.valueOf(HttpStatus.GATEWAY_TIMEOUT.value()))
@@ -268,7 +330,7 @@ public class RestClientServiceImpl implements RestClientService {
     }
 
     @Override
-    public <T> RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap, Class<T> responseType, Map<String, Object> params ) {
+    public <T> RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap, Class<T> responseType, Map<String, Object> params) {
         LocalDateTime now = LocalDateTime.now();
 
         String url = buildUrlSpring(serviceUrl, params);
@@ -356,7 +418,7 @@ public class RestClientServiceImpl implements RestClientService {
 
 
     private String buildUrlSpring(String baseUrl, Map<String, Object> params) {
-        if(params == null || params.isEmpty()) {
+        if (params == null || params.isEmpty()) {
             return baseUrl;
         }
 
@@ -364,7 +426,9 @@ public class RestClientServiceImpl implements RestClientService {
         params.forEach((k, v) -> {
             if (v == null) return;
             if (v instanceof Collection<?> coll) {
-                coll.forEach(item -> { if (item != null) b.queryParam(k, item); });
+                coll.forEach(item -> {
+                    if (item != null) b.queryParam(k, item);
+                });
             } else if (v.getClass().isArray()) {
                 int len = java.lang.reflect.Array.getLength(v);
                 for (int i = 0; i < len; i++) {
