@@ -1,4 +1,4 @@
-package com.afrione.africoinservice.infrastructure.web.controllers.admin;
+package com.afrione.africoinservice.infrastructure.web.controllers;
 
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
@@ -36,7 +36,7 @@ public class SystemSettingsController {
     private final SystemSettingsUseCase systemSettingsUseCase;
 
     @Operation(summary = "Update System setting value by id")
-    @PutMapping(value = "/system-setting/{settingId}")
+    @PutMapping(value = "/{system}/system-setting/{settingId}")
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseJSON<?> updateTransactionStatus(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser,
             @PathVariable @Pattern(regexp = "OTC|MERCHANT") @Parameter(description = "OTC|MERCHANT") String system, @PathVariable("settingId") Long settingId,
@@ -46,7 +46,7 @@ public class SystemSettingsController {
     }
 
     @Operation(summary = "Returns paginated list of System Settings.")
-    @GetMapping(value = "/system-settings", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{system}/system-settings", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public ApiResponseJSON<PagedResponse<SystemSettingsResponse>> getSystemSettingsUseCase(
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser,
