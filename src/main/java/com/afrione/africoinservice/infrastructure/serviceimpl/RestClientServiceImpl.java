@@ -38,15 +38,22 @@ public class RestClientServiceImpl implements RestClientService {
 
     @Override
     public RestClientResponse putRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap) {
-        return executeRequest(serviceUrl, requestPayload, "PUT", () ->
-                restClient.put()
-                        .uri(serviceUrl)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .headers(h -> headerMap.forEach(h::set))
-                        .body(requestPayload)
-                        .retrieve()
-                        .toEntity(String.class));
+        return executeRequest(serviceUrl, requestPayload, "PUT", () -> {
+            RestClient.RequestBodySpec requestSpec = restClient.put()
+                    .uri(serviceUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .headers(h -> headerMap.forEach(h::set));
+
+            if (StringUtils.isNotBlank(requestPayload)) {
+                requestSpec.body(requestPayload);
+            }
+
+            return requestSpec
+                    .retrieve()
+                    .toEntity(String.class);
+        });
     }
+
 
     @Override
     public RestClientResponse postRequest(String serviceUrl, String requestPayload, Map<String, String> headerMap) {
@@ -64,28 +71,49 @@ public class RestClientServiceImpl implements RestClientService {
     public <T, K> RestClientResponse postRequest(String serviceUrl, T requestPayload,
                                                  Map<String, String> headerMap, Class<K> responseType) {
         String payload = requestPayload == null ? null : requestPayload.toString();
-        return executeRequestWithObject(serviceUrl, payload, "POST", () ->
-                restClient.post()
-                        .uri(serviceUrl)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .headers(h -> headerMap.forEach(h::set))
-                        .body(requestPayload)
-                        .retrieve()
-                        .toEntity(responseType));
+        return executeRequestWithObject(serviceUrl, payload, "POST", () -> {
+
+            RestClient.RequestBodySpec requestSpec = restClient.post()
+                    .uri(serviceUrl)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .headers(h -> {
+                        if (headerMap != null) {
+                            headerMap.forEach(h::set);
+                        }
+                    });
+
+            if (StringUtils.isNotBlank(payload)) {
+                requestSpec.body(requestPayload);
+            }
+
+            return requestSpec
+                    .retrieve()
+                    .toEntity(responseType);
+        });
     }
 
     @Override
     public <T, K> RestClientResponse postFormRequest(String serviceUrl, T requestPayload, Class<K> responseType) {
+
         String payload = requestPayload == null ? null : requestPayload.toString();
-        return executeRequestWithObject(serviceUrl, payload, "POST", () ->
-                restClient.post()
-                        .uri(serviceUrl)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .body(requestPayload)
-                        .retrieve()
-                        .toEntity(responseType));
+
+        return executeRequestWithObject(serviceUrl, payload, "POST", () -> {
+
+            RestClient.RequestBodySpec requestSpec = restClient.post()
+                    .uri(serviceUrl)
+                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .accept(MediaType.APPLICATION_JSON);
+
+            if (requestPayload != null) {
+                requestSpec.body(requestPayload);
+            }
+
+            return requestSpec
+                    .retrieve()
+                    .toEntity(responseType);
+        });
     }
+
 
     @Override
     public RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap) {
