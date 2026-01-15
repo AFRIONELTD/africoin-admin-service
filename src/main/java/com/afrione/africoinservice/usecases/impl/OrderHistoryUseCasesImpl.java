@@ -132,18 +132,30 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
         try {
             StringBuilder url = new StringBuilder();
             url.append(applicationProperty.customerServiceUrl())
-                    .append("/api/v1/admin/order/%s/summary".formatted(orderType));
+                    .append("/api/v1/admin/order/")
+                    .append(orderType)
+                    .append("/summary");
+
+            boolean hasParam = false;
 
             if (StringUtils.isNotBlank(corridor)) {
-                url.append("&corridor=").append(URLEncoder.encode(corridor, StandardCharsets.UTF_8));
+                url.append("?")
+                        .append("corridor=")
+                        .append(URLEncoder.encode(corridor, StandardCharsets.UTF_8));
+                hasParam = true;
             }
 
             if (startDate != null) {
-                url.append("&startDate=").append(URLEncoder.encode(startDate.toString(), StandardCharsets.UTF_8));
+                url.append(hasParam ? "&" : "?")
+                        .append("startDate=")
+                        .append(URLEncoder.encode(startDate.toString(), StandardCharsets.UTF_8));
+                hasParam = true;
             }
 
             if (endDate != null) {
-                url.append("&endDate=").append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
+                url.append(hasParam ? "&" : "?")
+                        .append("endDate=")
+                        .append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
             }
 
             RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader());
@@ -161,8 +173,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
 
             ApiResponseJSON<List<OrderSummaryResponse>> apiResponse = objectMapper.readValue(
                     body,
-                    new TypeReference<ApiResponseJSON<List<OrderSummaryResponse>>>() {
-                    }
+                    new TypeReference<ApiResponseJSON<List<OrderSummaryResponse>>>() {}
             );
 
             return apiResponse.getData();
@@ -173,6 +184,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
             throw new BadRequestException("Error retrieving order summary: " + e.getMessage());
         }
     }
+
 
     private Map<String, String> generateHeader() {
         log.info("Generating headers for OTC request");
