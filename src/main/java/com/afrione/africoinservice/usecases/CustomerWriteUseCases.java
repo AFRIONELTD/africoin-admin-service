@@ -1,6 +1,6 @@
 package com.afrione.africoinservice.usecases;
 
-import com.afrione.africoinservice.usecases.data.response.customer.UserDocReviewRequest;
+import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
 
 /**
  * Created by felixadewale on

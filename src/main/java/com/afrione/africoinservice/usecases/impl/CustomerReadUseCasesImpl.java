@@ -9,7 +9,7 @@ import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
-import com.afrione.africoinservice.usecases.data.response.customer.AppUserModel;
+import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.core.type.TypeReference;

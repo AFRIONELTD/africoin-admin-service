@@ -1,7 +1,7 @@
 package com.afrione.africoinservice.usecases;
 
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
-import com.afrione.africoinservice.usecases.data.response.customer.AppUserModel;
+import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
 
 /**
  * Created by felixadewale on

@@ -7,7 +7,7 @@ import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.usecases.CustomerWriteUseCases;
-import com.afrione.africoinservice.usecases.data.response.customer.UserDocReviewRequest;
+import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;

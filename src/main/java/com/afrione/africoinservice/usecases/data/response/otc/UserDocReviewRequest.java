@@ -1,4 +1,4 @@
-package com.afrione.africoinservice.usecases.data.response.customer;
+package com.afrione.africoinservice.usecases.data.response.otc;
 
 import lombok.Builder;
 import lombok.Value;
