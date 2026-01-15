@@ -45,10 +45,8 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
     public PagedResponse<OrderHistoryResponse> getOrderHistory(String orderType, LocalDate startDate, LocalDate endDate, String corridor, String status, int page, int size) {
         try {
             StringBuilder url = new StringBuilder();
-            // Assuming OTC endpoints are hosted on customer service under /api/v1/admin/otc/orders
             url.append(applicationProperty.customerServiceUrl())
-                    .append("/api/v1/admin/otc/orders/history")
-                    .append("?orderType=").append(URLEncoder.encode(orderType, StandardCharsets.UTF_8))
+                    .append("/api/v1/admin/order/%s/history".formatted(orderType))
                     .append("&page=").append(page)
                     .append("&size=").append(size);
 
@@ -99,8 +97,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
     @Override
     public OrderHistoryResponse getOrderDetail(String orderId, String orderType) {
         try {
-            // Assuming detail endpoint
-            String url = String.format("%s/api/v1/admin/otc/orders/%s?orderType=%s", applicationProperty.customerServiceUrl(), URLEncoder.encode(orderId, StandardCharsets.UTF_8), URLEncoder.encode(orderType, StandardCharsets.UTF_8));
+            String url = String.format("%s/api/v1/admin/order/%s/%s", applicationProperty.customerServiceUrl(), URLEncoder.encode(orderId, StandardCharsets.UTF_8), URLEncoder.encode(orderType, StandardCharsets.UTF_8));
 
             RestClientResponse response = restClientService.getRequest(url, generateHeader());
             String body = response.getResponseBody();
@@ -135,8 +132,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
         try {
             StringBuilder url = new StringBuilder();
             url.append(applicationProperty.customerServiceUrl())
-                    .append("/api/v1/admin/otc/orders/summary")
-                    .append("?orderType=").append(URLEncoder.encode(orderType, StandardCharsets.UTF_8));
+                    .append("/api/v1/admin/order/%s/summary".formatted(orderType));
 
             if (StringUtils.isNotBlank(corridor)) {
                 url.append("&corridor=").append(URLEncoder.encode(corridor, StandardCharsets.UTF_8));
