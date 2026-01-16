@@ -47,7 +47,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
             StringBuilder url = new StringBuilder();
             url.append(applicationProperty.customerServiceUrl())
                     .append("/api/v1/admin/order/%s/history".formatted(orderType))
-                    .append("&page=").append(page)
+                    .append("?page=").append(page)
                     .append("&size=").append(size);
 
             if (startDate != null) {
