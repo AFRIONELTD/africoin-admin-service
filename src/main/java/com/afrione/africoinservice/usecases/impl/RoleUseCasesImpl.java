@@ -117,7 +117,7 @@ public class RoleUseCasesImpl implements RoleUseCases {
 
     @Override
     public List<RoleResponse> getUserRoles(Long userId) {
-        AppUserEntity user = appUserEntityDao.getUserWithRoles(userId);
+        AppUserEntity user = appUserEntityDao.getRecordById(userId);
         return user.getRoles().stream()
                 .filter(role -> role.getRecordStatus() == RecordStatusConstant.ACTIVE)
                 .map(role -> mapToRoleResponse(roleEntityDao.getRolesWithPrivileges(role.getId())))
