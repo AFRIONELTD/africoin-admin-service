@@ -33,4 +33,10 @@ public class AppUserEntityDaoImpl extends CrudDaoImpl<AppUserEntity, Long> imple
     public boolean recordExistWithEmail(String email) {
         return repository.existsByEmail(email.toLowerCase());
     }
+
+    @Override
+    public AppUserEntity getUserWithRoles(Long userId) {
+        return repository.findByIdWithRoles(userId)
+                .orElseThrow(() -> new RuntimeException("User not found - " + userId));
+    }
 }

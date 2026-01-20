@@ -66,6 +66,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
                     return new UnauthorisedAccessException("Invalid email or password");
                 });
 
+        user = appUserEntityDao.getUserWithRoles(user.getId());
         try {
             if (user.getFailedLoginAttempts() >= MAX_FAILED_LOGIN_ATTEMPTS) {
                 log.warn("Login attempt for locked account (too many failed attempts): {}", request.getEmail());

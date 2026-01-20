@@ -42,12 +42,12 @@ public class AppUserEntity extends AbstractBaseEntity<Long> {
     @Builder.Default
     private boolean requiresPasswordChange  = true;
 
-    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "app_user_role",
+            name = "user_role",
             joinColumns = @JoinColumn(name = "user_fk"),
             inverseJoinColumns = @JoinColumn(name = "role_fk")
     )
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<RoleEntity> roles = new ArrayList<>();
 
     @Builder.Default

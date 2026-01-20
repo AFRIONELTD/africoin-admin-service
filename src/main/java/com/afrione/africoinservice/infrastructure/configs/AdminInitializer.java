@@ -1,8 +1,10 @@
 package com.afrione.africoinservice.infrastructure.configs;
 
 import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
+import com.afrione.africoinservice.domain.dao.PrivilegeEntityDao;
 import com.afrione.africoinservice.domain.dao.RoleEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
+import com.afrione.africoinservice.domain.entities.PrivilegeEntity;
 import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
@@ -10,11 +12,12 @@ import com.afrione.africoinservice.domain.services.EnvironmentService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.time.OffsetDateTime;
 import java.util.Collections;
+import java.util.List;
 
 /**
  * Initializes an admin user at startup if none exists.
@@ -23,10 +26,12 @@ import java.util.Collections;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@Order(2) // Run after PrivilegeInitializer
 public class AdminInitializer implements CommandLineRunner {
 
     private final AppUserEntityDao appUserEntityDao;
     private final RoleEntityDao roleEntityDao;
+    private final PrivilegeEntityDao privilegeEntityDao;
     private final PasswordEncoder passwordEncoder;
     private final ApplicationProperty applicationProperty;
 
@@ -78,12 +83,17 @@ public class AdminInitializer implements CommandLineRunner {
     }
 
     private RoleEntity createAdminRole() {
+        // Get all privileges for the admin role
+        List<PrivilegeEntity> allPrivileges = privilegeEntityDao.getRecords();
+
         RoleEntity adminRole = new RoleEntity();
-        adminRole.setRoleName("ADMIN");
+        adminRole.setRoleName("SUPER ADMIN");
+        adminRole.setPrivileges(allPrivileges); // Admin gets all privileges
         adminRole.setRecordStatus(RecordStatusConstant.ACTIVE);
-        roleEntityDao.saveRecord(adminRole);
-        log.info("Created ADMIN role");
-        return adminRole;
+
+        RoleEntity savedRole = roleEntityDao.saveRecord(adminRole);
+        log.info("Created ADMIN role with {} privileges", allPrivileges.size());
+        return savedRole;
     }
 }
 
