@@ -16,4 +16,6 @@ public interface AccountSetupUseCases {
     void finaliseForgotPassword(String sessionId, String otp, String newPassword);
 
     ForgotPasswordResponse resendToken(String sessionId);
+
+    void deleteUser(Long userId, Long userId1);
 }

@@ -156,4 +156,11 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         return new ForgotPasswordResponse(sessionDataEntity.getSessionId(), Math.abs((int) Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
     }
 
+    @Override
+    public void deleteUser(Long userId, Long authenticatedUserId) {
+        AppUserEntity appUserEntity = appUserEntityDao.getRecordById(userId);
+        appUserEntity.setRecordStatus(RecordStatusConstant.DELETED);
+        appUserEntityDao.saveRecord(appUserEntity);
+    }
+
 }

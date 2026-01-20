@@ -2,6 +2,7 @@ package com.afrione.africoinservice.domain.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -15,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "app_user")
+@SQLRestriction("record_status = 'ACTIVE'")
 public class AppUserEntity extends AbstractBaseEntity<Long> {
 
     private String firstName;
