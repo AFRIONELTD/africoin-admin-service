@@ -17,5 +17,5 @@ public class AccountSetupRequest {
     String gender;
     String phoneNumber;
     String email;
-    Set<String> roles;
+    Set<Long> roles;
 }

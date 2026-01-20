@@ -74,7 +74,7 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
                 .password(passwordEncoder.encode(password))
                 .build();
 
-        List<RoleEntity> roleEntityList = request.getRoles().parallelStream().map(role -> rolesDao.findByName(role).orElseThrow(() -> new BadRequestException("Role " + role + " not found"))).collect(Collectors.toList());
+        List<RoleEntity> roleEntityList = request.getRoles().parallelStream().map(role -> rolesDao.findById(role).orElseThrow(() -> new BadRequestException("Role " + role + " not found"))).collect(Collectors.toList());
 
         appUserEntity.setRoles(roleEntityList);
 

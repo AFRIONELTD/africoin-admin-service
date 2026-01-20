@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -73,7 +74,7 @@ public class AccountSetupController {
         @NotBlank
         @Email
         private String email;
-        private Set<String> roles;
+        private Set<@Positive Long> roles;
 
         public AccountSetupRequest toRequest() {
             return AccountSetupRequest.builder()
