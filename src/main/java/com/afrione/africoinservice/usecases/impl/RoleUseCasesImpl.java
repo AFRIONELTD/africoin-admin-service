@@ -73,19 +73,19 @@ public class RoleUseCasesImpl implements RoleUseCases {
         }
 
         RoleEntity savedRole = roleEntityDao.saveRecord(role);
-        return mapToRoleResponse(roleEntityDao.getRolesWithPrivileges(savedRole.getId()));
+        return mapToRoleResponse(roleEntityDao.getRecordById(savedRole.getId()));
     }
 
     @Override
     public RoleResponse getRole(Long roleId) {
-        RoleEntity role = roleEntityDao.getRolesWithPrivileges(roleId);
+        RoleEntity role = roleEntityDao.getRecordById(roleId);
         return mapToRoleResponse(role);
     }
 
     @Override
     public List<RoleResponse> getAllRoles() {
         return roleEntityDao.getRecords().stream()
-                .map(role -> mapToRoleResponse(roleEntityDao.getRolesWithPrivileges(role.getId())))
+                .map(role -> mapToRoleResponse(roleEntityDao.getRecordById(role.getId())))
                 .collect(Collectors.toList());
     }
 
@@ -120,7 +120,7 @@ public class RoleUseCasesImpl implements RoleUseCases {
         AppUserEntity user = appUserEntityDao.getRecordById(userId);
         return user.getRoles().stream()
                 .filter(role -> role.getRecordStatus() == RecordStatusConstant.ACTIVE)
-                .map(role -> mapToRoleResponse(roleEntityDao.getRolesWithPrivileges(role.getId())))
+                .map(role -> mapToRoleResponse(roleEntityDao.getRecordById(role.getId())))
                 .collect(Collectors.toList());
     }
 

@@ -39,8 +39,4 @@ public class RoleEntityDaoImpl extends CrudDaoImpl<RoleEntity, Long>  implements
         return repository.getAllByRecordStatus(RecordStatusConstant.ACTIVE);
     }
 
-    @Override
-    public RoleEntity getRolesWithPrivileges(Long roleId) {
-        return repository.findByIdWithPrivileges(roleId).orElseThrow(() -> new RuntimeException("Role not found - "+roleId));
-    }
 }

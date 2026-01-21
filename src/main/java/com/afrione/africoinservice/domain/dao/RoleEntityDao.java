@@ -11,5 +11,4 @@ public interface RoleEntityDao extends CrudDao<RoleEntity, Long> {
     Optional<RoleEntity> findByName(String name);
     RoleEntity getByName(String superUser);
     List<RoleEntity> getRecords();
-    RoleEntity getRolesWithPrivileges(Long roleId);
 }
