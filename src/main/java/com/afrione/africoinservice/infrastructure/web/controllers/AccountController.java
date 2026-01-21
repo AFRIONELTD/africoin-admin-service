@@ -17,7 +17,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 /**
  * Created by felixadewale on
@@ -25,7 +24,7 @@ import java.util.List;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/account", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/v1/account", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
 @RestController
 @Validated
 public class AccountController {
@@ -34,7 +33,7 @@ public class AccountController {
 
 
 
-    @DeleteMapping(value = "{userId}", headers = {"Authorization"})
+    @DeleteMapping(value = "{userId}")
     public ApiResponseJSON<AccountSetupResponse> deleteAccount(@PathVariable Long userId, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
         accountSetupUseCases.deleteUser(userId, authenticatedUser.getUserId());
         return new ApiResponseJSON<>("User deleted successfully");
