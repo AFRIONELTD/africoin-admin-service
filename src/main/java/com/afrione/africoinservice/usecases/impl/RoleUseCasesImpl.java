@@ -13,6 +13,7 @@ import com.afrione.africoinservice.usecases.data.request.UpdateRoleRequest;
 import com.afrione.africoinservice.usecases.data.request.AssignUserRoleRequest;
 import com.afrione.africoinservice.usecases.data.response.role.RoleResponse;
 import com.afrione.africoinservice.usecases.data.response.role.PrivilegeResponse;
+import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,11 +57,10 @@ public class RoleUseCasesImpl implements RoleUseCases {
         RoleEntity role = roleEntityDao.getRecordById(roleId);
 
         if (request.getRoleName() != null && !request.getRoleName().trim().isEmpty()) {
-            // Check if new name conflicts with existing role
             roleEntityDao.findByName(request.getRoleName())
                     .filter(existingRole -> !existingRole.getId().equals(roleId))
                     .ifPresent(existingRole -> {
-                        throw new RuntimeException("Role with name '" + request.getRoleName() + "' already exists");
+                        throw new BadRequestException("Role with name '" + request.getRoleName() + "' already exists");
                     });
             role.setRoleName(request.getRoleName());
         }

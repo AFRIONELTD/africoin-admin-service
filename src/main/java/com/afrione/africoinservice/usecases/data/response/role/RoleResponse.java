@@ -21,5 +21,6 @@ public class RoleResponse {
     private List<PrivilegeResponse> privileges;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateCreated;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateModified;
 }
