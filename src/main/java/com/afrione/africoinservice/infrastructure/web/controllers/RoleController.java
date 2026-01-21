@@ -20,6 +20,7 @@ import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ import java.util.Set;
 @RequestMapping(value = "/api/v1/roles", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
+@Transactional
 @Tag(name = "Role Management", description = "APIs for managing roles and privileges")
 public class RoleController {
 
