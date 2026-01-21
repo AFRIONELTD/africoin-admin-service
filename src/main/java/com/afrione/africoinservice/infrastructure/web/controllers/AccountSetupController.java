@@ -41,12 +41,6 @@ public class AccountSetupController {
         return new ApiResponseJSON<>("Account setup successful", accountSetupResponse);
     }
 
-    @DeleteMapping(value = "{userId}", headers = {"Authorization"})
-    public ApiResponseJSON<AccountSetupResponse> setupAccount(@PathVariable Long userId, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
-        accountSetupUseCases.deleteUser(userId, authenticatedUser.getUserId());
-        return new ApiResponseJSON<>("User deleted successfully");
-    }
-
     @PostMapping("forgot-password/initiate/{emailAddress}")
     public ApiResponseJSON<ForgotPasswordResponse> initiateForgotPassword(@PathVariable @Email String emailAddress) {
         ForgotPasswordResponse response = accountSetupUseCases.initiateForgotPassword(emailAddress);

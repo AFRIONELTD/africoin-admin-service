@@ -1,5 +1,7 @@
 package com.afrione.africoinservice.usecases.models.admin;
 
+import com.afrione.africoinservice.domain.entities.AppUserEntity;
+import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
@@ -22,4 +24,19 @@ public class PortalUserModel {
     private LocalDate dateJoined;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate lastLoginDate;
+
+    public static PortalUserModel toModel(AppUserEntity appUserEntity){
+       return PortalUserModel
+                .builder()
+                .fullName(appUserEntity.getFirstName() + " " + appUserEntity.getLastName())
+                .email(appUserEntity.getEmail())
+                .twoFAEnabled(appUserEntity.isTwoFAEnabled())
+                .twoFAMethod(appUserEntity.getTwoFAMethod() != null ? appUserEntity.getTwoFAMethod() : null)
+                .requirePasswordChange(appUserEntity.isRequiresPasswordChange())
+                .roles(appUserEntity.getRoles().stream().map(RoleEntity::getRoleName).toList())
+                .dateJoined(appUserEntity.getDateCreated().toLocalDate())
+                .lastLoginDate(appUserEntity.getLastLoginAt() == null ? null : appUserEntity.getLastLoginAt().toLocalDate())
+                .phoneNumber(appUserEntity.getPhoneNumber())
+                .build();
+    }
 }

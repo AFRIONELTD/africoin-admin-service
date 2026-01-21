@@ -22,17 +22,6 @@ public class ProfileManagementUseCasesImpl implements ProfileManagementUseCases 
     @Override
     public PortalUserModel getUser(Long userId) {
         var appUserEntity = appUserEntityDao.findById(userId).orElseThrow(() -> new UnauthorisedAccessException("User not found"));
-        return PortalUserModel
-                .builder()
-                .fullName(appUserEntity.getFirstName() + " " + appUserEntity.getLastName())
-                .email(appUserEntity.getEmail())
-                .twoFAEnabled(appUserEntity.isTwoFAEnabled())
-                .twoFAMethod(appUserEntity.getTwoFAMethod() != null ? appUserEntity.getTwoFAMethod() : null)
-                .requirePasswordChange(appUserEntity.isRequiresPasswordChange())
-                .roles(appUserEntity.getRoles().stream().map(RoleEntity::getRoleName).toList())
-                .dateJoined(appUserEntity.getDateCreated().toLocalDate())
-                .lastLoginDate(appUserEntity.getLastLoginAt() == null ? null : appUserEntity.getLastLoginAt().toLocalDate())
-                .phoneNumber(appUserEntity.getPhoneNumber())
-                .build();
+        return PortalUserModel.toModel(appUserEntity);
     }
 }

@@ -1,8 +1,12 @@
 package com.afrione.africoinservice.usecases;
 
 import com.afrione.africoinservice.usecases.data.request.AccountSetupRequest;
+import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.account_setup.AccountSetupResponse;
 import com.afrione.africoinservice.usecases.data.response.auth.ForgotPasswordResponse;
+import com.afrione.africoinservice.usecases.models.admin.PortalUserModel;
+
+import java.util.List;
 
 /**
  * Created by felixadewale on
@@ -18,4 +22,6 @@ public interface AccountSetupUseCases {
     ForgotPasswordResponse resendToken(String sessionId);
 
     void deleteUser(Long userId, Long userId1);
+
+    PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, Long accountId);
 }

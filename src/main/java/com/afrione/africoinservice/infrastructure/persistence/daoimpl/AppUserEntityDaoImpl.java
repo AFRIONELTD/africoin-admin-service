@@ -5,6 +5,9 @@ import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.infrastructure.persistence.repository.AppUserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -22,6 +25,12 @@ public class AppUserEntityDaoImpl extends CrudDaoImpl<AppUserEntity, Long> imple
     @Override
     public Optional<AppUserEntity> findRecordByEmail(String email) {
         return repository.findByEmail(email.toLowerCase());
+    }
+
+    @Override
+    public Page<AppUserEntity> findAllUsers(int pageNo, int pageSize) {
+        PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.Direction.DESC, "dateCreated");
+        return repository.findAll(pageRequest);
     }
 
     @Override

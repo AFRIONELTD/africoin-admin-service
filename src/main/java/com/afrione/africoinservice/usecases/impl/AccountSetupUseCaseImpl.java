@@ -12,13 +12,16 @@ import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.usecases.AccountSetupUseCases;
 import com.afrione.africoinservice.usecases.data.request.AccountSetupRequest;
 import com.afrione.africoinservice.usecases.data.request.ForgotPasswordSD;
+import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.account_setup.AccountSetupResponse;
 import com.afrione.africoinservice.usecases.data.response.auth.ForgotPasswordResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
+import com.afrione.africoinservice.usecases.models.admin.PortalUserModel;
 import com.afrione.africoinservice.utils.RandomPasswordGenerator;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -161,6 +164,13 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         AppUserEntity appUserEntity = appUserEntityDao.getRecordById(userId);
         appUserEntity.setRecordStatus(RecordStatusConstant.DELETED);
         appUserEntityDao.saveRecord(appUserEntity);
+    }
+
+    @Override
+    public PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, Long accountId) {
+        Page<AppUserEntity> userEntityPage = appUserEntityDao.findAllUsers(pageNo, pageSize);
+        return new PagedResponse<>(userEntityPage.getTotalElements(), userEntityPage.getTotalPages(),
+                userEntityPage.getContent().stream().map(PortalUserModel::toModel).toList());
     }
 
 }
