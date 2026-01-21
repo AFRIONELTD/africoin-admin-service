@@ -19,7 +19,7 @@ public class RoleResponse {
     private Long id;
     private String roleName;
     private List<PrivilegeResponse> privileges;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateCreated;
     private LocalDate dateModified;
 }
