@@ -13,6 +13,7 @@ import java.util.List;
 @Data
 @Builder
 public class PortalUserModel {
+    private Long id;
     private String fullName;
     private String email;
     private String phoneNumber;
@@ -25,9 +26,13 @@ public class PortalUserModel {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate lastLoginDate;
 
-    public static PortalUserModel toModel(AppUserEntity appUserEntity){
-       return PortalUserModel
+    public static PortalUserModel toModel(AppUserEntity appUserEntity) {
+        if (appUserEntity == null) {
+            return null;
+        }
+        return PortalUserModel
                 .builder()
+                .id(appUserEntity.getId())
                 .fullName(appUserEntity.getFirstName() + " " + appUserEntity.getLastName())
                 .email(appUserEntity.getEmail())
                 .twoFAEnabled(appUserEntity.isTwoFAEnabled())
