@@ -24,4 +24,6 @@ public interface AccountSetupUseCases {
     void deleteUser(Long userId, Long userId1);
 
     PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, Long accountId);
+
+    void updateAccount(Long userId, AccountSetupRequest request, Long userId1);
 }

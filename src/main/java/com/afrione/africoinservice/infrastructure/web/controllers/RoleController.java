@@ -97,38 +97,7 @@ public class RoleController {
         return new ApiResponseJSON<>("User roles retrieved successfully", response);
     }
 
-    // Privilege Validation Endpoints
-    @GetMapping("/privileges/validate")
-    @Operation(summary = "Validate privilege consistency", description = "Check if all enum constants have corresponding database entities")
-    public ApiResponseJSON<Boolean> validatePrivilegeConsistency() {
-        boolean isConsistent = privilegeValidationService.validatePrivilegeConsistency();
-        String message = isConsistent ? "All privileges are consistent" : "Some privileges are missing or inconsistent";
-        return new ApiResponseJSON<>(message, isConsistent);
-    }
 
-    @GetMapping("/privileges/missing")
-    @Operation(summary = "Get missing privileges", description = "Get enum constants that are missing from database")
-    public ApiResponseJSON<Set<PrivilegeTypeConstant>> getMissingPrivileges() {
-        Set<PrivilegeTypeConstant> missingPrivileges = privilegeValidationService.getMissingPrivileges();
-        return new ApiResponseJSON<>("Missing privileges retrieved", missingPrivileges);
-    }
-
-    @GetMapping("/privileges/orphaned")
-    @Operation(summary = "Get orphaned privileges", description = "Get database privileges that don't have corresponding enum constants")
-    public ApiResponseJSON<Set<PrivilegeTypeConstant>> getOrphanedPrivileges() {
-        Set<PrivilegeTypeConstant> orphanedPrivileges = privilegeValidationService.getOrphanedPrivileges();
-        return new ApiResponseJSON<>("Orphaned privileges retrieved", orphanedPrivileges);
-    }
-
-    @PostMapping("/privileges/synchronize")
-    @Operation(summary = "Synchronize privileges", description = "Create missing privileges and optionally remove orphaned ones")
-    public ApiResponseJSON<Integer> synchronizePrivileges(@RequestParam(defaultValue = "false") boolean removeOrphaned) {
-        int changesCount = privilegeValidationService.synchronizePrivileges(removeOrphaned);
-        String message = changesCount > 0 ?
-                "Privileges synchronized successfully. Changes made: " + changesCount :
-                "No changes needed. All privileges are already synchronized.";
-        return new ApiResponseJSON<>(message, changesCount);
-    }
 
     // Request DTOs
     @Data

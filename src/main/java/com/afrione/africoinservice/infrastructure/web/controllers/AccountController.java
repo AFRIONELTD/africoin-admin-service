@@ -39,6 +39,12 @@ public class AccountController {
         return new ApiResponseJSON<>("User deleted successfully");
     }
 
+    @PutMapping(value = "{userId}")
+    public ApiResponseJSON<AccountSetupResponse> updateAccount(@PathVariable Long userId, @RequestBody AccountSetupController.AccountSetupRequestJSON accountSetupRequestJSON, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+        accountSetupUseCases.updateAccount(userId, accountSetupRequestJSON.toRequest(), authenticatedUser.getUserId());
+        return new ApiResponseJSON<>("User updated successfully");
+    }
+
     @GetMapping
     public ApiResponseJSON<PagedResponse<PortalUserModel>> getAllUsers(@RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
                                                               @RequestParam(defaultValue = "10") @Max(value = 50, message = "Max page size is 50") @Positive int pageSize, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {

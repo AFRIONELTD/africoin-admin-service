@@ -21,6 +21,7 @@ import com.afrione.africoinservice.utils.RandomPasswordGenerator;
 import com.google.gson.Gson;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -118,7 +120,7 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         sessionDataEntityDao.findBySessionIdAndType(sessionId, SessionDataTypeConstant.FORGOT_PASSWORD).ifPresentOrElse(sessionDataEntity -> {
             ForgotPasswordSD forgotPasswordSD = gson.fromJson(sessionDataEntity.getPayload(), ForgotPasswordSD.class);
 
-            if(forgotPasswordSD.isVerified()){
+            if (forgotPasswordSD.isVerified()) {
                 throw new BadRequestException("Token has already been used");
             }
 
@@ -171,6 +173,34 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         Page<AppUserEntity> userEntityPage = appUserEntityDao.findAllUsers(pageNo, pageSize);
         return new PagedResponse<>(userEntityPage.getTotalElements(), userEntityPage.getTotalPages(),
                 userEntityPage.getContent().stream().map(PortalUserModel::toModel).toList());
+    }
+
+    @Override
+    public void updateAccount(Long userId, AccountSetupRequest request, Long userId1) {
+        AppUserEntity appUserEntity = appUserEntityDao.getRecordById(userId);
+        if (StringUtils.isNotBlank(request.getFirstName())) {
+            appUserEntity.setFirstName(request.getFirstName());
+        }
+
+        if (StringUtils.isNotBlank(request.getLastName())) {
+            appUserEntity.setLastName(request.getLastName());
+        }
+
+        if (StringUtils.isNotBlank(request.getPhoneNumber())) {
+            appUserEntity.setPhoneNumber(request.getPhoneNumber());
+        }
+
+        if (Objects.nonNull(request.getEmail()) && appUserEntity.isRequiresPasswordChange()) {
+            appUserEntity.setEmail(request.getEmail());
+        }
+
+        if (Objects.nonNull(request.getRoles()) && !request.getRoles().isEmpty()) {
+            List<RoleEntity> roleEntityList = request.getRoles().parallelStream().map(role -> rolesDao.findById(role).orElseThrow(() -> new BadRequestException("Role " + role + " not found"))).collect(Collectors.toList());
+            appUserEntity.setRoles(roleEntityList);
+        }
+
+        appUserEntityDao.saveRecord(appUserEntity);
+
     }
 
 }

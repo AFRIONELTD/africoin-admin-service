@@ -23,4 +23,5 @@ public class RoleResponse {
     private LocalDate dateCreated;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate dateModified;
+    private Long numberOfUsersAssigned;
 }

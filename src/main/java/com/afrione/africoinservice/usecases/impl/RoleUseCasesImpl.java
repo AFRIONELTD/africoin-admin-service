@@ -136,6 +136,7 @@ public class RoleUseCasesImpl implements RoleUseCases {
                 .privileges(privilegeResponses)
                 .dateCreated(role.getDateCreated().toLocalDate())
                 .dateModified(role.getDateModified().toLocalDate())
+                .numberOfUsersAssigned((long) role.getAppUserEntityList().size())
                 .build();
     }
 
