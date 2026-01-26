@@ -1,7 +1,10 @@
 package com.afrione.africoinservice.infrastructure.web.controllers;
 
+import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
+import com.afrione.africoinservice.usecases.DashboardUseCases;
 import com.afrione.africoinservice.usecases.OrderHistoryUseCases;
+import com.afrione.africoinservice.usecases.data.response.dashboard.CrossBorderSummaryResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.OrderSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -12,6 +15,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +39,7 @@ import java.util.List;
 public class DashboardController {
 
     private final OrderHistoryUseCases orderHistoryUseCases;
+    private final DashboardUseCases dashboardUseCases;
 
     @Operation(summary = "Returns dashboard summary")
     @GetMapping(value = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,5 +49,15 @@ public class DashboardController {
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate) {
         List<OrderSummaryResponse> response = orderHistoryUseCases.getOrderSummary("ON_RAMP", corridor, startDate, endDate);
         return new ApiResponseJSON<>("Order summary returned successfully.", response);
+    }
+
+    @GetMapping("/crossborder")
+    @Operation(summary = "Get Cross Border Analytics",
+            description = "Get total amounts received per fiat currency within a given date range")
+    public ApiResponseJSON<CrossBorderSummaryResponse> getCrossBoarderAnalytics(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser,  @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate startDate,
+                                                                                @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate) {
+
+        CrossBorderSummaryResponse res = dashboardUseCases.getCrossBoarderAnalytics(authenticatedUser, startDate, endDate);
+        return new ApiResponseJSON<>("successful", res);
     }
 }

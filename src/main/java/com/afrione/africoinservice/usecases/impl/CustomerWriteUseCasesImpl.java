@@ -29,7 +29,6 @@ import java.util.Map;
 @Slf4j
 public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
 
-    private final JWTService jwtService;
     private final ApplicationProperty applicationProperty;
     private final RestClientService restClientService;
     private final ObjectMapper objectMapper;
