@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 public class CrossBorderSummaryData {
     private String currency;
     private String country;
-    private BigDecimal recipientCountry;
+    private BigDecimal recipientAmount;
 
 
 }
