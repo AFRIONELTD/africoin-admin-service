@@ -7,6 +7,7 @@ import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.DashboardUseCases;
 import com.afrione.africoinservice.usecases.data.response.dashboard.CrossBorderSummaryResponse;
+import com.afrione.africoinservice.usecases.data.response.dashboard.OrderGraphResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -87,5 +88,55 @@ public class DashboardUseCasesImpl implements DashboardUseCases {
     @Override
     public ApplicationProperty getApplicationProperty() {
         return applicationProperty;
+    }
+
+    @Override
+    public OrderGraphResponse getOrderGraphData(AuthenticatedUser authenticatedUser, LocalDate startDate, LocalDate endDate) {
+        try {
+            StringBuilder url = new StringBuilder();
+            url.append(getApplicationProperty().customerServiceUrl())
+                    .append("/api/v2/admin/dashboard/order-graph");
+
+            boolean hasParam = false;
+
+            if (startDate != null) {
+                url.append(hasParam ? "&" : "?")
+                        .append("startDate=")
+                        .append(URLEncoder.encode(startDate.toString(), StandardCharsets.UTF_8));
+                hasParam = true;
+            }
+
+            if (endDate != null) {
+                url.append(hasParam ? "&" : "?")
+                        .append("endDate=")
+                        .append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader(authenticatedUser.getEmail()));
+            String body = response.getResponseBody();
+            log.info("graph data response body: {}", body);
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve order graph data. Status: {}", response.getStatusCode());
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Error retrieving order graph data ");
+                }
+            }
+
+            ApiResponseJSON<OrderGraphResponse> apiResponse = objectMapper.readValue(
+                    body,
+                    new TypeReference<ApiResponseJSON<OrderGraphResponse>>() {
+                    }
+            );
+
+            return apiResponse.getData();
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving order graph data", e);
+            throw new BadRequestException("Error retrieving order graph data: " + e.getMessage());
+        }
     }
 }

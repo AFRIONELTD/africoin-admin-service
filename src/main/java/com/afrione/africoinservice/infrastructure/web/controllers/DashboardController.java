@@ -5,6 +5,7 @@ import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.DashboardUseCases;
 import com.afrione.africoinservice.usecases.OrderHistoryUseCases;
 import com.afrione.africoinservice.usecases.data.response.dashboard.CrossBorderSummaryResponse;
+import com.afrione.africoinservice.usecases.data.response.dashboard.OrderGraphResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.OrderSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -59,5 +60,15 @@ public class DashboardController {
 
         CrossBorderSummaryResponse res = dashboardUseCases.getCrossBoarderAnalytics(authenticatedUser, startDate, endDate);
         return new ApiResponseJSON<>("successful", res);
+    }
+
+    @GetMapping("/order-graph")
+    @Operation(summary = "Get Order Graph Data",
+            description = "Get order graph data within a given date range")
+    public ApiResponseJSON<OrderGraphResponse> getOrderGraphData(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser, @RequestParam(value = "startDate", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate startDate,
+                                                                        @RequestParam(value = "endDate", required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate) {
+
+        OrderGraphResponse response = dashboardUseCases.getOrderGraphData(authenticatedUser, startDate, endDate);
+        return new ApiResponseJSON<>("successful", response);
     }
 }
