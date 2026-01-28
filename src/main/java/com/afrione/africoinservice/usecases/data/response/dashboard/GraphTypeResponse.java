@@ -1,6 +1,6 @@
 package com.afrione.africoinservice.usecases.data.response.dashboard;
 
-import com.afrione.africoinservice.domain.entities.enums.GraphTypeConstant;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -8,6 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 @Data
 public class GraphTypeResponse {
-    GraphTypeConstant graphType;
+    @Parameter(description = "DAY|WEEK|MONTH")
+    String graphType;
     long duration;
 }
