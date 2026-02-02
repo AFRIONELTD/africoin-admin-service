@@ -17,13 +17,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Created by felixadewale on
@@ -58,7 +55,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             String url = urlBuilder.toString();
 
-            RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader(getAdminUsername(accountId)));
             String responseBody = response.getResponseBody();
             log.info("Response Body: {}", responseBody);
 
@@ -91,7 +88,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         try {
             String url = String.format("%s/api/v1/admin/verification/user/%s", applicationProperty.customerServiceUrl(), userId);
 
-            RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customer service. Status: {}", userId, response.getStatusCode());
@@ -129,12 +126,8 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     }
 
 
-    private Map<String, String> generateHeader(String adminUser) {
-        log.info("Generating headers for admin user: {}", adminUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-client-key", applicationProperty.getB2CRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
-
 }

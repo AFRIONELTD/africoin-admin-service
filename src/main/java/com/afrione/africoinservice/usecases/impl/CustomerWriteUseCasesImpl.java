@@ -42,7 +42,7 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
 
             String requestPayload = objectMapper.writeValueAsString(request);
 
-            Map<String, String> headers = generateHeader(getAdminUsername(accountId));
+            Map<String, String> headers = generateClientHeader(getAdminUsername(accountId));
 
             RestClientResponse response = restClientService.postRequest(url, requestPayload, headers);
 
@@ -79,11 +79,8 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
         return user.getFirstName() + " " + user.getLastName();
     }
 
-    private Map<String, String> generateHeader(String adminUser) {
-        log.info("Generating headers for admin user: {}", adminUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-client-key", applicationProperty.getB2CRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
 }

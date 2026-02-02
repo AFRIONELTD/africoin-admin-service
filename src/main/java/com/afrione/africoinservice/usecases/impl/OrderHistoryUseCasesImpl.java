@@ -1,9 +1,11 @@
 package com.afrione.africoinservice.usecases.impl;
 
 import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
+import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.RestClientService;
+import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.OrderHistoryUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
@@ -16,15 +18,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by felixadewale on
@@ -42,7 +41,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
     private final AppUserEntityDao appUserEntityDao;
 
     @Override
-    public PagedResponse<OrderHistoryResponse> getOrderHistory(String orderType, LocalDate startDate, LocalDate endDate, String corridor, String status, int page, int size) {
+    public PagedResponse<OrderHistoryResponse> getOrderHistory(AuthenticatedUser authenticatedUser, String orderType, LocalDate startDate, LocalDate endDate, String corridor, String status, int page, int size) {
         try {
             StringBuilder url = new StringBuilder();
             url.append(applicationProperty.customerServiceUrl())
@@ -66,7 +65,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
                 url.append("&status=").append(URLEncoder.encode(status, StandardCharsets.UTF_8));
             }
 
-            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader());
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getAccountId())));
             String body = response.getResponseBody();
             log.info("Order history response body: {}", body);
 
@@ -95,11 +94,11 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
     }
 
     @Override
-    public OrderHistoryResponse getOrderDetail(String orderId, String orderType) {
+    public OrderHistoryResponse getOrderDetail(AuthenticatedUser authenticatedUser, String orderId, String orderType) {
         try {
             String url = String.format("%s/api/v1/admin/order/%s/%s", applicationProperty.customerServiceUrl(), URLEncoder.encode(orderId, StandardCharsets.UTF_8), URLEncoder.encode(orderType, StandardCharsets.UTF_8));
 
-            RestClientResponse response = restClientService.getRequest(url, generateHeader());
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader(getAdminUsername(authenticatedUser.getAccountId())));
             String body = response.getResponseBody();
             log.info("Order detail response body: {}", body);
 
@@ -128,7 +127,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
     }
 
     @Override
-    public List<OrderSummaryResponse> getOrderSummary(String orderType, String corridor, LocalDate startDate, LocalDate endDate) {
+    public List<OrderSummaryResponse> getOrderSummary(AuthenticatedUser authenticatedUser, String orderType, String corridor, LocalDate startDate, LocalDate endDate) {
         try {
             StringBuilder url = new StringBuilder();
             url.append(applicationProperty.customerServiceUrl())
@@ -158,7 +157,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
                         .append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
             }
 
-            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader());
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(authenticatedUser.getEmail()));
             String body = response.getResponseBody();
             log.info("Order summary response body: {}", body);
 
@@ -186,12 +185,14 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
     }
 
 
-    private Map<String, String> generateHeader() {
-        log.info("Generating headers for OTC request");
-        Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-client-key", applicationProperty.getB2CRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
 
+    private String getAdminUsername(Long accountId) {
+        AppUserEntity user = appUserEntityDao.findById(accountId)
+                .orElseThrow(() -> new BadRequestException("Admin user not found for account: " + accountId));
+        return user.getFirstName() + " " + user.getLastName();
+    }
 }

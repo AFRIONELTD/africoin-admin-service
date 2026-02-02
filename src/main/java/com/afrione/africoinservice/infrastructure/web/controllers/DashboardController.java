@@ -16,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -45,10 +44,11 @@ public class DashboardController {
     @Operation(summary = "Returns dashboard summary")
     @GetMapping(value = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseJSON<List<OrderSummaryResponse>> getOrderSummary(
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser,
             @Parameter(description = "GHS|NGN") @Pattern(regexp = "GHS|NGN") @RequestParam String corridor,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate) {
-        List<OrderSummaryResponse> response = orderHistoryUseCases.getOrderSummary("ON_RAMP", corridor, startDate, endDate);
+        List<OrderSummaryResponse> response = orderHistoryUseCases.getOrderSummary(authenticatedUser, "ON_RAMP", corridor, startDate, endDate);
         return new ApiResponseJSON<>("Order summary returned successfully.", response);
     }
 

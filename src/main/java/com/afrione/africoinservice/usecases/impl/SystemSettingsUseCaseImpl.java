@@ -105,6 +105,10 @@ public class SystemSettingsUseCaseImpl implements SystemSettingsUseCase {
 
     }
 
+    private Map<String, String> generateHeader(String adminUsername, boolean isOTC) {
+        return isOTC ? generateClientHeader(adminUsername) : generateMerchantHeader(adminUsername);
+    }
+
     private String getAdminUsername(Long accountId) {
         AppUserEntity user = appUserEntityDao.findById(accountId)
                 .orElseThrow(() -> new BadRequestException("Admin user not found for account: " + accountId));
@@ -112,12 +116,9 @@ public class SystemSettingsUseCaseImpl implements SystemSettingsUseCase {
     }
 
 
-    private Map<String, String> generateHeader(String adminUser, boolean isOTC) {
-        log.info("Generating headers for admin user: {}", adminUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-client-key", isOTC ? applicationProperty.getB2CRequestClientKey() : applicationProperty.getB2BRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
 }
 

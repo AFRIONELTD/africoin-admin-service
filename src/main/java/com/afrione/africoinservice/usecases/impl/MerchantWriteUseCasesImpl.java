@@ -4,7 +4,6 @@ import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
-import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
@@ -31,7 +30,6 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
 
     private final RestClientService restClientService;
     private final ObjectMapper objectMapper;
-    private final JWTService jwtService;
     private final ApplicationProperty applicationProperty;
     private final AppUserEntityDao appUserEntityDao;
 
@@ -49,7 +47,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
 
             log.info("Sending exchange rate update request for {} currency pairs", requests.size());
 
-            RestClientResponse response = restClientService.postRequest(url, requestPayload, generateHeader(getAdminUsername(accountId)));
+            RestClientResponse response = restClientService.postRequest(url, requestPayload, generateMerchantHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to update exchange rates. Status: {}", response.getStatusCode());
@@ -77,7 +75,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
 
             String requestPayload = objectMapper.writeValueAsString(request);
 
-            Map<String, String> headers = generateHeader(getAdminUsername(accountId));
+            Map<String, String> headers = generateMerchantHeader(getAdminUsername(accountId));
 
             RestClientResponse response = restClientService.postRequest(url, requestPayload, headers);
 
@@ -105,14 +103,15 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
         }
     }
 
-    @Override
-    public ApplicationProperty getApplicationProperty() {
-        return applicationProperty;
-    }
 
     private String getAdminUsername(Long accountId) {
         AppUserEntity user = appUserEntityDao.findById(accountId)
                 .orElseThrow(() -> new BadRequestException("Admin user not found for account: " + accountId));
         return user.getFirstName() + " " + user.getLastName();
+    }
+
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
 }

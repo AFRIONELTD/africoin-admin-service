@@ -4,7 +4,6 @@ import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
-import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.MerchantReadUseCases;
@@ -17,14 +16,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by felixadewale on
@@ -66,7 +62,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 url.append("&countryCode=").append(countryCode);
             }
 
-            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader(getAdminUsername(accountId)));
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateMerchantHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve merchants from service. Status: {}", response.getStatusCode());
@@ -103,7 +99,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
         try {
             String url = String.format("%s/api/admin/v1/retrieve-merchant/%s?detailLevel=%s", applicationProperty.merchantServiceUrl(), merchantId, detailLevel.name());
 
-            RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
+            RestClientResponse response = restClientService.getRequest(url, generateMerchantHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve merchant {} from service. Status: {}", merchantId, response.getStatusCode());
@@ -137,7 +133,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
         try {
             String url = String.format("%s/api/admin/v1/retrieve-rates", applicationProperty.merchantServiceUrl());
 
-            RestClientResponse response = restClientService.getRequest(url, generateHeader(getAdminUsername(accountId)));
+            RestClientResponse response = restClientService.getRequest(url, generateMerchantHeader(getAdminUsername(accountId)));
 
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve rates from service. Status: {}", response.getStatusCode());
@@ -171,17 +167,14 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
     }
 
 
-    private Map<String, String> generateHeader(String adminUser) {
-        log.info("Generating headers for admin user: {}", adminUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-client-key", applicationProperty.getB2BRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
-    }
-
     private String getAdminUsername(Long accountId) {
         AppUserEntity user = appUserEntityDao.findById(accountId)
                 .orElseThrow(() -> new BadRequestException("Admin user not found for account: " + accountId));
         return user.getFirstName() + " " + user.getLastName();
+    }
+
+    @Override
+    public ApplicationProperty getApplicationProperty() {
+        return applicationProperty;
     }
 }
