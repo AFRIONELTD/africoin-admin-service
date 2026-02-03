@@ -49,7 +49,7 @@ public class OrderHistoryController {
             @PathVariable @Pattern(regexp = "OFF_RAMP|ON_RAMP") String orderType,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate,
-            @Parameter(description = "GHS|NGN") @Pattern(regexp = "GHS|NGN") @RequestParam(required = false) String corridor,
+            @Parameter(description = "GHS|NGN|CAD|EUR|GBP") @Pattern(regexp = "GHS|NGN|CAD|EUR|GBP") @RequestParam(required = false) String corridor,
             @Parameter(description = "PENDING|FAILED|SUCCESSFUL") @Pattern(regexp = "PENDING|FAILED|SUCCESSFUL") @RequestParam(required = false) String status,
             @Parameter(description = "No. of records per page. Min:1, Max:20") @Valid @Min(value = 1) @Max(value = 100) @RequestParam(value = "size", defaultValue = "20") int size,
             @Parameter(description = "The index of the page to return. Min: 0") @Valid @Min(value = 0) @RequestParam(value = "page", defaultValue = "0") int page) {
@@ -71,7 +71,7 @@ public class OrderHistoryController {
     public ApiResponseJSON<List<OrderSummaryResponse>> getOrderSummary(
             @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser,
             @PathVariable @Pattern(regexp = "OFF_RAMP|ON_RAMP") String orderType,
-            @Parameter(description = "GHS|NGN") @Pattern(regexp = "GHS|NGN") @RequestParam String corridor,
+            @Parameter(description = "GHS|NGN|CAD|EUR|GBP") @Pattern(regexp = "GHS|NGN|CAD|EUR|GBP") @RequestParam String corridor,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate) {
         List<OrderSummaryResponse> response = orderHistoryUseCases.getOrderSummary(authenticatedUser, orderType, corridor, startDate, endDate);

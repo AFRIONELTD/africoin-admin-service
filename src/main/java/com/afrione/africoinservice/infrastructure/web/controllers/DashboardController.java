@@ -45,7 +45,7 @@ public class DashboardController {
     @GetMapping(value = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseJSON<List<OrderSummaryResponse>> getOrderSummary(
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser,
-            @Parameter(description = "GHS|NGN") @Pattern(regexp = "GHS|NGN") @RequestParam String corridor,
+            @Parameter(description = "GHS|NGN|CAD|EUR|GBP") @Pattern(regexp = "GHS|NGN|CAD|EUR|GBP") @RequestParam String corridor,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate startDate,
             @RequestParam(required = false) @DateTimeFormat(pattern = "dd/MM/yyyy") @PastOrPresent LocalDate endDate) {
         List<OrderSummaryResponse> response = orderHistoryUseCases.getOrderSummary(authenticatedUser, "ON_RAMP", corridor, startDate, endDate);
