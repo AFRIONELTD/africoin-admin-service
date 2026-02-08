@@ -22,5 +22,6 @@ public class CryptoRateResponse {
         private String cryptoCurrencyCode;
         private BigDecimal fiatRate;
         private BigDecimal rateMarkup;
+        private BigDecimal previousFiatRate;
     }
 }
