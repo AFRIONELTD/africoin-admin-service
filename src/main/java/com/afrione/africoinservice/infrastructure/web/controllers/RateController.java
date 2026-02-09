@@ -7,6 +7,7 @@ import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
+import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
@@ -51,6 +52,13 @@ public class RateController {
         return ResponseEntity.ok(ApiResponseJSON.<Void>builder()
                 .message("Exchange rate updated successfully.")
                 .build());
+    }
+
+    @Operation(summary = "Returns basic rate stats: active currencies count, average markup, last updated")
+    @GetMapping(value = "/rate-stats", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResponseJSON<RateStatsModel> getRateStats(@Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser, @RequestParam(required = false) String fiat) {
+        RateStatsModel stats = merchantReadUseCases.retrieveRateStats(fiat, authenticatedUser.getAccountId());
+        return new ApiResponseJSON<>("Rate stats returned successfully", stats);
     }
 
 

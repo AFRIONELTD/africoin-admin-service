@@ -10,6 +10,7 @@ import com.afrione.africoinservice.usecases.MerchantReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchantResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
+import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -163,6 +164,45 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
         } catch (Exception e) {
             log.error("Error retrieving rates for", e);
             throw new BadRequestException("Error retrieving rates: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public RateStatsModel retrieveRateStats(String fiat, Long accountId) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/admin/v1/rate-stats", applicationProperty.merchantServiceUrl()));
+
+            if (fiat != null && !fiat.isBlank()) {
+                url.append("?fiat=").append(URLEncoder.encode(fiat, StandardCharsets.UTF_8));
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateMerchantHeader(getAdminUsername(accountId)));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve rate stats from service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve rate stats");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            ApiResponseJSON<RateStatsModel> apiResponseJSON = objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<RateStatsModel>>() {
+                    }
+            );
+
+            RateStatsModel stats = apiResponseJSON.getData();
+            log.info("Successfully retrieved rate stats");
+            return stats;
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving rate stats", e);
+            throw new BadRequestException("Error retrieving rate stats: " + e.getMessage());
         }
     }
 
