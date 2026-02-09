@@ -18,14 +18,6 @@ import java.util.Map;
 public interface DashboardUseCases extends ExternalRequestUseCases {
     CrossBorderSummaryResponse getCrossBoarderAnalytics(AuthenticatedUser authenticatedUser, LocalDate startDate, LocalDate endDate);
 
-    default Map<String, String> generateHeader(String adminUser) {
-        System.out.println("Generating headers for admin user: " + adminUser);
-        Map<String, String> headers = new HashMap<>();
-        headers.put("x-request-client-key", getApplicationProperty().getB2CRequestClientKey());
-        headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
-        return headers;
-    }
-
     ApplicationProperty getApplicationProperty();
 
     OrderGraphResponse getOrderGraphData(AuthenticatedUser authenticatedUser, LocalDate startDate, LocalDate endDate);

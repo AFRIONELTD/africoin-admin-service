@@ -57,7 +57,7 @@ public class DashboardUseCasesImpl implements DashboardUseCases {
                         .append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
             }
 
-            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader(authenticatedUser.getEmail()));
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(authenticatedUser.getEmail()));
             String body = response.getResponseBody();
             log.info("Cross border summary response body: {}", body);
 
@@ -112,7 +112,7 @@ public class DashboardUseCasesImpl implements DashboardUseCases {
                         .append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
             }
 
-            RestClientResponse response = restClientService.getRequest(url.toString(), generateHeader(authenticatedUser.getEmail()));
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(authenticatedUser.getEmail()));
             String body = response.getResponseBody();
             log.info("graph data response body: {}", body);
 
