@@ -1,11 +1,9 @@
 package com.afrione.africoinservice.usecases.data.response.merchant;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -25,9 +23,7 @@ public class CryptoRateResponse {
         private BigDecimal fiatRate;
         private BigDecimal rateMarkup;
         private BigDecimal previousFiatRate;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime lastUpdate;
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-        private LocalDateTime created;
+        private String lastUpdate;
+        private String created;
     }
 }
