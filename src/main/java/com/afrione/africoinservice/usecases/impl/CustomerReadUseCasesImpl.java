@@ -8,7 +8,10 @@ import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
+import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
+import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
+import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestErrorHandler;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * Created by felixadewale on
@@ -115,6 +119,83 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         } catch (Exception e) {
             log.error("Error retrieving customer: {}", userId, e);
             throw new BadRequestException("Error retrieving customer: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public RateStatsModel retrieveRateStats(String fiat, Long accountId) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/exchange-rate/stats", applicationProperty.customerServiceUrl()));
+
+            if (fiat != null && !fiat.isBlank()) {
+                url.append("?fiat=").append(URLEncoder.encode(fiat, StandardCharsets.UTF_8));
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(accountId)));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve rate stats from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve rate stats");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            ApiResponseJSON<RateStatsModel> apiResponseJSON = objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<RateStatsModel>>() {
+                    }
+            );
+
+            RateStatsModel stats = apiResponseJSON.getData();
+            log.info("Successfully retrieved rate stats");
+            return stats;
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving rate stats", e);
+            throw new BadRequestException("Error retrieving rate stats: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public List<CryptoRateResponse> retrieveRate(Long accountId) {
+        try {
+            String url = String.format("%s/api/v1/admin/exchange-rate/retrieve", applicationProperty.customerServiceUrl());
+
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader(getAdminUsername(accountId)));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve rates from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestErrorHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve rates");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            ApiResponseJSON<List<CryptoRateResponse>> apiResponseJSON =
+                    objectMapper.readValue(
+                            responseBody,
+                            new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {
+                            }
+                    );
+
+            List<CryptoRateResponse> rates = apiResponseJSON.getData();
+
+            log.info("Successfully retrieved rates for {}", rates.size());
+            return rates;
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving rates for", e);
+            throw new BadRequestException("Error retrieving rates: " + e.getMessage());
         }
     }
 

@@ -1,6 +1,10 @@
 package com.afrione.africoinservice.usecases;
 
+import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
+import jakarta.validation.constraints.Pattern;
+
+import java.util.List;
 
 /**
  * Created by felixadewale on
@@ -8,4 +12,6 @@ import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewReque
  */
 public interface CustomerWriteUseCases extends ExternalRequestUseCases {
     void reviewUserDocument(UserDocReviewRequest request, Long accountId);
+
+    void updateRates(List<ExchangeRateUpdateRequest> exchangeRateUpdateRequests, String cryptoCurrency, Long accountId);
 }

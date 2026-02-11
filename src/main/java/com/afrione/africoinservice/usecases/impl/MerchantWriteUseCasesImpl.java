@@ -37,29 +37,8 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
     @Override
     public void updateRates(List<ExchangeRateUpdateRequest> requests, String cryptoCurrency, Long accountId) {
         try {
-            if (requests == null || requests.isEmpty()) {
-                throw new BadRequestException("At least one exchange rate update is required");
-            }
-
             String url = String.format("%s/api/admin/v1/update-exchange-rate/" + cryptoCurrency, applicationProperty.merchantServiceUrl());
-
-            String requestPayload = objectMapper.writeValueAsString(requests);
-
-            log.info("Sending exchange rate update request for {} currency pairs", requests.size());
-
-            RestClientResponse response = restClientService.postRequest(url, requestPayload, generateMerchantHeader(getAdminUsername(accountId)));
-
-            if (!isSuccessful(response.getStatusCode())) {
-                log.warn("Failed to update exchange rates. Status: {}", response.getStatusCode());
-                String body = response.getResponseBody();
-                if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
-                } else {
-                    throw new BadRequestException("Failed to update exchange rates");
-                }
-            }
-
-            log.info("Successfully updated {} exchange rates", requests.size());
+            ExchangeRateHelper.updateRate(restClientService, objectMapper, url, requests, generateMerchantHeader(getAdminUsername(accountId)));
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {

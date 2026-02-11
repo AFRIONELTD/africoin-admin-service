@@ -134,28 +134,14 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
         try {
             String url = String.format("%s/api/admin/v1/retrieve-rates", applicationProperty.merchantServiceUrl());
 
-            RestClientResponse response = restClientService.getRequest(url, generateMerchantHeader(getAdminUsername(accountId)));
-
-            if (!isSuccessful(response.getStatusCode())) {
-                log.warn("Failed to retrieve rates from service. Status: {}", response.getStatusCode());
-                String body = response.getResponseBody();
-                if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
-                } else {
-                    throw new BadRequestException("Failed to retrieve rates");
-                }
-            }
-
-            String responseBody = response.getResponseBody();
-            System.out.println(responseBody);
-            ApiResponseJSON<List<CryptoRateResponse>> apiResponseJSON =
-                    objectMapper.readValue(
-                            responseBody,
-                            new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {
-                            }
-                    );
-
-            List<CryptoRateResponse> rates = apiResponseJSON.getData();
+            List<CryptoRateResponse> rates = ExchangeRateHelper.retrieve(
+                    restClientService,
+                    objectMapper,
+                    url,
+                    generateMerchantHeader(getAdminUsername(accountId)),
+                    new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {
+                    }
+            );
 
             log.info("Successfully retrieved rates for {}", rates.size());
             return rates;
@@ -176,26 +162,15 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 url.append("?fiat=").append(URLEncoder.encode(fiat, StandardCharsets.UTF_8));
             }
 
-            RestClientResponse response = restClientService.getRequest(url.toString(), generateMerchantHeader(getAdminUsername(accountId)));
-
-            if (!isSuccessful(response.getStatusCode())) {
-                log.warn("Failed to retrieve rate stats from service. Status: {}", response.getStatusCode());
-                String body = response.getResponseBody();
-                if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
-                } else {
-                    throw new BadRequestException("Failed to retrieve rate stats");
-                }
-            }
-
-            String responseBody = response.getResponseBody();
-            ApiResponseJSON<RateStatsModel> apiResponseJSON = objectMapper.readValue(
-                    responseBody,
+            RateStatsModel stats = ExchangeRateHelper.stat(
+                    restClientService,
+                    objectMapper,
+                    url.toString(),
+                    generateMerchantHeader(getAdminUsername(accountId)),
                     new TypeReference<ApiResponseJSON<RateStatsModel>>() {
                     }
             );
 
-            RateStatsModel stats = apiResponseJSON.getData();
             log.info("Successfully retrieved rate stats");
             return stats;
         } catch (BadRequestException e) {
