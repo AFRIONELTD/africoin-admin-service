@@ -180,6 +180,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             }
 
             String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
             ApiResponseJSON<List<CryptoRateResponse>> apiResponseJSON =
                     objectMapper.readValue(
                             responseBody,
