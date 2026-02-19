@@ -20,6 +20,7 @@ public class CryptoRateResponse {
     @Data
     public static class CryptoRateByType {
         private String cryptoCurrencyCode;
+        private String fiatCurrencyCode;
         private BigDecimal fiatRate;
         private BigDecimal rateMarkup;
         private BigDecimal previousFiatRate;
