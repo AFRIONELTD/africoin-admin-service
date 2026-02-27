@@ -169,8 +169,8 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
     }
 
     @Override
-    public PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, Long accountId) {
-        Page<AppUserEntity> userEntityPage = appUserEntityDao.findAllUsers(pageNo, pageSize);
+    public PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, String searchTerm, Long roleId, Long accountId) {
+        Page<AppUserEntity> userEntityPage = appUserEntityDao.findAllUsers(pageNo, pageSize, searchTerm, roleId);
         return new PagedResponse<>(userEntityPage.getTotalElements(), userEntityPage.getTotalPages(),
                 userEntityPage.getContent().stream().map(PortalUserModel::toModel).toList());
     }

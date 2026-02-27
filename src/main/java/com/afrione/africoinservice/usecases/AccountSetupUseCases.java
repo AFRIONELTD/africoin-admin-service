@@ -23,7 +23,7 @@ public interface AccountSetupUseCases {
 
     void deleteUser(Long userId, Long userId1);
 
-    PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, Long accountId);
+    PagedResponse<PortalUserModel> getAllUsers(int pageNo, int pageSize, String searchTerm, Long roleId, Long accountId);
 
     void updateAccount(Long userId, AccountSetupRequest request, Long userId1);
 }

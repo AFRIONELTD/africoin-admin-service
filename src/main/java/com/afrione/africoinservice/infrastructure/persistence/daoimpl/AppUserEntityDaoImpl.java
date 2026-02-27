@@ -5,6 +5,7 @@ import com.afrione.africoinservice.domain.dao.AppUserEntityDao;
 import com.afrione.africoinservice.domain.entities.AppUserEntity;
 import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.infrastructure.persistence.repository.AppUserRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -28,9 +29,13 @@ public class AppUserEntityDaoImpl extends CrudDaoImpl<AppUserEntity, Long> imple
     }
 
     @Override
-    public Page<AppUserEntity> findAllUsers(int pageNo, int pageSize) {
+    public Page<AppUserEntity> findAllUsers(int pageNo, int pageSize, String searchTerm, Long roleId) {
         PageRequest pageRequest = PageRequest.of(pageNo, pageSize, Sort.Direction.DESC, "dateCreated");
-        return repository.findAll(pageRequest);
+        if (StringUtils.isBlank(searchTerm) && roleId == null) {
+            return repository.findAll(pageRequest);
+        }
+        String st = StringUtils.isBlank(searchTerm) ? null : searchTerm;
+        return repository.findAllUsersFiltered(st, roleId, pageRequest);
     }
 
     @Override

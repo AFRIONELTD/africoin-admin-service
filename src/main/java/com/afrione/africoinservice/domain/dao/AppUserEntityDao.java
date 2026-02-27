@@ -10,6 +10,5 @@ public interface AppUserEntityDao extends CrudDao<AppUserEntity, Long> {
     boolean recordExistWithEmail(String email);
     Optional<AppUserEntity> findRecordByPhoneNumber(String phoneNumber);
     Optional<AppUserEntity> findRecordByEmail(String email);
-
-    Page<AppUserEntity> findAllUsers(int pageNo, int pageSize);
+    Page<AppUserEntity> findAllUsers(int pageNo, int pageSize, String searchTerm, Long roleId);
 }

@@ -47,8 +47,11 @@ public class AccountController {
 
     @GetMapping
     public ApiResponseJSON<PagedResponse<PortalUserModel>> getAllUsers(@RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
-                                                              @RequestParam(defaultValue = "10") @Max(value = 50, message = "Max page size is 50") @Positive int pageSize, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
-        PagedResponse<PortalUserModel> users = accountSetupUseCases.getAllUsers(pageNo, pageSize, authenticatedUser.getAccountId());
+                                                              @RequestParam(defaultValue = "10") @Max(value = 50, message = "Max page size is 50") @Positive int pageSize,
+                                                                       @RequestParam(required = false) String searchTerm,
+                                                                       @RequestParam(required = false) Long roleId,
+                                                                       @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+        PagedResponse<PortalUserModel> users = accountSetupUseCases.getAllUsers(pageNo, pageSize, searchTerm, roleId, authenticatedUser.getAccountId());
         return new ApiResponseJSON<>("Users fetched successfully", users);
     }
 
