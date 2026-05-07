@@ -7,6 +7,7 @@ import com.afrione.africoinservice.usecases.CustomerWriteUseCases;
 import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
+import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
 import io.swagger.v3.oas.annotations.Parameter;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -50,8 +51,8 @@ public class CustomerController {
     }
 
     @GetMapping("/user/{userId}")
-    public ApiResponseJSON<AppUserModel> getAppUser(@PathVariable String userId, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
-        AppUserModel appUserModelExtended = readUseCases.getAppUser(userId, authenticatedUser.getUserId());
+    public ApiResponseJSON<UserKycDetailModel> getAppUser(@PathVariable String userId, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+        UserKycDetailModel appUserModelExtended = readUseCases.getAppUser(userId, authenticatedUser.getUserId());
         return new ApiResponseJSON<>("User fetched successfully", appUserModelExtended);
     }
 

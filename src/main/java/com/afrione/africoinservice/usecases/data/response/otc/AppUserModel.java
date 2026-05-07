@@ -1,5 +1,6 @@
 package com.afrione.africoinservice.usecases.data.response.otc;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Value;
 
@@ -12,16 +13,18 @@ import java.util.List;
 @Value
 @Builder
 public class AppUserModel {
-    Long id;
-    String firstName;
-    String lastName;
-    String userId;
-    String email;
-    String gender;
-    String phoneNumber;
-    String dateOfBirth;
-    String dateJoined;
-    boolean passwordUpdateRequired;
-    String verificationStatus;
-    List<FileModel> files;
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String userId;
+    private String email;
+    private String gender;
+    private String phoneNumber;
+    private String idType;
+    private String idNumber;
+    private String dateOfBirth;
+    private String dateJoined;
+    private boolean passwordUpdateRequired;
+    private String verificationStatus;
+    private List<FileModel> files;
 }

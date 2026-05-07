@@ -13,6 +13,7 @@ import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
+import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestErrorHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -88,7 +89,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     }
 
     @Override
-    public AppUserModel getAppUser(String userId, Long accountId) {
+    public UserKycDetailModel getAppUser(String userId, Long accountId) {
         try {
             String url = String.format("%s/api/v1/admin/verification/user/%s", applicationProperty.customerServiceUrl(), userId);
 
@@ -106,9 +107,9 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             String responseBody = response.getResponseBody();
             log.info("Response Body: {}", responseBody);
-            ApiResponseJSON<AppUserModel> apiResponseJSON = objectMapper.readValue(
+            ApiResponseJSON<UserKycDetailModel> apiResponseJSON = objectMapper.readValue(
                     responseBody,
-                    new TypeReference<ApiResponseJSON<AppUserModel>>() {
+                    new TypeReference<ApiResponseJSON<UserKycDetailModel>>() {
                     }
             );
 
