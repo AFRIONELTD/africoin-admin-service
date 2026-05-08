@@ -15,6 +15,8 @@ public class UserKycDetailModel {
 
     private IdSection idSection;
 
+    private EddSection eddSection;
+
 
     @Data
     @Builder
@@ -54,6 +56,17 @@ public class UserKycDetailModel {
         private FileModel idBack;
         private FileModel selfie;
     }
+
+    @Data
+    @Builder
+    public static class EddSection {
+        private String accountPurpose;
+        private String employmentStatus;
+        private String occupation;
+        private String sourceOfFunds;
+        private String expectedMonthlySpend;
+    }
+
 
 
 }
