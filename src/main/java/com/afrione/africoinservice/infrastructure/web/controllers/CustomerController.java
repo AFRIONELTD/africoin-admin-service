@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @Transactional
 @RequiredArgsConstructor
-@RequestMapping(value = "/api/v1/customer/", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
+@RequestMapping(value = "/api/v1/customer", produces = MediaType.APPLICATION_JSON_VALUE, headers = {"Authorization"})
 @RestController
 @Validated
 @Slf4j
@@ -57,10 +57,10 @@ public class CustomerController {
     }
 
 
-    @PostMapping("review")
-    public ApiResponseJSON<Void> reviewUserDocument(@RequestBody @Valid UserDocReviewRequestJSON userDocReviewRequestJSON, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
-        writeUseCases.reviewUserDocument(userDocReviewRequestJSON.toRequest(), authenticatedUser.getAccountId());
-        return new ApiResponseJSON<>("User document reviewed successfully", null);
+    @PostMapping("/review")
+    public ApiResponseJSON<String> reviewUserDocument(@RequestBody @Valid UserDocReviewRequestJSON userDocReviewRequestJSON, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+      String resp =  writeUseCases.reviewUserDocument(userDocReviewRequestJSON.toRequest(), authenticatedUser.getAccountId());
+        return new ApiResponseJSON<String>("User document reviewed successfully", resp);
     }
 
 
@@ -79,6 +79,12 @@ public class CustomerController {
         String fileType;
 
         public UserDocReviewRequest toRequest() {
+
+            if(!isApproved && (reviewComment == null || reviewComment.isBlank())){
+                throw new IllegalArgumentException("Review comment is required when rejecting a document");
+            }
+
+
             return UserDocReviewRequest.builder()
                     .verificationId(verificationId)
                     .userId(userId)

@@ -17,11 +17,15 @@ public class UserKycDetailModel {
 
     private EddSection eddSection;
 
+    private SelfieSection selfieSection;
+
 
     @Data
     @Builder
     public static class CustomerDetails {
-
+        @Builder.Default
+        private String fileType = "GENERAL";
+        private Long  verificationDataId;
         private String userId;
         private String firstName;
         private String lastName;
@@ -44,19 +48,22 @@ public class UserKycDetailModel {
         private String city;
         private String street;
         private FileModel proofOfAddress;
+        @Builder.Default
+        private String fileType= "POA";
     }
 
     @Data
     @Builder
     public static class IdSection {
+        @Builder.Default
+        String fileType = "ID";
         private String idType;
         private String idNumber;
         private String expiryDate;
         private FileModel idFront;
         private FileModel idBack;
-        private FileModel selfie;
-    }
 
+    }
     @Data
     @Builder
     public static class EddSection {
@@ -67,6 +74,13 @@ public class UserKycDetailModel {
         private String expectedMonthlySpend;
     }
 
+    @Data
+    @Builder
+    public static class SelfieSection {
+        @Builder.Default
+        private String fileType = "SELFIE";
+        private FileModel selfie;
+    }
 
 
 }

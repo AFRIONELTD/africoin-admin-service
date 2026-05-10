@@ -35,7 +35,7 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
 
 
     @Override
-    public void reviewUserDocument(UserDocReviewRequest request, Long accountId) {
+    public String reviewUserDocument(UserDocReviewRequest request, Long accountId) {
         try {
             String url = String.format("%s/api/v1/admin/verification/review", applicationProperty.customerServiceUrl());
 
@@ -61,8 +61,9 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
             log.info("KYC document {} for customer {} has been successfully {}",
                     request.getVerificationId(),
                     request.getUserId(),
-                    request.getIsApproved() == Boolean.TRUE ? "APPROVED" : "DECLINED");
 
+                    request.getIsApproved() == Boolean.TRUE ? "APPROVED" : "DECLINED");
+         return response.getResponseBody();
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
@@ -88,11 +89,14 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
     private String getAdminUsername(Long accountId) {
         AppUserEntity user = appUserEntityDao.findById(accountId)
                 .orElseThrow(() -> new BadRequestException("Admin user not found for account: " + accountId));
-        return user.getFirstName() + " " + user.getLastName();
+        //user.getFirstName() + " " + user.getLastName();
+        return  user.getEmail();
     }
 
     @Override
     public ApplicationProperty getApplicationProperty() {
         return applicationProperty;
     }
+
+
 }

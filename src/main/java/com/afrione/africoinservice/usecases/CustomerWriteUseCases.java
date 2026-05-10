@@ -11,7 +11,7 @@ import java.util.List;
  * 15/12/2025
  */
 public interface CustomerWriteUseCases extends ExternalRequestUseCases {
-    void reviewUserDocument(UserDocReviewRequest request, Long accountId);
+    String reviewUserDocument(UserDocReviewRequest request, Long accountId);
 
     void updateRates(List<ExchangeRateUpdateRequest> exchangeRateUpdateRequests, String cryptoCurrency, Long accountId);
 }
