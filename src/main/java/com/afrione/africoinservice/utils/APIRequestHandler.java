@@ -33,7 +33,7 @@ public class APIRequestHandler {
         try {
             ApiResponseJSON<?>  response = objectMapper.readValue(responseBody, new TypeReference<ApiResponseJSON<?>>() {
             });
-            return response != null && response.getData() != null ? responseBody : "Successful";
+            return response != null && response.getData() != null ? response.getMessage() : "Successful";
         } catch (Exception e) {
 
             return "Successful";
