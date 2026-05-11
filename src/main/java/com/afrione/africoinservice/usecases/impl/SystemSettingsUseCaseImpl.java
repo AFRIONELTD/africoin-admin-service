@@ -10,15 +10,13 @@ import com.afrione.africoinservice.usecases.SystemSettingsUseCase;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.system_settings.SystemSettingsResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -55,7 +53,7 @@ public class SystemSettingsUseCaseImpl implements SystemSettingsUseCase {
                 log.warn("Failed to update {} settings {} from customers service. Status:", system, response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error update system settings");
                 }
@@ -86,7 +84,7 @@ public class SystemSettingsUseCaseImpl implements SystemSettingsUseCase {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve {} settings {} from customers service. Status:", system, response.getStatusCode());
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error update system settings");
                 }

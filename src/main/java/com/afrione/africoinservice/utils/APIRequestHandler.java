@@ -8,11 +8,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 
+import java.util.Map;
+
 /**
  * Created by felixadewale on
  * 12/01/2026
  */
-public class APIRequestErrorHandler {
+public class APIRequestHandler {
     private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     public static void handleErrorResponse(RestClientResponse response) throws JsonProcessingException {
@@ -22,5 +24,19 @@ public class APIRequestErrorHandler {
         HttpStatus httpStatus = response.getStatusCode() != null ? HttpStatus.resolve(response.getStatusCode().value()) : null;
         if (httpStatus == null) httpStatus = HttpStatus.BAD_GATEWAY;
         throw new APIRequestException(httpStatus, message);
+    }
+
+    public static String extractResponseMessage(String responseBody) {
+        if (responseBody == null || responseBody.isBlank()) {
+            return "Successful";
+        }
+        try {
+            ApiResponseJSON<?>  response = objectMapper.readValue(responseBody, new TypeReference<ApiResponseJSON<?>>() {
+            });
+            return response != null && response.getData() != null ? responseBody : "Successful";
+        } catch (Exception e) {
+
+            return "Successful";
+        }
     }
 }

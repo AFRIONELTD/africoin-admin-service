@@ -12,7 +12,7 @@ import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.OrderHistoryResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.OrderSummaryResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -72,7 +72,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve order history. Status: {}", response.getStatusCode());
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error retrieving order history");
                 }
@@ -105,7 +105,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve order detail {}. Status: {}", orderId, response.getStatusCode());
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Order not found");
                 }
@@ -164,7 +164,7 @@ public class OrderHistoryUseCasesImpl implements OrderHistoryUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve order summary. Status: {}", response.getStatusCode());
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error retrieving order summary");
                 }

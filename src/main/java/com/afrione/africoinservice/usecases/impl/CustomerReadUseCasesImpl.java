@@ -8,14 +8,13 @@ import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
-import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
 import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -67,7 +66,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve customer {} from customers service. Status:", response.getStatusCode());
                 if (responseBody != null && !responseBody.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error retrieving users");
                 }
@@ -99,7 +98,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
                 log.warn("Failed to retrieve customer {} from customer service. Status: {}", userId, response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("user not found");
                 }
@@ -138,7 +137,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
                 log.warn("Failed to retrieve rate stats from customer service. Status: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to retrieve rate stats");
                 }
@@ -174,7 +173,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
                 log.warn("Failed to retrieve rates from customer service. Status: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to retrieve rates");
                 }

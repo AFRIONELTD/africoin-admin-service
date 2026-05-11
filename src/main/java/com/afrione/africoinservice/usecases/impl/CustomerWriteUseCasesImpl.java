@@ -9,7 +9,7 @@ import com.afrione.africoinservice.usecases.CustomerWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -51,7 +51,7 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
 
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to process Customer KYC approval");
                 }
@@ -63,7 +63,7 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
                     request.getUserId(),
 
                     request.getIsApproved() == Boolean.TRUE ? "APPROVED" : "DECLINED");
-         return response.getResponseBody();
+         return APIRequestHandler.extractResponseMessage(response.getResponseBody());
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {

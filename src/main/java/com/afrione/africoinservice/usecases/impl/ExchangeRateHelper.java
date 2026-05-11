@@ -5,7 +5,7 @@ import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public final class ExchangeRateHelper {
                 log.warn("Failed to GET {}. Status: {}", url, status);
                 String body = response != null ? response.getResponseBody() : null;
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to retrieve data");
                 }
@@ -73,7 +73,7 @@ public final class ExchangeRateHelper {
                 log.warn("Failed to update exchange rates. Status: {}", statusCode);
                 String body = response != null ? response.getResponseBody() : null;
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to update exchange rates");
                 }

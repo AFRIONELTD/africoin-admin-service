@@ -9,7 +9,7 @@ import com.afrione.africoinservice.usecases.DashboardUseCases;
 import com.afrione.africoinservice.usecases.data.response.dashboard.CrossBorderSummaryResponse;
 import com.afrione.africoinservice.usecases.data.response.dashboard.OrderGraphResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +64,7 @@ public class DashboardUseCasesImpl implements DashboardUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve cross border summary. Status: {}", response.getStatusCode());
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error retrieving cross border summary");
                 }
@@ -119,7 +119,7 @@ public class DashboardUseCasesImpl implements DashboardUseCases {
             if (!isSuccessful(response.getStatusCode())) {
                 log.warn("Failed to retrieve order graph data. Status: {}", response.getStatusCode());
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Error retrieving order graph data ");
                 }

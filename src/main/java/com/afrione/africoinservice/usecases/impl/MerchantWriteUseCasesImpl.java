@@ -9,7 +9,7 @@ import com.afrione.africoinservice.usecases.MerchantWriteUseCases;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.request.KycApprovalRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +63,7 @@ public class MerchantWriteUseCasesImpl implements MerchantWriteUseCases {
                         request.getMerchantId(), request.getFileId(), response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to process KYC approval");
                 }

@@ -28,6 +28,7 @@ public class UserKycDetailModel {
         private Long  verificationDataId;
         private String userId;
         private String firstName;
+        private String verificationStatus;
         private String lastName;
         private String email;
         private String phoneNumber;

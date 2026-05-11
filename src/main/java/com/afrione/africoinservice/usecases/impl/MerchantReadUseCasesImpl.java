@@ -12,7 +12,7 @@ import com.afrione.africoinservice.usecases.data.response.merchant.AdminMerchant
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
-import com.afrione.africoinservice.utils.APIRequestErrorHandler;
+import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +69,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 log.warn("Failed to retrieve merchants from service. Status: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Failed to retrieve merchants");
                 }
@@ -106,7 +106,7 @@ public class MerchantReadUseCasesImpl implements MerchantReadUseCases {
                 log.warn("Failed to retrieve merchant {} from service. Status: {}", merchantId, response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
-                    APIRequestErrorHandler.handleErrorResponse(response);
+                    APIRequestHandler.handleErrorResponse(response);
                 } else {
                     throw new BadRequestException("Merchant not found");
                 }
