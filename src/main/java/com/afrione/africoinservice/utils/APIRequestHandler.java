@@ -31,9 +31,9 @@ public class APIRequestHandler {
             return "Successful";
         }
         try {
-            ApiResponseJSON<?>  response = objectMapper.readValue(responseBody, new TypeReference<ApiResponseJSON<?>>() {
+            ApiResponseJSON<String>  response = objectMapper.readValue(responseBody, new TypeReference<ApiResponseJSON<String>>() {
             });
-            return response != null && response.getData() != null ? response.getMessage() : "Successful";
+            return response != null && response.getData() != null ? response.getData(): "Successful";
         } catch (Exception e) {
 
             return "Successful";
