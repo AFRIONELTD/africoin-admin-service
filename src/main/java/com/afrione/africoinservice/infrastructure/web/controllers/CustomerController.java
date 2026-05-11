@@ -57,7 +57,7 @@ public class CustomerController {
     }
 
 
-    @PostMapping("/review")
+    @PostMapping(value = "/review" , consumes = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseJSON<String> reviewUserDocument(@RequestBody @Valid UserDocReviewRequestJSON userDocReviewRequestJSON, @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
       String resp =  writeUseCases.reviewUserDocument(userDocReviewRequestJSON.toRequest(), authenticatedUser.getAccountId());
         return new ApiResponseJSON<String>("User document reviewed successfully", resp);
