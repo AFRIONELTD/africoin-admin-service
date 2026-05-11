@@ -75,7 +75,7 @@ public class CustomerController {
         @NotNull
         Boolean isApproved;
         @NotBlank
-        @Pattern(regexp = "SELFIE|ID")
+        @Pattern(regexp = "SELFIE|ID|POA|GENERAL", message = "Invalid file type")
         String fileType;
 
         public UserDocReviewRequest toRequest() {
