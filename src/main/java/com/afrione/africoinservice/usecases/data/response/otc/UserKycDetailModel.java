@@ -30,6 +30,7 @@ public class UserKycDetailModel {
         private String firstName;
         private String verificationStatus;
         private String ghanaCardNumber;
+        private String ghanaCardVerificationStatus;
         private String lastName;
         private String email;
         private String phoneNumber;
