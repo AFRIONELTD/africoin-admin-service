@@ -1,5 +1,6 @@
 package com.afrione.africoinservice.usecases.data.response.otc;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,6 +8,7 @@ import java.util.Objects;
 
 @Data
 @Builder
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserKycDetailModel {
 
     private CustomerDetails customerDetails;
@@ -22,6 +24,7 @@ public class UserKycDetailModel {
 
     @Data
     @Builder
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class CustomerDetails {
         @Builder.Default
         private String fileType = "GENERAL";
