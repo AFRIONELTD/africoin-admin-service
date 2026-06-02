@@ -39,6 +39,7 @@ public class UserKycDetailModel {
         private String email;
         private String phoneNumber;
         private String dateOfBirth;
+        private String dateJoined;
         private String gender;
         private String country;
         private String province;
