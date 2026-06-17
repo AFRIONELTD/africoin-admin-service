@@ -9,7 +9,7 @@ on:
 env:
   DOCKERHUB_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKERHUB_KEY: ${{ secrets.DOCKER_KEY }}
-  IMAGE_NAME: africoin-service
+  IMAGE_NAME: africoin-admin-service
   MANIFEST_DIR: apps/afrione-prod
   GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
   GIT_PASSWORD: ${{ secrets.GIT_PASSWORD }}
