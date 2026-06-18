@@ -47,6 +47,12 @@ public class ApplicationProperty {
     }
 
     public String geCustomerTokenSecretKey() {
+        return  "ec39fe4cd9b69453d5a856890d0f8e8cda95706db413ac108e87d3a7e567ad44";
+//        return environmentService.getVariable("TOKEN_B2C_SECRET_KEY", "ec39fe4cd9b69453d5a856890d0f8e8cda95706db413ac108e87d3a7e567ad44");
+    }
+
+
+    public String getTestCustomerTokenSecretKey() {
 
         return environmentService.getVariable("TOKEN_B2C_SECRET_KEY", "ec39fe4cd9b69453d5a856890d0f8e8cda95706db413ac108e87d3a7e567ad44");
     }
