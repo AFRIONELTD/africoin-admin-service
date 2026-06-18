@@ -53,10 +53,10 @@ jobs:
       - name: update image
         run: |
           cd ${{ env.MANIFEST_DIR }}
-          sed -i "s|${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}.*|${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:prod-app-${{ github.run_number }}|g" africoin-service.yaml  
+          sed -i "s|${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}.*|${{ env.DOCKERHUB_USERNAME }}/${{ env.IMAGE_NAME }}:prod-app-${{ github.run_number }}|g" africoin-admin-service.yaml  
           git config user.email info@afrione.co
           git config user.name AFRIONELTD
-          git add africoin-service.yaml
+          git add africoin-admin-service.yaml
           git diff --staged  # Debugging: print the changes to be committed
-          git commit -m "Deploy Prod Africoin Service with new image tag: ${{ github.run_number }}"
+          git commit -m "Deploy Prod Africoin Admin Service with new image tag: ${{ github.run_number }}"
           git push origin main
