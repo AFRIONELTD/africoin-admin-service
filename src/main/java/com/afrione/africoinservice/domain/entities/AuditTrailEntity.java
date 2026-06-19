@@ -30,7 +30,7 @@ public class AuditTrailEntity extends AbstractBaseEntity<Long> {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String description;
 
-    @Column(nullable = false)
+
     private Long entityId;
 
     @Column(nullable = false)
