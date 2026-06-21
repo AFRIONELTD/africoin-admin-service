@@ -8,6 +8,7 @@ import com.afrione.africoinservice.domain.entities.SessionDataEntity;
 import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
 import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
+import com.afrione.africoinservice.domain.services.EmailService;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.usecases.AuthUseCases;
@@ -55,6 +56,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
     private final SessionDataEntityDao sessionDataEntityDao;
     private final Gson gson;
     private final SequenceGenerator sequenceGenerator;
+    private final EmailService emailService;
 
     private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
 
@@ -100,6 +102,7 @@ public class AuthUseCasesImpl implements AuthUseCases {
 
             LoginPasswordSD loginPasswordSD = new LoginPasswordSD();
             loginPasswordSD.setUserId(user.getId());
+            loginPasswordSD.setEmail(request.getEmail());
             loginPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode)); //to be changed
 
             SessionDataEntity sessionDataEntity = new SessionDataEntity();
@@ -108,6 +111,11 @@ public class AuthUseCasesImpl implements AuthUseCases {
             sessionDataEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
             sessionDataEntity.setPayload(gson.toJson(loginPasswordSD));
             sessionDataEntityDao.saveRecord(sessionDataEntity);
+
+            String message = String.format("Your login otp is %s", generatedCode);
+
+            emailService.sendNotice(request.getEmail(),message, "LOGIN OTP" );
+
             return new LoginInitiationResponse(sessionDataEntity.getSessionId(), Math.abs(Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
 
         } finally {
@@ -374,6 +382,12 @@ public class AuthUseCasesImpl implements AuthUseCases {
         sessionDataEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
         sessionDataEntityDao.saveRecord(sessionDataEntity);
         //publish the generated code to user's 2FA method
+
+
+        String message = String.format("Your login otp is %s", generatedCode);
+
+        emailService.sendNotice(loginPasswordSD.getEmail(),message, "LOGIN OTP" );
+
         return new LoginInitiationResponse(sessionDataEntity.getSessionId(), Math.abs(Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
     }
 

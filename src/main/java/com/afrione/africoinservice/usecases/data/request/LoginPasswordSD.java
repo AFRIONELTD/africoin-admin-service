@@ -16,4 +16,5 @@ public class LoginPasswordSD {
     private int tokenTrial;
     private boolean verified;
     private boolean eligibleForPasswordReset;
+    private String email;
 }
