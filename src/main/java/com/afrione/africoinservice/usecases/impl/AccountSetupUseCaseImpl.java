@@ -8,6 +8,7 @@ import com.afrione.africoinservice.domain.entities.RoleEntity;
 import com.afrione.africoinservice.domain.entities.SessionDataEntity;
 import com.afrione.africoinservice.domain.entities.enums.RecordStatusConstant;
 import com.afrione.africoinservice.domain.entities.enums.SessionDataTypeConstant;
+import com.afrione.africoinservice.domain.services.EmailService;
 import com.afrione.africoinservice.domain.services.SequenceGenerator;
 import com.afrione.africoinservice.usecases.AccountSetupUseCases;
 import com.afrione.africoinservice.usecases.data.request.AccountSetupRequest;
@@ -19,6 +20,7 @@ import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.usecases.models.admin.PortalUserModel;
 import com.afrione.africoinservice.utils.RandomPasswordGenerator;
 import com.google.gson.Gson;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +45,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Slf4j
 @Component
+@Transactional
 public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
 
     private static final int MAX_FAILED_LOGIN_ATTEMPTS = 5;
@@ -54,6 +57,7 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
     private final RoleEntityDao rolesDao;
     private final SessionDataEntityDao sessionDataEntityDao;
     private final SequenceGenerator sequenceGenerator;
+    private final EmailService emailService;
     private final Gson gson = new Gson();
 
     @Override
@@ -85,6 +89,10 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
 
         appUserEntityDao.saveRecord(appUserEntity);
 
+        String message = String.format("You have been invited to Afrione backoffice \n email : %s  \n  password : %s \n you can change your password when you are ready" , request.getEmail(), password);
+
+        emailService.sendNotice(request.getEmail(), message, "BACKOFFICE INVITATION" );
+
         return AccountSetupResponse
                 .builder()
                 .firstName(appUserEntity.getFirstName())
@@ -109,9 +117,15 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         forgotPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode));
         forgotPasswordSD.setUserId(appUserEntity.getId());
         forgotPasswordSD.setExpiryInSeconds(exp);
+        forgotPasswordSD.setEmail(emailAddress);
         sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
         sessionDataEntityDao.saveRecord(sessionDataEntity);
         //publish the generated code to user's email address
+
+        String message = "Otp code :" + generatedCode;
+
+        emailService.sendNotice(emailAddress, message, "OTP CODE FOR PASSWORD CHANGE");
+
         return new ForgotPasswordResponse(sessionDataEntity.getSessionId(), exp);
     }
 
@@ -152,11 +166,16 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
     @Override
     public ForgotPasswordResponse resendToken(String sessionId) {
         SessionDataEntity sessionDataEntity = sessionDataEntityDao.findBySessionIdAndType(sessionId, SessionDataTypeConstant.FORGOT_PASSWORD).orElseThrow(() -> new BadRequestException("Invalid session ID"));
+        sessionDataEntity.setExpiryTime(LocalDateTime.now().plusMinutes(5));
         ForgotPasswordSD forgotPasswordSD = gson.fromJson(sessionDataEntity.getPayload(), ForgotPasswordSD.class);
         String generatedCode = sequenceGenerator.generateCode(6);
         forgotPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode));
         sessionDataEntity.setPayload(gson.toJson(forgotPasswordSD));
         sessionDataEntityDao.saveRecord(sessionDataEntity);
+
+        String message = "Otp code :" + generatedCode;
+
+        emailService.sendNotice(forgotPasswordSD.getEmail(), message, "OTP CODE FOR PASSWORD CHANGE");
 
         return new ForgotPasswordResponse(sessionDataEntity.getSessionId(), Math.abs((int) Duration.between(LocalDateTime.now(), sessionDataEntity.getExpiryTime()).toSeconds()));
     }

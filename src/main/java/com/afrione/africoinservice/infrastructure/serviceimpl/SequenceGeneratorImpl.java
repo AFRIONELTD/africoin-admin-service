@@ -53,7 +53,12 @@ public class SequenceGeneratorImpl implements SequenceGenerator {
 
     @Override
     public String generateCode(int size) {
-        return "123456";
+
+        if (!applicationProperty.isProductionEnvironment()) {
+            return "123456";
+        }
+        // return "654321";
+        return RandomStringUtils.randomNumeric(size);
     }
 
     @Override
