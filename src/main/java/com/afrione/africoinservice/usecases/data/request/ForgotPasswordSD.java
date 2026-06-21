@@ -14,6 +14,7 @@ public class ForgotPasswordSD {
     private Long userId;
     private String encryptedToken;
     private int expiryInSeconds;
+    private String email;
     private int tokenTrial;
     private boolean verified;
 }
