@@ -113,6 +113,9 @@ public class AccountSetupUseCaseImpl implements AccountSetupUseCases {
         sessionDataEntity.setSessionDataType(SessionDataTypeConstant.FORGOT_PASSWORD.name());
         sessionDataEntity.setExpiryTime(LocalDateTime.now().plusSeconds(exp));
         String generatedCode = sequenceGenerator.generateCode(6);
+
+        log.info("forgot password otp: {}", generatedCode);
+
         ForgotPasswordSD forgotPasswordSD = new ForgotPasswordSD();
         forgotPasswordSD.setEncryptedToken(passwordEncoder.encode(generatedCode));
         forgotPasswordSD.setUserId(appUserEntity.getId());
