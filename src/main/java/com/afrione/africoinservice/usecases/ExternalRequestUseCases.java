@@ -53,7 +53,6 @@ public interface ExternalRequestUseCases {
     }
 
     default Map<String, String> generateClientHeader(String adminUser) {
-        System.out.println("&&&&&&&&&&&&&&&&&&&&&&&&&&&-------   " + getApplicationProperty().getTestCustomerTokenSecretKey());
         Map<String, String> headers = new HashMap<>();
         headers.put("x-request-client-key", getApplicationProperty().getB2CRequestClientKey());
         headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
