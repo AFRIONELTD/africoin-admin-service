@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -145,8 +146,16 @@ public class RestClientServiceImpl implements RestClientService {
                     .build();
             updateLog(logEntity, response, serviceUrl);
             return response;
-        } catch (HttpClientErrorException e) {
-            return handleHttpClientError(e, start, logEntity, serviceUrl);
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+
+           if(e instanceof HttpClientErrorException ex){
+               return handleHttpClientError(  ex, start, logEntity, serviceUrl);
+           }else {
+
+               return handleHttpClientError(  (HttpServerErrorException) e, start, logEntity, serviceUrl);
+           }
+
+
         } catch (Exception e) {
             return handleGenericError(e, start, logEntity, serviceUrl);
         }
@@ -219,6 +228,17 @@ public class RestClientServiceImpl implements RestClientService {
     }
 
     private RestClientResponse handleHttpClientError(HttpClientErrorException e, LocalDateTime start,
+                                                     ApiRequestLogEntity logEntity, String serviceUrl) {
+        RestClientResponse response = RestClientResponse.builder()
+                .statusCode(e.getStatusCode())
+                .responseBody(e.getResponseBodyAsString())
+                .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
+                .build();
+        updateLog(logEntity, response, serviceUrl);
+        return response;
+    }
+
+    private RestClientResponse handleHttpClientError(HttpServerErrorException e, LocalDateTime start,
                                                      ApiRequestLogEntity logEntity, String serviceUrl) {
         RestClientResponse response = RestClientResponse.builder()
                 .statusCode(e.getStatusCode())
