@@ -54,7 +54,7 @@ public class RateController {
 
     @PostMapping(value = "/{service}/update/{cryptoCurrency}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Operation(summary = "Update exchange rates for cryptocurrencies.")
-    public ResponseEntity<ApiResponseJSON<Void>> updateExchangeRate(@RequestBody @Valid List<ExchangeRateUpdateRequestJSON> requestJSON, @Pattern(regexp = "AFRi_TRC20|AFRi_ERC20") @PathVariable String cryptoCurrency, @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser, @PathVariable @Pattern(regexp = "OTC|MERCHANT") @Parameter(description = "OTC|MERCHANT") String service) {
+    public ResponseEntity<ApiResponseJSON<Void>> updateExchangeRate(@RequestBody @Valid List<ExchangeRateUpdateRequestJSON> requestJSON, @Pattern(regexp = "AFRi_TRC20|AFRi_ERC20|AFRi_SPL") @PathVariable String cryptoCurrency, @Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser, @PathVariable @Pattern(regexp = "OTC|MERCHANT") @Parameter(description = "OTC|MERCHANT") String service) {
         List<ExchangeRateUpdateRequest> exchangeRateUpdateRequests = requestJSON.stream().map(ExchangeRateUpdateRequestJSON::toRequest).toList();
         if (isMerchantService(service)) {
             merchantWriteUseCases.updateRates(exchangeRateUpdateRequests, cryptoCurrency, authenticatedUser.getAccountId());
