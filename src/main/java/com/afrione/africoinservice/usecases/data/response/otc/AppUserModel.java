@@ -1,5 +1,6 @@
 package com.afrione.africoinservice.usecases.data.response.otc;
 
+import com.afrione.africoinservice.usecases.data.response.merchant.CountryModel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Value;
@@ -23,7 +24,13 @@ public class AppUserModel {
     private String idType;
     private String idNumber;
     private String dateOfBirth;
+    private CountryModel country;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String dateJoined;
+
+    private String lastSeen;
+
     private boolean passwordUpdateRequired;
     private String verificationStatus;
     private List<FileModel> files;

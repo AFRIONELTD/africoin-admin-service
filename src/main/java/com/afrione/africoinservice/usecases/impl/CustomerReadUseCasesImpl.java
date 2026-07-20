@@ -6,13 +6,16 @@ import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.JWTService;
 import com.afrione.africoinservice.domain.services.RestClientService;
+import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
 import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
+import com.afrione.africoinservice.usecases.data.response.otc.CoinTransactionResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
+import com.afrione.africoinservice.usecases.data.response.otc.WalletModel;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -197,6 +201,146 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         } catch (Exception e) {
             log.error("Error retrieving rates for", e);
             throw new BadRequestException("Error retrieving rates: " + e.getMessage());
+        }
+    }
+
+
+    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(pageNo)
+                    .append("&pageSize=").append(pageSize);
+
+
+            if(searchKey != null && !searchKey.isBlank()) {
+                url.append("&searchKeyword=").append(URLEncoder.encode(searchKey, StandardCharsets.UTF_8));
+            }
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(URLEncoder.encode(countryCode, StandardCharsets.UTF_8));
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve active users from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve active users");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+            PagedResponse<AppUserModel> apiResponseJSON =
+                    objectMapper.readValue(
+                            responseBody,
+                            new TypeReference<PagedResponse<AppUserModel>>() {
+                            }
+                    );
+
+           return apiResponseJSON;
+
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving active users", e);
+            throw new BadRequestException("Error retrieving active users: " + e.getMessage());
+        }
+    }
+
+
+    public PagedResponse<CoinTransactionResponse> getCustomerTransactions(String userId, String transactionType,
+                                                                          LocalDate startDate,LocalDate endDate,  int pageNo , int pageSize, AuthenticatedUser authenticatedUser) {
+
+        try{
+
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/transaction/%s", applicationProperty.customerServiceUrl(), userId));
+            url.append("?pageNo=").append(pageNo)
+                    .append("&pageSize=").append(pageSize);
+
+            if(transactionType != null && !transactionType.isBlank()) {
+                url.append("&transactionType=").append(URLEncoder.encode(transactionType, StandardCharsets.UTF_8));
+            }
+
+            if(startDate != null) {
+                url.append("&startDate=").append(URLEncoder.encode(startDate.toString(), StandardCharsets.UTF_8));
+            }
+
+            if(endDate != null) {
+                url.append("&endDate=").append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve customer transactions from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve customer transactions");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+            PagedResponse<CoinTransactionResponse> apiResponseJSON =
+                    objectMapper.readValue(
+                            responseBody,
+                            new TypeReference<PagedResponse<CoinTransactionResponse>>() {
+                            }
+                    );
+
+           return apiResponseJSON;
+
+
+
+        }catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving customer transactions", e);
+            throw new BadRequestException("Error retrieving customer transactions: " + e.getMessage());
+        }
+
+
+    }
+
+
+
+    public List<WalletModel> getUserWallets(String userId, AuthenticatedUser authenticatedUser) {
+        try {
+            String url = String.format("%s/api/v1/admin/wallet/%s", applicationProperty.customerServiceUrl(), userId);
+
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve user wallets from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve user wallets");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<List<WalletModel>>() {
+                    }
+            );
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving user wallets", e);
+            throw new BadRequestException("Error retrieving user wallets: " + e.getMessage());
         }
     }
 
