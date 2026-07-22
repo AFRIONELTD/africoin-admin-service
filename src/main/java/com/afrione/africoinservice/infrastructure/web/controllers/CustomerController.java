@@ -67,7 +67,7 @@ public class CustomerController {
         return new ApiResponseJSON<String>("User document reviewed successfully", resp);
     }
 
-    @GetMapping(value = "active-user" , produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/active-user" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchActiveUser(
             @RequestParam(required = false) String searchKeyword,
             @RequestParam(required = false) String countryCode,
@@ -90,7 +90,7 @@ public class CustomerController {
 
 
 
-    @GetMapping( value = "transaction/{userId}", produces = "application/json")
+    @GetMapping( value = "/transaction/{userId}", produces = "application/json")
     public ResponseEntity<PagedResponse<CoinTransactionResponse>>  fetchUserTransactions(@PathVariable String userId,
                                                                                          @Schema(description ="ON_RAMP|OFF_RAMP|TRANSFER|RECEIVE" ) @Pattern(regexp = ("ON_RAMP|OFF_RAMP|TRANSFER|RECEIVE")) @RequestParam  String transactionType,
                                                                                          @RequestParam(defaultValue = "0") @PositiveOrZero  int pageNo,
