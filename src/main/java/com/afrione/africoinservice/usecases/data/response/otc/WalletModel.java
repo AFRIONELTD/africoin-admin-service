@@ -1,6 +1,7 @@
 package com.afrione.africoinservice.usecases.data.response.otc;
 
 
+import com.afrione.africoinservice.usecases.data.response.WalletCurrencyModel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,7 +14,7 @@ public class WalletModel {
 
   private String walletId;
   private BigDecimal walletBalance;
-  private String currency;
+  private WalletCurrencyModel currency;
   private String walletAddress;
   private BigDecimal coinBalance = BigDecimal.ZERO;
   private BigDecimal fiatBalance = BigDecimal.ZERO;
