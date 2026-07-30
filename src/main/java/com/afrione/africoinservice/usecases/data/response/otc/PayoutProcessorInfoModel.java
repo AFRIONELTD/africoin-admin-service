@@ -1,7 +1,9 @@
 package com.afrione.africoinservice.usecases.data.response.otc;
 
-import java.util.List;
+import lombok.Data;
 
+import java.util.List;
+@Data
 public class PayoutProcessorInfoModel {
 
     private long recordId;
