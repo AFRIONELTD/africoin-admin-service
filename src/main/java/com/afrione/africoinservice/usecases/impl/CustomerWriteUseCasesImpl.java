@@ -6,6 +6,7 @@ import com.afrione.africoinservice.domain.models.RestClientResponse;
 import com.afrione.africoinservice.domain.services.ApplicationProperty;
 import com.afrione.africoinservice.domain.services.RestClientService;
 import com.afrione.africoinservice.usecases.CustomerWriteUseCases;
+import com.afrione.africoinservice.usecases.data.request.B2cExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateRequest;
 import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
@@ -73,7 +74,7 @@ public class CustomerWriteUseCasesImpl implements CustomerWriteUseCases {
     }
 
     @Override
-    public void updateRates(List<ExchangeRateUpdateRequest> requests, String cryptoCurrency, Long accountId) {
+    public void updateRates(B2cExchangeRateUpdateRequest requests, String cryptoCurrency, Long accountId) {
         try {
             String url = String.format("%s/api/v1/admin/exchange-rate/update/" + cryptoCurrency, applicationProperty.customerServiceUrl());
             ExchangeRateHelper.updateRate(restClientService, objectMapper, url, requests, generateClientHeader(getAdminUsername(accountId)));

@@ -10,12 +10,11 @@ import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
+import com.afrione.africoinservice.usecases.data.response.WalletCurrencyModel;
+import com.afrione.africoinservice.usecases.data.response.merchant.CountryModel;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
-import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinTransactionResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
-import com.afrione.africoinservice.usecases.data.response.otc.WalletModel;
+import com.afrione.africoinservice.usecases.data.response.otc.*;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import com.afrione.africoinservice.utils.APIRequestHandler;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -253,6 +252,58 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     }
 
 
+    public PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,
+                                                                               AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/exchange-rate/history", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(pageNo)
+                    .append("&pageSize=").append(pageSize);
+
+            if (fiatCurrency != null && !fiatCurrency.isBlank()) {
+                url.append("&fiatCurrency=").append(URLEncoder.encode(fiatCurrency, StandardCharsets.UTF_8));
+            }
+
+            if (cryptoCurrency != null && !cryptoCurrency.isBlank()) {
+                url.append("&cryptoCurrency=").append(URLEncoder.encode(cryptoCurrency, StandardCharsets.UTF_8));
+            }
+
+            if (startDate != null) {
+                url.append("&startDate=").append(URLEncoder.encode(startDate.toString(), StandardCharsets.UTF_8));
+            }
+
+            if (endDate != null) {
+                url.append("&endDate=").append(URLEncoder.encode(endDate.toString(), StandardCharsets.UTF_8));
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getAccountId())));
+
+            if (!response.getStatusCode().is2xxSuccessful() ) {
+                log.warn("Failed to retrieve exchange rate history from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve exchange rate history");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+
+            return objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<PagedResponse<ExchangeRateHistoryResponse>>() {
+                    }
+            );
+        }catch (Exception e){
+
+            log.error("Error retrieving exchange rate history", e);
+            throw new BadRequestException("Error retrieving exchange rate history: " + e.getMessage());
+        }
+
+
+    }
+
+
     public PagedResponse<CoinTransactionResponse> getCustomerTransactions(String userId, String transactionType,
                                                                           LocalDate startDate,LocalDate endDate,  int pageNo , int pageSize, AuthenticatedUser authenticatedUser) {
 
@@ -342,6 +393,118 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             log.error("Error retrieving user wallets", e);
             throw new BadRequestException("Error retrieving user wallets: " + e.getMessage());
         }
+    }
+
+
+
+    public List<PayoutProcessorInfoModel> getSupportedCorridors(){
+
+        try{
+            String url = String.format("%s/api/v1/common/supported-payout-corridors", applicationProperty.customerServiceUrl());
+
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader("system"));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve user wallets from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve user wallets");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            ApiResponseJSON<List<PayoutProcessorInfoModel>> responseObject =  objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<List<PayoutProcessorInfoModel>>>() {
+                    }
+            );
+
+            return responseObject.getData();
+        }catch (BadRequestException e){
+          throw e;
+        }catch (Exception e){
+            throw new BadRequestException("Error retrieving supported corridors: " + e.getMessage());
+        }
+
+    }
+
+    public List<WalletCurrencyModel> getSupportedWalletCurrencies(){
+
+        try{
+            String url = String.format("%s/api/v1/common/crypto-type", applicationProperty.customerServiceUrl());
+
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader("system"));
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.warn("Failed to retrieve supported wallet currencies from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve supported wallet currencies");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            ApiResponseJSON<List<WalletCurrencyModel>> responseObject =  objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<List<WalletCurrencyModel>>>() {
+                    }
+            );
+
+            return responseObject.getData();
+        }catch (BadRequestException e){
+          throw e;
+        }catch (Exception e){
+            throw new BadRequestException("Error retrieving supported wallet currencies: " + e.getMessage());
+        }
+
+    }
+
+
+    public List<CountryModel> getActiveCountries(){
+
+        try{
+
+            String url = String.format("%s/api/v1/common/selected-countries", applicationProperty.customerServiceUrl());
+
+            RestClientResponse response = restClientService.getRequest(url, generateClientHeader("system"));
+
+            if (!response.getStatusCode().is2xxSuccessful()) {
+                log.warn("Failed to retrieve active countries from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve active countries");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            ApiResponseJSON<List<CountryModel>> responseObject =  objectMapper.readValue(
+                    responseBody,
+                    new TypeReference<ApiResponseJSON<List<CountryModel>>>() {
+                    }
+            );
+
+            return responseObject.getData();
+
+
+        }catch (BadRequestException e){
+          throw e;
+        }catch (Exception e){
+
+            throw new BadRequestException("Error retrieving active countries: " + e.getMessage());
+        }
+
     }
 
 

@@ -2,12 +2,11 @@ package com.afrione.africoinservice.usecases;
 
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
+import com.afrione.africoinservice.usecases.data.response.WalletCurrencyModel;
+import com.afrione.africoinservice.usecases.data.response.merchant.CountryModel;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
-import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinTransactionResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
-import com.afrione.africoinservice.usecases.data.response.otc.WalletModel;
+import com.afrione.africoinservice.usecases.data.response.otc.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -30,4 +29,17 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     PagedResponse<CoinTransactionResponse> getCustomerTransactions(String userId, String transactionType,
                                                                    LocalDate startDate, LocalDate endDate, int pageNo , int pageSize, AuthenticatedUser authenticatedUser);
+
+
+    PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,
+                                                                        AuthenticatedUser authenticatedUser);
+
+
+
+    List<PayoutProcessorInfoModel> getSupportedCorridors();
+
+    List<WalletCurrencyModel> getSupportedWalletCurrencies();
+
+    List<CountryModel> getActiveCountries();
+
 }
