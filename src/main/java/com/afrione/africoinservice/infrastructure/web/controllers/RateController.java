@@ -132,6 +132,8 @@ public class RateController {
                     markup);
         }
     }
+
+    @Data
     public static class B2cExchangeRateUpdateRequestJSON {
 
         @NotBlank(message = "Fiat currency is required")
