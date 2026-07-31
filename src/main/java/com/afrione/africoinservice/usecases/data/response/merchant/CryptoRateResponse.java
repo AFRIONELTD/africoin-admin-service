@@ -13,10 +13,18 @@ import java.util.List;
 @Builder
 @Data
 public class CryptoRateResponse {
-    private String cryptoCurrencyCode;
-    private String fiatCurrencyCode;
-    private BigDecimal onRampRate;
-    private BigDecimal offRampRate;
-    private String created;
-    private String createdBy;
+    private CountryModel country;
+    private List<CryptoRateByType> cryptoRates;
+
+    @Builder
+    @Data
+    public static class CryptoRateByType {
+        private String cryptoCurrencyCode;
+        private String fiatCurrencyCode;
+        private BigDecimal fiatRate;
+        private BigDecimal rateMarkup;
+        private BigDecimal previousFiatRate;
+        private String lastUpdate;
+        private String created;
+    }
 }

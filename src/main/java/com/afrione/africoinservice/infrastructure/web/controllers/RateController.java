@@ -12,6 +12,7 @@ import com.afrione.africoinservice.usecases.data.request.ExchangeRateUpdateReque
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
+import com.afrione.africoinservice.usecases.data.response.otc.B2cCryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.otc.ExchangeRateHistoryResponse;
 import com.afrione.africoinservice.usecases.exceptions.BadRequestException;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,10 +52,20 @@ public class RateController {
 
     @GetMapping(value = "/{service}/retrieve", produces = MediaType.APPLICATION_JSON_VALUE)
     public ApiResponseJSON<List<CryptoRateResponse>> retrieveRate(@Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser, @PathVariable @Pattern(regexp = "OTC|MERCHANT") @Parameter(description = "OTC|MERCHANT") String service) {
-        List<CryptoRateResponse> response =
-                isMerchantService(service) ?
-                        merchantReadUseCases.retrieveRate(authenticatedUser.getAccountId()) :
-                        customerReadUseCases.retrieveRate(authenticatedUser.getAccountId());
+        List<CryptoRateResponse> response = List.of();
+              if(  isMerchantService(service)) {
+                 response =  merchantReadUseCases.retrieveRate(authenticatedUser.getAccountId());
+
+              }else {
+                  throw new BadRequestException("End point is no longer in use for OTC. Please use /b2c/retrieve instead.");
+              }
+
+        return new ApiResponseJSON<>("Data fetched successfully", response);
+    }
+
+    @GetMapping(value = "/b2c/retrieve", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ApiResponseJSON<List<B2cCryptoRateResponse>> retrieveB2cRate(@Parameter(hidden = true) @AuthenticationPrincipal AuthenticatedUser authenticatedUser) {
+        List<B2cCryptoRateResponse> response = customerReadUseCases.retrieveRate(authenticatedUser.getAccountId());
         return new ApiResponseJSON<>("Data fetched successfully", response);
     }
 

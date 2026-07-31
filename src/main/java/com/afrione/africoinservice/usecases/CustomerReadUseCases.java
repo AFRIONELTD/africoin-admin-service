@@ -21,7 +21,7 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     RateStatsModel retrieveRateStats(String fiat, Long accountId);
 
-    List<CryptoRateResponse> retrieveRate(Long accountId);
+    List<B2cCryptoRateResponse> retrieveRate(Long accountId);
 
     PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
 

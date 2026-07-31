@@ -166,7 +166,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
 
     @Override
-    public List<CryptoRateResponse> retrieveRate(Long accountId) {
+    public List<B2cCryptoRateResponse> retrieveRate(Long accountId) {
         try {
             String url = String.format("%s/api/v1/admin/exchange-rate/retrieve", applicationProperty.customerServiceUrl());
 
@@ -184,14 +184,14 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             String responseBody = response.getResponseBody();
             log.info("Response Body: {}", responseBody);
-            ApiResponseJSON<List<CryptoRateResponse>> apiResponseJSON =
+            ApiResponseJSON<List<B2cCryptoRateResponse>> apiResponseJSON =
                     objectMapper.readValue(
                             responseBody,
-                            new TypeReference<ApiResponseJSON<List<CryptoRateResponse>>>() {
+                            new TypeReference<ApiResponseJSON<List<B2cCryptoRateResponse>>>() {
                             }
                     );
 
-            List<CryptoRateResponse> rates = apiResponseJSON.getData();
+            List<B2cCryptoRateResponse> rates = apiResponseJSON.getData();
 
             log.info("Successfully retrieved rates for {}", rates.size());
             return rates;
