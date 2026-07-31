@@ -9,20 +9,7 @@ public class FiatCurrencyModel {
     private String shortName;
     private String code;
     private String logoUrl;
+    private String country;
 
-    public FiatCurrencyModel(String name, String symbol, String code) {
-        this.name = name;
-        this.symbol = symbol;
-        this.code = code;
-    }
-
-    public FiatCurrencyModel(
-            String name, String symbol, String code, String shortName, String logoUrl) {
-        this.name = name;
-        this.symbol = symbol;
-        this.code = code;
-        this.shortName = shortName;
-        this.logoUrl = logoUrl;
-    }
 }
 
