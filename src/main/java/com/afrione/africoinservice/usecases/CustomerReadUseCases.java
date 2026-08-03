@@ -1,11 +1,14 @@
 package com.afrione.africoinservice.usecases;
 
+import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
+import com.afrione.africoinservice.usecases.data.response.WalletCurrencyModel;
+import com.afrione.africoinservice.usecases.data.response.merchant.CountryModel;
 import com.afrione.africoinservice.usecases.data.response.merchant.CryptoRateResponse;
 import com.afrione.africoinservice.usecases.data.response.merchant.RateStatsModel;
-import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
-import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
+import com.afrione.africoinservice.usecases.data.response.otc.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 /**
@@ -18,5 +21,25 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     RateStatsModel retrieveRateStats(String fiat, Long accountId);
 
-    List<CryptoRateResponse> retrieveRate(Long accountId);
+    List<B2cCryptoRateResponse> retrieveRate(Long accountId);
+
+    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+
+    List<WalletModel> getUserWallets(String userId, AuthenticatedUser authenticatedUser);
+
+    PagedResponse<CoinTransactionResponse> getCustomerTransactions(String userId, String transactionType,
+                                                                   LocalDate startDate, LocalDate endDate, int pageNo , int pageSize, AuthenticatedUser authenticatedUser);
+
+
+    PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,
+                                                                        AuthenticatedUser authenticatedUser);
+
+
+
+    List<PayoutProcessorInfoModel> getSupportedCorridors();
+
+    List<WalletCurrencyModel> getSupportedWalletCurrencies();
+
+    List<CountryModel> getActiveCountries();
+
 }

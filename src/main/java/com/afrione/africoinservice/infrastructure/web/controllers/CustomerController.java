@@ -4,21 +4,25 @@ import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.CustomerWriteUseCases;
-import com.afrione.africoinservice.usecases.data.response.otc.AppUserModel;
+import com.afrione.africoinservice.usecases.data.response.otc.*;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.UserDocReviewRequest;
-import com.afrione.africoinservice.usecases.data.response.otc.UserKycDetailModel;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Created by felixadewale on
@@ -62,6 +66,44 @@ public class CustomerController {
       String resp =  writeUseCases.reviewUserDocument(userDocReviewRequestJSON.toRequest(), authenticatedUser.getAccountId());
         return new ApiResponseJSON<String>("User document reviewed successfully", resp);
     }
+
+    @GetMapping(value = "/active-user" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchActiveUser(
+            @RequestParam(required = false) String searchKeyword,
+            @RequestParam(required = false) String countryCode,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
+            @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+
+
+        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, pageNo, pageSize, authenticatedUser);
+        return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
+    }
+
+
+    @GetMapping(value = "/wallet/{userId}" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponseJSON<List<WalletModel>>> fetchUserWallets(@PathVariable String userId,
+                                                              @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+        List<WalletModel> userWallets = readUseCases.getUserWallets(userId, authenticatedUser);
+        return ResponseEntity.ok(new ApiResponseJSON<>("User wallets fetched successfully", userWallets));
+    }
+
+
+
+    @GetMapping( value = "/transaction/{userId}", produces = "application/json")
+    public ResponseEntity<PagedResponse<CoinTransactionResponse>>  fetchUserTransactions(@PathVariable String userId,
+                                                                                         @Schema(description ="ON_RAMP|OFF_RAMP|TRANSFER|RECEIVE" ) @Pattern(regexp = ("ON_RAMP|OFF_RAMP|TRANSFER|RECEIVE")) @RequestParam  String transactionType,
+                                                                                         @RequestParam(defaultValue = "0") @PositiveOrZero  int pageNo,
+                                                                                         @RequestParam(defaultValue = "10") @Positive int pageSize,
+                                                                                         @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                                         @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+                                                                                         @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ) {
+
+        PagedResponse<CoinTransactionResponse> response = readUseCases.getCustomerTransactions(userId, transactionType, startDate, endDate, pageNo, pageSize,authenticatedUser);
+
+        return ResponseEntity.ok(response);
+    }
+
 
 
     @Data
