@@ -17,6 +17,7 @@ public class WalletModel {
   private WalletCurrencyModel currency;
   private String walletAddress;
   private BigDecimal coinBalance = BigDecimal.ZERO;
+  private FiatCurrencyModel fiatCurrency;
   private BigDecimal fiatBalance = BigDecimal.ZERO;
 
 
