@@ -53,7 +53,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
                     .append("&pageSize=").append(pageSize);
 
             if (StringUtils.isNotBlank(searchTerm)) {
-                log.info("------------------search term : {}" , searchTerm);
+
                 urlBuilder.append("&searchTerm=").append(searchTerm);
             }
 
@@ -63,7 +63,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             String url = urlBuilder.toString();
 
-            log.info("----------------------------------------Request URL: {}", url);
+
 
             RestClientResponse response = restClientService.getRequest(url, generateClientHeader(getAdminUsername(accountId)));
             String responseBody = response.getResponseBody();
