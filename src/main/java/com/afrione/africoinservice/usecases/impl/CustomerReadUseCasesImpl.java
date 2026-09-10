@@ -54,7 +54,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
             if (StringUtils.isNotBlank(searchTerm)) {
                 log.info("------------------search term : {}" , searchTerm);
-                urlBuilder.append("&searchTerm=").append(URLEncoder.encode(searchTerm, StandardCharsets.UTF_8));
+                urlBuilder.append("&searchTerm=").append(searchTerm);
             }
 
             if(StringUtils.isNotBlank(searchStatus)){
