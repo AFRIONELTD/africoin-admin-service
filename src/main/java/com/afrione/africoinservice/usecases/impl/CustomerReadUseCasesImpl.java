@@ -58,7 +58,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             }
 
             if(StringUtils.isNotBlank(searchStatus)){
-                urlBuilder.append("&searchStatus=").append(URLEncoder.encode(searchStatus, StandardCharsets.UTF_8));
+                urlBuilder.append("&searchStatus=").append(searchStatus);
             }
 
             String url = urlBuilder.toString();
@@ -215,11 +215,11 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
 
 
             if(searchKey != null && !searchKey.isBlank()) {
-                url.append("&searchKeyword=").append(URLEncoder.encode(searchKey, StandardCharsets.UTF_8));
+                url.append("&searchKeyword=").append(searchKey);
             }
 
             if(countryCode != null && !countryCode.isBlank()) {
-                url.append("&countryCode=").append(URLEncoder.encode(countryCode, StandardCharsets.UTF_8));
+                url.append("&countryCode=").append(countryCode);
             }
 
             RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
