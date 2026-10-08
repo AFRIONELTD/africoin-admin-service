@@ -3,8 +3,7 @@ package com.afrione.africoinservice.infrastructure.web.controllers;
 
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinBalanceResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinCirculationResponse;
+import com.afrione.africoinservice.usecases.data.response.otc.CoinInfoResponse;
 import com.afrione.africoinservice.usecases.feature.customer.coinInfo.CoinInfoUseCases;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -24,22 +23,14 @@ public class CoinInfoController {
 
     private final CoinInfoUseCases coinInfoUseCases;
 
-    @GetMapping(value = "/circulation", produces = "application/json")
+    @GetMapping(value = "", produces = "application/json")
     @Operation(summary = "Get AfriCoin in circulation", description = "Returns the total amount of AfriCoin currently in circulation.")
-    public ResponseEntity<ApiResponseJSON<CoinCirculationResponse>> getCoinInCirculation(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+    public ResponseEntity<ApiResponseJSON<CoinInfoResponse>> getCoinInCirculation(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
 
-        ApiResponseJSON<CoinCirculationResponse> response = coinInfoUseCases.getAfriCoinInCirculation(authenticatedUser);
+        ApiResponseJSON<CoinInfoResponse> response = coinInfoUseCases.getAfriCoinInCirculation(authenticatedUser);
 
         return ResponseEntity.ok(response);
 
     }
 
-    @GetMapping(value = "/bridge-wallet-balance", produces = "application/json")
-    @Operation(summary = "Get AfriCoin bridge wallet balance", description = "Returns the total amount of AfriCoin currently in the bridge wallet.")
-    public ResponseEntity<ApiResponseJSON<CoinBalanceResponse>> getBridgeWalletBalance(@AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser){
-
-        ApiResponseJSON<CoinBalanceResponse> response = coinInfoUseCases.getBridgeCoinBalance(authenticatedUser);
-
-        return ResponseEntity.ok(response);
-    }
 }
