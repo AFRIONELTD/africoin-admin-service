@@ -207,7 +207,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     }
 
 
-    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType,int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
         try {
             StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
             url.append("?pageNo=").append(pageNo)
@@ -221,6 +221,12 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             if(countryCode != null && !countryCode.isBlank()) {
                 url.append("&countryCode=").append(countryCode);
             }
+
+            if(deviceType != null && !deviceType.isBlank() ){
+                url.append("&deviceType=").append(deviceType);
+            }
+
+            url.append("&status=VERIFIED");
 
             RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
@@ -253,6 +259,63 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             throw new BadRequestException("Error retrieving active users: " + e.getMessage());
         }
     }
+
+    public PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(pageNo)
+                    .append("&pageSize=").append(pageSize);
+
+
+            if(searchKey != null && !searchKey.isBlank()) {
+                url.append("&searchKeyword=").append(searchKey);
+            }
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            if(deviceType != null && !deviceType.isBlank()){
+
+                url.append("&deviceType=").append(deviceType);
+            }
+
+            url.append("&status=UNVERIFIED");
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve active users from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve active users");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+            PagedResponse<AppUserModel> apiResponseJSON =
+                    objectMapper.readValue(
+                            responseBody,
+                            new TypeReference<PagedResponse<AppUserModel>>() {
+                            }
+                    );
+
+            return apiResponseJSON;
+
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving active users", e);
+            throw new BadRequestException("Error retrieving active users: " + e.getMessage());
+        }
+    }
+
+
+
 
 
     public PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,

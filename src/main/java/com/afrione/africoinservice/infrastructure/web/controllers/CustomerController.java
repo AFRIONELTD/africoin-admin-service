@@ -71,15 +71,30 @@ public class CustomerController {
     public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchActiveUser(
             @RequestParam(required = false) String searchKeyword,
             @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
 
 
-        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, pageNo, pageSize, authenticatedUser);
+        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, deviceType ,pageNo, pageSize, authenticatedUser);
         return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
     }
 
+
+    @GetMapping(value = "/prospective-users" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchProspectiveUsers(
+            @RequestParam(required = false) String searchKeyword,
+            @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
+            @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+
+
+        PagedResponse<AppUserModel> users = readUseCases.getProspectiveUsers(searchKeyword, countryCode, deviceType ,pageNo, pageSize, authenticatedUser);
+        return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
+    }
 
     @GetMapping(value = "/wallet/{userId}" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponseJSON<List<WalletModel>>> fetchUserWallets(@PathVariable String userId,

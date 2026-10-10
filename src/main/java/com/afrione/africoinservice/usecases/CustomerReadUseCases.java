@@ -23,7 +23,9 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     List<B2cCryptoRateResponse> retrieveRate(Long accountId);
 
-    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType,int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+
+    PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
 
     List<WalletModel> getUserWallets(String userId, AuthenticatedUser authenticatedUser);
 
