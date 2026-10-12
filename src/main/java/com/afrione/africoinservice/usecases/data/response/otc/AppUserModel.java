@@ -3,6 +3,7 @@ package com.afrione.africoinservice.usecases.data.response.otc;
 import com.afrione.africoinservice.usecases.data.response.merchant.CountryModel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Value;
 
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
  * Created by felixadewale on
  * 15/12/2025
  */
-@Value
+@Data
 @Builder
 public class AppUserModel {
     private Long id;
@@ -25,6 +26,8 @@ public class AppUserModel {
     private String idNumber;
     private String dateOfBirth;
     private CountryModel country;
+    private String imageUrl;
+    private String deviceType;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String dateJoined;
