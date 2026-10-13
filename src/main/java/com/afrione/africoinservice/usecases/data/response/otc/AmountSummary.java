@@ -12,9 +12,11 @@ import java.math.BigDecimal;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class AmountSummary {
 
-      BigDecimal totalAmount;
+    private  BigDecimal totalAmount;
 
-     FiatCurrencyModel currency;
+    private FiatCurrencyModel currency;
+
+    private BigDecimal  afriAmount;
 
 
 
