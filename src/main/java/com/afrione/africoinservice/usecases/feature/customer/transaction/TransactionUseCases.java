@@ -26,4 +26,8 @@ public interface TransactionUseCases extends ExternalRequestUseCases {
 
 
     PagedResponse<CoinPayoutTransactionResponse> fetchPayoutTransactions(LocalDate startDate, LocalDate endDate, String countryCode, int pageNo, int pageSize , AuthenticatedUser authenticatedUser);
+
+    CoinFundingTransactionResponse fetchFundTransactionDetails(Long id, AuthenticatedUser authenticatedUser);
+
+    CoinTransferTransactionResponse fetchTransferTransactionDetails(Long id, AuthenticatedUser authenticatedUser);
 }

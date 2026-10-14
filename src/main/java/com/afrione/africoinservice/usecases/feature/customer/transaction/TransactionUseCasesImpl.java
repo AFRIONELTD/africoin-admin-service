@@ -397,5 +397,75 @@ public class TransactionUseCasesImpl implements TransactionUseCases{
     }
 
 
+    @Override
+    public CoinTransferTransactionResponse fetchTransferTransactionDetails(Long id, AuthenticatedUser authenticatedUser) {
+        try{
+
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/transaction/transfer/%s", applicationProperty.customerServiceUrl(), id));
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve payout transactions Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve payout transactions");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    CoinTransferTransactionResponse.class
+            );
+
+        }catch (BadRequestException | APIRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to retrieve payout transactions", e);
+            throw new BadRequestException("Failed to retrieve payout transactions: " + e.getMessage());
+        }
+    }
+
+
+    @Override
+    public CoinFundingTransactionResponse fetchFundTransactionDetails(Long id, AuthenticatedUser authenticatedUser) {
+        try{
+
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/transaction/funding/%s", applicationProperty.customerServiceUrl(), id));
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve payout transactions Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve payout transactions");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    CoinFundingTransactionResponse.class
+            );
+
+        }catch (BadRequestException | APIRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to retrieve payout transactions", e);
+            throw new BadRequestException("Failed to retrieve payout transactions: " + e.getMessage());
+        }
+    }
+
+
 
 }

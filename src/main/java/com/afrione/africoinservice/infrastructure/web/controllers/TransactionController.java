@@ -125,4 +125,24 @@ public class TransactionController {
 
         return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
     }
+
+
+    @GetMapping(value = "/transfer/")
+    public ResponseEntity<ApiResponseJSON<CoinPayoutTransactionResponse>> getTransferTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+
+
+        CoinPayoutTransactionResponse response = transactionUseCases.fetchPayoutTransactionDetails(id, authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
+    }
+
+
+    @GetMapping(value = "/funding/{id}")
+    public ResponseEntity<ApiResponseJSON<CoinPayoutTransactionResponse>> getFundingTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+
+
+        CoinPayoutTransactionResponse response = transactionUseCases.fetchPayoutTransactionDetails(id, authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
+    }
 }
