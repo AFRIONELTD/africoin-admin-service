@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 @RestController
-@RequestMapping(value = "api/vi/transaction", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "api/v1/transaction", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 @Validated
 public class TransactionController {
