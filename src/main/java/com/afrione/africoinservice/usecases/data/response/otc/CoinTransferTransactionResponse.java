@@ -30,6 +30,7 @@ public class CoinTransferTransactionResponse {
 
     private String recipientAddress;
 
+    private String dateCreated;
 
 
 }
