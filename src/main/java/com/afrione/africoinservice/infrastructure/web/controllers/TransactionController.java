@@ -128,20 +128,20 @@ public class TransactionController {
 
 
     @GetMapping(value = "/transfer/{id}")
-    public ResponseEntity<ApiResponseJSON<CoinPayoutTransactionResponse>> getTransferTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+    public ResponseEntity<ApiResponseJSON<CoinTransferTransactionResponse>> getTransferTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
 
 
-        CoinPayoutTransactionResponse response = transactionUseCases.fetchPayoutTransactionDetails(id, authenticatedUser);
+        CoinTransferTransactionResponse response = transactionUseCases.fetchTransferTransactionDetails(id, authenticatedUser);
 
         return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
     }
 
 
     @GetMapping(value = "/funding/{id}")
-    public ResponseEntity<ApiResponseJSON<CoinPayoutTransactionResponse>> getFundingTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+    public ResponseEntity<ApiResponseJSON<CoinFundingTransactionResponse>> getFundingTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
 
 
-        CoinPayoutTransactionResponse response = transactionUseCases.fetchPayoutTransactionDetails(id, authenticatedUser);
+        CoinFundingTransactionResponse response = transactionUseCases.fetchFundTransactionDetails(id, authenticatedUser);
 
         return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
     }
