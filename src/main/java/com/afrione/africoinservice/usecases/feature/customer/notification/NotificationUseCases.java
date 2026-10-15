@@ -11,6 +11,8 @@ import java.time.LocalDate;
 
 public interface NotificationUseCases extends ExternalRequestUseCases {
 
+    void deleteNotification(Long id, AuthenticatedUser authenticatedUser);
+
     NotificationConstant getConstant(AuthenticatedUser authenticatedUser);
 
     NotificationResponse notificationDetail(Long id , AuthenticatedUser authenticatedUser);

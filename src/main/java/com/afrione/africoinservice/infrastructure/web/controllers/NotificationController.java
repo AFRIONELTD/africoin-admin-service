@@ -115,6 +115,14 @@ public class NotificationController {
     }
 
 
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<ApiResponseJSON<Void>> deleteNotificationRecord(@PathVariable("id") Long id, @AuthenticationPrincipal AuthenticatedUser authenticatedUser  ){
+
+        notificationUseCase.deleteNotification(id, authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("Deleted successfully"));
+    }
+
 
 
     @Data

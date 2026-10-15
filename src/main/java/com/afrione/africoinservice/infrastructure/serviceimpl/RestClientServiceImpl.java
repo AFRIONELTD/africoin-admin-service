@@ -127,6 +127,14 @@ public class RestClientServiceImpl implements RestClientService {
         return executeGetRequest(buildUrlSpring(serviceUrl, params), headerMap, responseType, null);
     }
 
+
+
+    @Override
+    public <T> RestClientResponse deleteRequest(String serviceUrl, Map<String, String> headerMap,
+                                                Class<T> responseType) {
+        return executeDeleteRequest(buildUrlSpring(serviceUrl, null), headerMap, responseType, null);
+    }
+
     @Override
     public RestClientResponse getRequest(String serviceUrl) {
         return executeGetRequest(serviceUrl, new HashMap<>(), null, null);
@@ -189,6 +197,29 @@ public class RestClientServiceImpl implements RestClientService {
 
         try {
             RestClientResponse response = restClient.get()
+                    .uri(serviceUrl)
+                    .headers(h -> headerMap.forEach(h::set))
+                    .exchange((req, res) -> RestClientResponse.builder()
+                            .responseBody(responseType == null ? res.bodyTo(String.class) : null)
+                            .responseObject(responseType != null ? res.bodyTo(responseType) : null)
+                            .statusCode(res.getStatusCode())
+                            .timeTakenInMs(ChronoUnit.MILLIS.between(start, LocalDateTime.now()))
+                            .build());
+            updateLog(logEntity, response, serviceUrl);
+            return response;
+        } catch (Exception e) {
+            return handleGenericError(e, start, logEntity, serviceUrl);
+        }
+    }
+
+
+    private <T> RestClientResponse executeDeleteRequest(String serviceUrl, Map<String, String> headerMap,
+                                                     Class<T> responseType, Map<String, Object> params) {
+        LocalDateTime start = LocalDateTime.now();
+        ApiRequestLogEntity logEntity = createLog(serviceUrl, null, "GET");
+
+        try {
+            RestClientResponse response = restClient.delete()
                     .uri(serviceUrl)
                     .headers(h -> headerMap.forEach(h::set))
                     .exchange((req, res) -> RestClientResponse.builder()

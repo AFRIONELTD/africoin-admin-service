@@ -36,6 +36,34 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
     private final AppUserEntityDao appUserEntityDao;
 
 
+    public void deleteNotification(Long id, AuthenticatedUser authenticatedUser) {
+
+        try{
+            String url = String.format("%s/api/v1/admin/notification/delete/%s", applicationProperty.customerServiceUrl(), id);
+
+
+            RestClientResponse response = restClientService.deleteRequest(url,generateClientHeader(getAdminUsername(authenticatedUser.getUserId())), null);
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("error deleting notification: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("error deleting notification");
+                }
+            }
+
+
+
+        }catch (BadRequestException | APIRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("error deleting notification", e);
+            throw new BadRequestException("error deleting notification" + e.getMessage());
+        }
+    }
+
     public NotificationConstant getConstant(AuthenticatedUser authenticatedUser) {
 
         try{
@@ -45,12 +73,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
             RestClientResponse response = restClientService.getRequest(url.toString(),generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("failed to retrieve amount summary for funding transactions: {}", response.getStatusCode());
+                log.warn("error fetching constant: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
                     APIRequestHandler.handleErrorResponse(response);
                 } else {
-                    throw new BadRequestException("failed to retrieve amount summary for funding transactions");
+                    throw new BadRequestException("error fetching constant");
                 }
             }
 
@@ -67,8 +95,8 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
         }catch (BadRequestException | APIRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("failed to retrieve amount summary for funding transactions", e);
-            throw new BadRequestException("failed to retrieve amount summary for funding transactions " + e.getMessage());
+            log.error("error fetching constant", e);
+            throw new BadRequestException("error fetching constant " + e.getMessage());
         }
     }
 
@@ -85,12 +113,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
             RestClientResponse response = restClientService.getRequest(url.toString(),generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("failed to retrieve amount summary for funding transactions: {}", response.getStatusCode());
+                log.warn("failed to retrieve notification details {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
                     APIRequestHandler.handleErrorResponse(response);
                 } else {
-                    throw new BadRequestException("failed to retrieve amount summary for funding transactions");
+                    throw new BadRequestException("failed to retrieve notification details");
                 }
             }
 
@@ -107,8 +135,8 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
         }catch (BadRequestException | APIRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("failed to retrieve amount summary for funding transactions", e);
-            throw new BadRequestException("failed to retrieve amount summary for funding transactions " + e.getMessage());
+            log.error("failed to retrieve notification details", e);
+            throw new BadRequestException("failed to retrieve notification details " + e.getMessage());
         }
     }
 
@@ -151,12 +179,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
             RestClientResponse response = restClientService.getRequest(url.toString(),generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("failed to retrieve amount summary for funding transactions: {}", response.getStatusCode());
+                log.warn("failed to fetch notification: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
                     APIRequestHandler.handleErrorResponse(response);
                 } else {
-                    throw new BadRequestException("failed to retrieve amount summary for funding transactions");
+                    throw new BadRequestException("failed to fetch notification");
                 }
             }
 
@@ -174,8 +202,8 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
         }catch (BadRequestException | APIRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("failed to retrieve amount summary for funding transactions", e);
-            throw new BadRequestException("failed to retrieve amount summary for funding transactions " + e.getMessage());
+            log.error("failed to fetch notification", e);
+            throw new BadRequestException("failed to fetch notification " + e.getMessage());
         }
     }
 
@@ -190,12 +218,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
             RestClientResponse response = restClientService.getRequest(url.toString(),generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("failed to retrieve amount summary for funding transactions: {}", response.getStatusCode());
+                log.warn(" Failed to get User count: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
                     APIRequestHandler.handleErrorResponse(response);
                 } else {
-                    throw new BadRequestException("failed to retrieve amount summary for funding transactions");
+                    throw new BadRequestException("Failed to get User count");
                 }
             }
 
@@ -212,8 +240,8 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
         }catch (BadRequestException | APIRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("failed to retrieve amount summary for funding transactions", e);
-            throw new BadRequestException("failed to retrieve amount summary for funding transactions " + e.getMessage());
+            log.error("Failed to get User count", e);
+            throw new BadRequestException("Failed to get User count " + e.getMessage());
         }
     }
 
@@ -228,12 +256,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
             RestClientResponse response = restClientService.postRequest(url.toString(), objectMapper.writeValueAsString(request) ,generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("failed to retrieve amount summary for funding transactions: {}", response.getStatusCode());
+                log.warn("failed to update notification: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
                     APIRequestHandler.handleErrorResponse(response);
                 } else {
-                    throw new BadRequestException("failed to retrieve amount summary for funding transactions");
+                    throw new BadRequestException("");
                 }
             }
 
@@ -250,8 +278,8 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
         }catch (BadRequestException | APIRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("failed to retrieve amount summary for funding transactions", e);
-            throw new BadRequestException("failed to retrieve amount summary for funding transactions " + e.getMessage());
+            log.error("failed to update notification:", e);
+            throw new BadRequestException("failed to update notification: " + e.getMessage());
         }
     }
 
@@ -268,12 +296,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
             RestClientResponse response = restClientService.postRequest(url.toString(), objectMapper.writeValueAsString(request) ,generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
             if (!isSuccessful(response.getStatusCode())) {
-                log.warn("failed to retrieve amount summary for funding transactions: {}", response.getStatusCode());
+                log.warn(" failed to create notification: {}", response.getStatusCode());
                 String body = response.getResponseBody();
                 if (body != null && !body.isBlank()) {
                     APIRequestHandler.handleErrorResponse(response);
                 } else {
-                    throw new BadRequestException("failed to retrieve amount summary for funding transactions");
+                    throw new BadRequestException("failed to create notification");
                 }
             }
 
@@ -290,8 +318,8 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
         }catch (BadRequestException | APIRequestException e) {
             throw e;
         } catch (Exception e) {
-            log.error("failed to retrieve amount summary for funding transactions", e);
-            throw new BadRequestException("failed to retrieve amount summary for funding transactions " + e.getMessage());
+            log.error("failed to create notification", e);
+            throw new BadRequestException("failed to create notification " + e.getMessage());
         }
     }
 
