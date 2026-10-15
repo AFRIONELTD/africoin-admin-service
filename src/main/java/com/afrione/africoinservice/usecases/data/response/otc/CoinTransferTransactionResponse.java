@@ -18,6 +18,8 @@ public class CoinTransferTransactionResponse {
 
     private String customerName;
 
+    private String senderAddress;
+
     private String recipientName;
 
     private CountryModel country;
