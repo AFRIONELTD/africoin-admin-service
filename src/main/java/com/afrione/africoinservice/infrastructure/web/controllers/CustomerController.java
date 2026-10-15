@@ -69,9 +69,9 @@ public class CustomerController {
 
     @GetMapping(value = "/active-user" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchActiveUser(
-            @RequestParam(required = false) String searchKeyword,
-            @RequestParam(required = false) String countryCode,
-            @RequestParam(required = false) @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(required = false) @Parameter(description = "Search against customers' name,email and phone") String searchKeyword,
+            @RequestParam(required = false)   @Parameter(description = "NG|GH") String countryCode,
+            @RequestParam(required = false) @Parameter(description = "ANDROID|IOS|WEB") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
@@ -84,9 +84,9 @@ public class CustomerController {
 
     @GetMapping(value = "/prospective-users" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchProspectiveUsers(
-            @RequestParam(required = false) String searchKeyword,
-            @RequestParam(required = false) String countryCode,
-            @RequestParam(required = false) @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(required = false) @Parameter(description = "Search against customers' email") String searchKeyword,
+            @RequestParam(required = false) @Parameter(description = "NG|GH") String countryCode,
+            @RequestParam(required = false) @Parameter(description = "ANDROID|IOS|WEB") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
