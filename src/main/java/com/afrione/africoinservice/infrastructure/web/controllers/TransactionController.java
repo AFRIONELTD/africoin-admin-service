@@ -127,7 +127,7 @@ public class TransactionController {
     }
 
 
-    @GetMapping(value = "/transfer/")
+    @GetMapping(value = "/transfer/{id}")
     public ResponseEntity<ApiResponseJSON<CoinPayoutTransactionResponse>> getTransferTransactionDetails(@PathVariable Long id,  @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
 
 
