@@ -26,6 +26,10 @@ public class CoinTransferTransactionResponse {
 
     private BigDecimal afriAmount;
 
+    private String customerEmail;
+
+    private BigDecimal networkFee;
+
     private String status;
 
     private WalletCurrencyModel cryptoCurrency;
