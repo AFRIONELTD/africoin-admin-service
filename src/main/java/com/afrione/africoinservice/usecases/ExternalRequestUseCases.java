@@ -57,6 +57,8 @@ public interface ExternalRequestUseCases {
         headers.put("x-request-client-key", getApplicationProperty().getB2CRequestClientKey());
         headers.put("Content-Type", MediaType.APPLICATION_JSON_VALUE);
         headers.put("Authorization", "Bearer " + generateToken(adminUser, getApplicationProperty().geCustomerTokenSecretKey()));
+
+        System.out.println("TOKENNNNNNNNNNNNNNNNNNNNNNNNN ---&  " + generateToken(adminUser, getApplicationProperty().geCustomerTokenSecretKey()));
         return headers;
     }
 
