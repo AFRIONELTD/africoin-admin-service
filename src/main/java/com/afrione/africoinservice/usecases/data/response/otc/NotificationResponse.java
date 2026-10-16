@@ -19,6 +19,8 @@ public class NotificationResponse {
 
     private Long recipientCount;
 
+    private Long audienceCount;
+
     private boolean active;
 
     private String time;
@@ -26,7 +28,6 @@ public class NotificationResponse {
     private String sentBy;
 
     private String status;
-
 
     private String dateCreated;
 
