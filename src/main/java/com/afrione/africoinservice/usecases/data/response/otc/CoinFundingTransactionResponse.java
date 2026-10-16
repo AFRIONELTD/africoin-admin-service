@@ -42,5 +42,7 @@ public class CoinFundingTransactionResponse {
 
     private WalletCurrencyModel cryptoCurrency;
 
+    private BigDecimal networkFee;
+
 
 }

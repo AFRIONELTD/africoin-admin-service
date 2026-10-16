@@ -44,4 +44,10 @@ public class CoinPayoutTransactionResponse {
 
     private String dateCreated;
 
+    private String customerEmail;
+
+    private BigDecimal fee;
+
+    private BigDecimal networkFee;
+
 }

@@ -39,4 +39,6 @@ public class CoinTransferTransactionResponse {
     private String dateCreated;
 
 
+
+
 }
