@@ -42,4 +42,6 @@ public class CoinPayoutTransactionResponse {
 
     private String recipientAccountName;
 
+    private String dateCreated;
+
 }
