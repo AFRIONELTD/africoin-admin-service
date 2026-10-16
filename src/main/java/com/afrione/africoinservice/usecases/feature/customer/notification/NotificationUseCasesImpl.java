@@ -163,12 +163,12 @@ public class NotificationUseCasesImpl implements  NotificationUseCases{
                 url.append("&keyword=").append(keyword);
             }
 
-            if(keyword != null && !keyword.isBlank()  ){
+            if(audience != null && !audience.isBlank()  ){
 
                 url.append("&audience=").append(audience);
             }
 
-            if(keyword != null && !keyword.isBlank()  ){
+            if(notificationTYpe != null && !notificationTYpe.isBlank()  ){
 
                 url.append("&notificationType=").append(notificationTYpe);
             }
