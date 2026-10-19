@@ -37,7 +37,6 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
                                                                         AuthenticatedUser authenticatedUser);
 
 
-
     List<PayoutProcessorInfoModel> getSupportedCorridors();
 
     List<WalletCurrencyModel> getSupportedWalletCurrencies();
