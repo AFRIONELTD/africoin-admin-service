@@ -72,12 +72,14 @@ public class CustomerController {
             @RequestParam(required = false) @Parameter(description = "Search against customers' name,email and phone") String searchKeyword,
             @RequestParam(required = false)   @Parameter(description = "NG|GH") String countryCode,
             @RequestParam(required = false) @Parameter(description = "ANDROID|IOS") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
 
 
-        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, deviceType ,pageNo, pageSize, authenticatedUser);
+        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, deviceType, startDate, endDate ,pageNo, pageSize, authenticatedUser);
         return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
     }
 
@@ -87,12 +89,14 @@ public class CustomerController {
             @RequestParam(required = false) @Parameter(description = "Search against customers' email") String searchKeyword,
             @RequestParam(required = false) @Parameter(description = "NG|GH") String countryCode,
             @RequestParam(required = false) @Parameter(description = "ANDROID|IOS") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
 
 
-        PagedResponse<AppUserModel> users = readUseCases.getProspectiveUsers(searchKeyword, countryCode, deviceType ,pageNo, pageSize, authenticatedUser);
+        PagedResponse<AppUserModel> users = readUseCases.getProspectiveUsers(searchKeyword, countryCode, deviceType, startDate, endDate ,pageNo, pageSize, authenticatedUser);
         return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
     }
 

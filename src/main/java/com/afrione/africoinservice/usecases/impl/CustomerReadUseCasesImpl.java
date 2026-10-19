@@ -207,7 +207,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     }
 
 
-    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType,int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate  ,int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
         try {
             StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
             url.append("?pageNo=").append(pageNo)
@@ -225,6 +225,17 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             if(deviceType != null && !deviceType.isBlank() ){
                 url.append("&deviceType=").append(deviceType);
             }
+
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
 
             url.append("&status=VERIFIED");
 
@@ -260,7 +271,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         }
     }
 
-    public PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+    public PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate , int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
         try {
             StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
             url.append("?pageNo=").append(pageNo)
@@ -278,6 +289,15 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             if(deviceType != null && !deviceType.isBlank()){
 
                 url.append("&deviceType=").append(deviceType);
+            }
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
             }
 
             url.append("&status=UNVERIFIED");
@@ -314,7 +334,54 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         }
     }
 
+    public UserSummaryResponse getUserStatsByDevice(String countryCode,LocalDate startDate, LocalDate endDate , AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user/device-stats", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
 
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve data. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve data");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    UserSummaryResponse.class
+            );
+
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving active users", e);
+            throw new BadRequestException("Error retrieving active users: " + e.getMessage());
+        }
+    }
 
 
 

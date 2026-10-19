@@ -23,9 +23,9 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     List<B2cCryptoRateResponse> retrieveRate(Long accountId);
 
-    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType,int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate ,  int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
 
-    PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+    PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate , int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
 
     List<WalletModel> getUserWallets(String userId, AuthenticatedUser authenticatedUser);
 
@@ -43,5 +43,7 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
     List<WalletCurrencyModel> getSupportedWalletCurrencies();
 
     List<CountryModel> getActiveCountries();
+
+    UserSummaryResponse getUserStatsByDevice(String countryCode, LocalDate startDate, LocalDate endDate , AuthenticatedUser authenticatedUser);
 
 }
