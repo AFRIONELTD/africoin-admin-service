@@ -16,6 +16,7 @@ import java.util.List;
  * 15/12/2025
  */
 public interface CustomerReadUseCases extends ExternalRequestUseCases {
+
     PagedResponse<AppUserModel> listUsers(String searchTerm, String searchStatus, int pageNo, int pageSize, Long accountId);
     UserKycDetailModel getAppUser(String userId, Long accountId);
 
@@ -35,7 +36,6 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,
                                                                         AuthenticatedUser authenticatedUser);
-
 
     List<PayoutProcessorInfoModel> getSupportedCorridors();
 
