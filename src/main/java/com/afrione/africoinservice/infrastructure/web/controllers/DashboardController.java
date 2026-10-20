@@ -98,7 +98,7 @@ public class DashboardController {
     @Operation(description = "get month graph data")
     public ResponseEntity<ApiResponseJSON<MonthStatsWrapper>> adminPortalGraph(@RequestParam(required = false) @Max(value = 12) @Min(value = 1) @Parameter(description = "value between 1 -12 ") Integer startMonth,
                                                                                @RequestParam(required = false) @Max(value = 12) @Min(value = 1) @Parameter(description = "value between 1 -12 ")   Integer endMonth,
-                                                                               @Pattern(regexp = "^\\d{4}$" , message = "please provide a valid year number") Integer year, @Schema(description ="GH|NG" ) @Pattern(regexp = ("GH|NG")) @RequestParam(required = false)  String countryCode,
+                                                                               Integer year, @Schema(description ="GH|NG" ) @Pattern(regexp = ("GH|NG")) @RequestParam(required = false)  String countryCode,
                                                                                @AuthenticationPrincipal AuthenticatedUser authenticatedUser){
 
 
