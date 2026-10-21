@@ -9,5 +9,6 @@ import lombok.Data;
 public class ExportResult {
     private String fileName;
     private String fileUrl;
+    private String status;
 
 }
