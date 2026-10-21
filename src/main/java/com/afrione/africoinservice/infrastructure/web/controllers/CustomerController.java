@@ -100,6 +100,23 @@ public class CustomerController {
         return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
     }
 
+
+    @GetMapping(value = "/download-users-report" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponseJSON<ExportResult>> downloadUSerReport(
+                                                            @RequestParam(required = false) @Parameter(description = "Search against customers' email") String searchKeyword,
+                                                            @RequestParam(required = false) @Parameter(description = "NG|GH") String countryCode,
+                                                            @RequestParam(required = false) @Parameter(description = "ANDROID|IOS") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+                                                            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+                                                            @RequestParam(required = false) @Parameter(description = "Takes true/false -- true for prospective users and false for active users ") Boolean isProspective,
+                                                            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+
+
+        ExportResult exportResult = readUseCases.downloadUSer(searchKeyword, countryCode, deviceType, startDate, endDate ,isProspective, authenticatedUser);
+        return ResponseEntity.ok( new ApiResponseJSON<>("Exported successfully", exportResult));
+    }
+
+
     @GetMapping(value = "/wallet/{userId}" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponseJSON<List<WalletModel>>> fetchUserWallets(@PathVariable String userId,
                                                               @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {

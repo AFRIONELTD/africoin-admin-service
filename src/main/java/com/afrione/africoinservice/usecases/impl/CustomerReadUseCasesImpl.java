@@ -271,6 +271,69 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
         }
     }
 
+
+    public ExportResult downloadUSer(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate  , Boolean isProspective , AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user/download", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
+
+
+            if(searchKey != null && !searchKey.isBlank()) {
+                url.append("&searchKeyword=").append(searchKey);
+            }
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            if(deviceType != null && !deviceType.isBlank() ){
+                url.append("&deviceType=").append(deviceType);
+            }
+
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
+            if(isProspective != null ) {
+                url.append(isProspective ?  "&status=UNVERIFIED" :"&status=VERIFIED" );
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Error exporting user record");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    ExportResult.class
+            );
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error exporting user record", e);
+            throw new BadRequestException("Error exporting user record " + e.getMessage());
+        }
+    }
+
+
     public PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate , int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
         try {
             StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));

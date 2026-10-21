@@ -45,4 +45,6 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     UserSummaryResponse getUserStatsByDevice(String countryCode, LocalDate startDate, LocalDate endDate , AuthenticatedUser authenticatedUser);
 
+    ExportResult downloadUSer(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate  , Boolean isProspective , AuthenticatedUser authenticatedUser);
+
 }
