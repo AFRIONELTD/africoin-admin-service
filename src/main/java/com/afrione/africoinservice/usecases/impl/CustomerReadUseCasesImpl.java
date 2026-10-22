@@ -207,7 +207,7 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
     }
 
 
-    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+    public PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate  ,int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
         try {
             StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
             url.append("?pageNo=").append(pageNo)
@@ -221,6 +221,23 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             if(countryCode != null && !countryCode.isBlank()) {
                 url.append("&countryCode=").append(countryCode);
             }
+
+            if(deviceType != null && !deviceType.isBlank() ){
+                url.append("&deviceType=").append(deviceType);
+            }
+
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
+
+            url.append("&status=VERIFIED");
 
             RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
 
@@ -253,6 +270,182 @@ public class CustomerReadUseCasesImpl implements CustomerReadUseCases {
             throw new BadRequestException("Error retrieving active users: " + e.getMessage());
         }
     }
+
+
+    public ExportResult downloadUSer(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate  , Boolean isProspective , AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user/download", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
+
+
+            if(searchKey != null && !searchKey.isBlank()) {
+                url.append("&searchKeyword=").append(searchKey);
+            }
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            if(deviceType != null && !deviceType.isBlank() ){
+                url.append("&deviceType=").append(deviceType);
+            }
+
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
+            if(isProspective != null ) {
+                url.append(isProspective ?  "&status=UNVERIFIED" :"&status=VERIFIED" );
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Error exporting user record");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    ExportResult.class
+            );
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error exporting user record", e);
+            throw new BadRequestException("Error exporting user record " + e.getMessage());
+        }
+    }
+
+
+    public PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate , int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(pageNo)
+                    .append("&pageSize=").append(pageSize);
+
+
+            if(searchKey != null && !searchKey.isBlank()) {
+                url.append("&searchKeyword=").append(searchKey);
+            }
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            if(deviceType != null && !deviceType.isBlank()){
+
+                url.append("&deviceType=").append(deviceType);
+            }
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
+            url.append("&status=UNVERIFIED");
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve active users from customer service. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve active users");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+            PagedResponse<AppUserModel> apiResponseJSON =
+                    objectMapper.readValue(
+                            responseBody,
+                            new TypeReference<PagedResponse<AppUserModel>>() {
+                            }
+                    );
+
+            return apiResponseJSON;
+
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving active users", e);
+            throw new BadRequestException("Error retrieving active users: " + e.getMessage());
+        }
+    }
+
+    public UserSummaryResponse getUserStatsByDevice(String countryCode,LocalDate startDate, LocalDate endDate , AuthenticatedUser authenticatedUser) {
+        try {
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/user/device-stats", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
+
+
+            if(countryCode != null && !countryCode.isBlank()) {
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            if(startDate != null){
+
+                url.append("&startDate=").append(startDate);
+            }
+
+            if(endDate != null){
+                url.append("&endDate=").append(endDate);
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve data. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve data");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    UserSummaryResponse.class
+            );
+
+
+        } catch (BadRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving active users", e);
+            throw new BadRequestException("Error retrieving active users: " + e.getMessage());
+        }
+    }
+
 
 
     public PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,

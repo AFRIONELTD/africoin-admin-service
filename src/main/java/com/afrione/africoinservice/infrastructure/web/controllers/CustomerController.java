@@ -69,15 +69,51 @@ public class CustomerController {
 
     @GetMapping(value = "/active-user" , produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchActiveUser(
-            @RequestParam(required = false) String searchKeyword,
-            @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) @Parameter(description = "Search against customers' name,email and phone") String searchKeyword,
+            @RequestParam(required = false)   @Parameter(description = "NG|GH") String countryCode,
+            @RequestParam(required = false) @Parameter(description = "ANDROID|IOS") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
             @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
             @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
             @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
 
 
-        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, pageNo, pageSize, authenticatedUser);
+        PagedResponse<AppUserModel> users = readUseCases.getActiveUsers(searchKeyword, countryCode, deviceType, startDate, endDate ,pageNo, pageSize, authenticatedUser);
         return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
+    }
+
+
+    @GetMapping(value = "/prospective-users" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponseJSON<PagedResponse<AppUserModel>>> fetchProspectiveUsers(
+            @RequestParam(required = false) @Parameter(description = "Search against customers' email") String searchKeyword,
+            @RequestParam(required = false) @Parameter(description = "NG|GH") String countryCode,
+            @RequestParam(required = false) @Parameter(description = "ANDROID|IOS") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam(defaultValue = "0") @PositiveOrZero int pageNo,
+            @RequestParam(defaultValue = "10") @PositiveOrZero int pageSize,
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+
+
+        PagedResponse<AppUserModel> users = readUseCases.getProspectiveUsers(searchKeyword, countryCode, deviceType, startDate, endDate ,pageNo, pageSize, authenticatedUser);
+        return ResponseEntity.ok( new ApiResponseJSON<>("Active users fetched successfully", users));
+    }
+
+
+    @GetMapping(value = "/download-users-report" , produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiResponseJSON<ExportResult>> downloadUSerReport(
+                                                            @RequestParam(required = false) @Parameter(description = "Search against customers' email") String searchKeyword,
+                                                            @RequestParam(required = false) @Parameter(description = "NG|GH") String countryCode,
+                                                            @RequestParam(required = false) @Parameter(description = "ANDROID|IOS") @Pattern(regexp = "ANDROID|IOS" , message = "device type should have value between ANDROID & IOS") String  deviceType,
+                                                            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+                                                            @RequestParam(required = false) @Parameter(description = "Takes true/false -- true for prospective users and false for active users ") Boolean isProspective,
+                                                            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser) {
+
+
+        ExportResult exportResult = readUseCases.downloadUSer(searchKeyword, countryCode, deviceType, startDate, endDate ,isProspective, authenticatedUser);
+        return ResponseEntity.ok( new ApiResponseJSON<>("Exported successfully", exportResult));
     }
 
 

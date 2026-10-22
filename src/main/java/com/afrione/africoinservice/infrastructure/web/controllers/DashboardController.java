@@ -2,20 +2,27 @@ package com.afrione.africoinservice.infrastructure.web.controllers;
 
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
+import com.afrione.africoinservice.usecases.CustomerReadUseCases;
 import com.afrione.africoinservice.usecases.DashboardUseCases;
 import com.afrione.africoinservice.usecases.OrderHistoryUseCases;
 import com.afrione.africoinservice.usecases.data.response.dashboard.CrossBorderSummaryResponse;
 import com.afrione.africoinservice.usecases.data.response.dashboard.OrderGraphResponse;
+import com.afrione.africoinservice.usecases.data.response.otc.MonthStatsWrapper;
 import com.afrione.africoinservice.usecases.data.response.otc.OrderSummaryResponse;
+import com.afrione.africoinservice.usecases.data.response.otc.UserSummaryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -40,6 +47,7 @@ public class DashboardController {
 
     private final OrderHistoryUseCases orderHistoryUseCases;
     private final DashboardUseCases dashboardUseCases;
+    private final CustomerReadUseCases customerReadUseCases;
 
     @Operation(summary = "Returns dashboard summary")
     @GetMapping(value = "/summary", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,5 +78,32 @@ public class DashboardController {
 
         OrderGraphResponse response = dashboardUseCases.getOrderGraphData(authenticatedUser, startDate, endDate);
         return new ApiResponseJSON<>("successful", response);
+    }
+
+
+    @GetMapping(value = "/user-device-stats")
+    public ResponseEntity<ApiResponseJSON<UserSummaryResponse>> getUserDeviceStat(@RequestParam(required = false) @Parameter(description = "GH|NG") @Pattern(regexp = "GH|NG") String countryCode,
+                                                                                  @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+                                                                                  @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+                                                                                  @AuthenticationPrincipal AuthenticatedUser authenticatedUser){
+
+
+        UserSummaryResponse response = customerReadUseCases.getUserStatsByDevice(countryCode, startDate, endDate ,authenticatedUser);
+        return ResponseEntity.ok(new ApiResponseJSON<>("successful", response));
+
+    }
+
+
+    @GetMapping(value = "/afri-month-graph")
+    @Operation(description = "get month graph data")
+    public ResponseEntity<ApiResponseJSON<MonthStatsWrapper>> adminPortalGraph(@RequestParam(required = false) @Max(value = 12) @Min(value = 1) @Parameter(description = "value between 1 -12 ") Integer startMonth,
+                                                                               @RequestParam(required = false) @Max(value = 12) @Min(value = 1) @Parameter(description = "value between 1 -12 ")   Integer endMonth,
+                                                                               Integer year, @Schema(description ="GH|NG" ) @Pattern(regexp = ("GH|NG")) @RequestParam(required = false)  String countryCode,
+                                                                               @AuthenticationPrincipal AuthenticatedUser authenticatedUser){
+
+
+        MonthStatsWrapper response = dashboardUseCases.getMonthStats(startMonth, endMonth, year, countryCode, authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("successful", response));
     }
 }

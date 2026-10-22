@@ -18,4 +18,7 @@ public interface RestClientService {
     <T, K> RestClientResponse postRequest(String serviceUrl, T requestPayload, Map<String, String> headerMap, Class<K> responseType);
     <T, K>  RestClientResponse postFormRequest(String serviceUrl, T requestPayload, Class<K> responseType);
     <T> RestClientResponse getRequest(String serviceUrl, Map<String, String> headerMap, Class<T> responseType,  Map<String, Object> params);
+
+    <T> RestClientResponse deleteRequest(String serviceUrl, Map<String, String> headerMap,
+                                         Class<T> responseType);
 }

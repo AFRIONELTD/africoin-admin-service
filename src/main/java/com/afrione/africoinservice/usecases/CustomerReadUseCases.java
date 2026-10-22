@@ -16,6 +16,7 @@ import java.util.List;
  * 15/12/2025
  */
 public interface CustomerReadUseCases extends ExternalRequestUseCases {
+
     PagedResponse<AppUserModel> listUsers(String searchTerm, String searchStatus, int pageNo, int pageSize, Long accountId);
     UserKycDetailModel getAppUser(String userId, Long accountId);
 
@@ -23,7 +24,9 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
 
     List<B2cCryptoRateResponse> retrieveRate(Long accountId);
 
-    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+    PagedResponse<AppUserModel> getActiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate ,  int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
+
+    PagedResponse<AppUserModel> getProspectiveUsers(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate , int pageNo, int pageSize, AuthenticatedUser authenticatedUser);
 
     List<WalletModel> getUserWallets(String userId, AuthenticatedUser authenticatedUser);
 
@@ -34,12 +37,14 @@ public interface CustomerReadUseCases extends ExternalRequestUseCases {
     PagedResponse<ExchangeRateHistoryResponse> fetchExchangeRateHistory(String fiatCurrency, String cryptoCurrency, LocalDate startDate, LocalDate endDate, int pageNo, int pageSize,
                                                                         AuthenticatedUser authenticatedUser);
 
-
-
     List<PayoutProcessorInfoModel> getSupportedCorridors();
 
     List<WalletCurrencyModel> getSupportedWalletCurrencies();
 
     List<CountryModel> getActiveCountries();
+
+    UserSummaryResponse getUserStatsByDevice(String countryCode, LocalDate startDate, LocalDate endDate , AuthenticatedUser authenticatedUser);
+
+    ExportResult downloadUSer(String searchKey, String countryCode, String deviceType, LocalDate startDate, LocalDate endDate  , Boolean isProspective , AuthenticatedUser authenticatedUser);
 
 }

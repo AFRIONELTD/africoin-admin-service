@@ -17,9 +17,17 @@ import java.util.Map;
 public class APIRequestHandler {
     private static final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
-    public static void handleErrorResponse(RestClientResponse response) throws JsonProcessingException {
-        ApiResponseJSON<?> apiResp = objectMapper.readValue(response.getResponseBody(), new TypeReference<ApiResponseJSON<?>>() {
-        });
+    public static void handleErrorResponse(RestClientResponse response)  {
+
+        ApiResponseJSON<?> apiResp = null;
+
+        try {
+             apiResp = objectMapper.readValue(response.getResponseBody(), new TypeReference<ApiResponseJSON<?>>() {
+            });
+
+        }catch (Exception e){
+            throw new APIRequestException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
         String message = apiResp != null && apiResp.getMessage() != null ? apiResp.getMessage() : "Error Making remote call";
         HttpStatus httpStatus = response.getStatusCode() != null ? HttpStatus.resolve(response.getStatusCode().value()) : null;
         if (httpStatus == null) httpStatus = HttpStatus.BAD_GATEWAY;
