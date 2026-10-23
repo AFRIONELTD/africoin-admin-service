@@ -255,6 +255,61 @@ public class TransactionUseCasesImpl implements TransactionUseCases{
 
     }
 
+
+
+    public ExportResult downloadCoinFundingReport(LocalDate startDate, LocalDate endDate, String countryCode, AuthenticatedUser authenticatedUser) {
+
+        try{
+
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/transaction/download-funding-report", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
+
+
+            if(startDate != null) {
+                url.append("&startDate=").append(URLEncoder.encode(startDate.toString(), StandardCharsets.UTF_8));
+            }
+
+            if(endDate != null) {
+                url.append("&endDate=").append(endDate.toString());
+            }
+
+            if(countryCode != null && !countryCode.isBlank()  ){
+
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("failed to fetch funding transactions: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("failed to fetch funding transactions");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    ExportResult.class
+            );
+
+
+
+        }catch (BadRequestException | APIRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("failed to fetch funding transactions", e);
+            throw new BadRequestException("failed to fetch funding transactions: " + e.getMessage());
+        }
+
+    }
+
     @Override
     public PagedResponse<CoinTransferTransactionResponse> fetchTransferTransactions(LocalDate startDate, LocalDate endDate, String countryCode, int pageNo, int pageSize, AuthenticatedUser authenticatedUser) {
         try{
@@ -296,6 +351,59 @@ public class TransactionUseCasesImpl implements TransactionUseCases{
                     responseBody,
                     new TypeReference<PagedResponse<CoinTransferTransactionResponse>>() {
                     }
+            );
+
+
+
+        }catch (BadRequestException | APIRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Error retrieving customer transactions", e);
+            throw new BadRequestException("Error retrieving customer transactions: " + e.getMessage());
+        }
+
+    }
+
+
+    public ExportResult downloadTransferReport(LocalDate startDate, LocalDate endDate, String countryCode,  AuthenticatedUser authenticatedUser) {
+        try{
+
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/transaction/download-transfer-report", applicationProperty.customerServiceUrl()));
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
+
+
+            if(startDate != null) {
+                url.append("&startDate=").append(startDate.toString());
+            }
+
+            if(endDate != null) {
+                url.append("&endDate=").append(endDate.toString());
+            }
+
+            if(countryCode != null && !countryCode.isBlank()  ){
+
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("failed to fetch transfer transactions. Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("failed to fetch transfer transactions");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    ExportResult.class
             );
 
 
@@ -351,6 +459,57 @@ public class TransactionUseCasesImpl implements TransactionUseCases{
                     responseBody,
                     new TypeReference<PagedResponse<CoinPayoutTransactionResponse>>() {
                     }
+            );
+
+        }catch (BadRequestException | APIRequestException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("Failed to retrieve payout transactions", e);
+            throw new BadRequestException("Failed to retrieve payout transactions: " + e.getMessage());
+        }
+    }
+
+
+    public ExportResult downloadPayoutReport(LocalDate startDate, LocalDate endDate, String countryCode, AuthenticatedUser authenticatedUser) {
+        try{
+
+            StringBuilder url = new StringBuilder(String.format("%s/api/v1/admin/transaction/download-payout-report", applicationProperty.customerServiceUrl()));
+
+            url.append("?pageNo=").append(1)
+                    .append("&pageSize=").append(1);
+
+
+            if(startDate != null) {
+                url.append("&startDate=").append(startDate.toString());
+            }
+
+            if(endDate != null) {
+                url.append("&endDate=").append(endDate.toString());
+            }
+
+            if(countryCode != null && !countryCode.isBlank()  ){
+
+                url.append("&countryCode=").append(countryCode);
+            }
+
+            RestClientResponse response = restClientService.getRequest(url.toString(), generateClientHeader(getAdminUsername(authenticatedUser.getUserId())));
+
+            if (!isSuccessful(response.getStatusCode())) {
+                log.warn("Failed to retrieve payout transactions Status: {}", response.getStatusCode());
+                String body = response.getResponseBody();
+                if (body != null && !body.isBlank()) {
+                    APIRequestHandler.handleErrorResponse(response);
+                } else {
+                    throw new BadRequestException("Failed to retrieve payout transactions");
+                }
+            }
+
+            String responseBody = response.getResponseBody();
+            log.info("Response Body: {}", responseBody);
+
+            return objectMapper.readValue(
+                    responseBody,
+                    ExportResult.class
             );
 
         }catch (BadRequestException | APIRequestException e) {

@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class ExportResult {
+    private String message;
     private String fileName;
     private String fileUrl;
     private String status;

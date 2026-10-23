@@ -3,10 +3,7 @@ package com.afrione.africoinservice.infrastructure.web.controllers;
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.infrastructure.web.models.ApiResponseJSON;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.AmountSummaryResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinFundingTransactionResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinPayoutTransactionResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinTransferTransactionResponse;
+import com.afrione.africoinservice.usecases.data.response.otc.*;
 import com.afrione.africoinservice.usecases.feature.customer.transaction.TransactionUseCases;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -88,6 +85,19 @@ public class TransactionController {
         return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
     }
 
+    @GetMapping(value = "/download-funding-report")
+    public ResponseEntity<ApiResponseJSON<ExportResult>> downloadFundingReport(
+            @Schema(description ="NG|GH" ) @Pattern(regexp = ("NG|GH")) @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+
+
+        ExportResult response = transactionUseCases.downloadCoinFundingReport(startDate,endDate,countryCode, authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("processed successfully", response));
+    }
+
     @GetMapping(value = "/transfer")
     public ResponseEntity<ApiResponseJSON<PagedResponse<CoinTransferTransactionResponse>>> fetchTransferTransaction(
             @Schema(description ="NG|GH" ) @Pattern(regexp = ("NG|GH")) @RequestParam(required = false) String countryCode,
@@ -100,6 +110,18 @@ public class TransactionController {
        PagedResponse<CoinTransferTransactionResponse> response = transactionUseCases.fetchTransferTransactions(startDate,endDate, countryCode, pageNo, pageSize, authenticatedUser);
 
         return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
+    }
+
+    @GetMapping(value = "/download-transfer-report")
+    public ResponseEntity<ApiResponseJSON<ExportResult>> downloadTransferReport(
+            @Schema(description ="NG|GH" ) @Pattern(regexp = ("NG|GH")) @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+
+        ExportResult response = transactionUseCases.downloadTransferReport(startDate,endDate, countryCode,  authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("Processed successfully", response));
     }
 
     @GetMapping(value = "/payout")
@@ -115,6 +137,20 @@ public class TransactionController {
         PagedResponse<CoinPayoutTransactionResponse> response = transactionUseCases.fetchPayoutTransactions(startDate, endDate, countryCode, pageNo, pageSize, authenticatedUser);
 
         return ResponseEntity.ok(new ApiResponseJSON<>("Retrieve successfully", response));
+    }
+
+
+    @GetMapping(value = "/download-payout-report")
+    public ResponseEntity<ApiResponseJSON<ExportResult>> downloadPayoutReport(
+            @Schema(description ="NG|GH" ) @Pattern(regexp = ("NG|GH")) @RequestParam(required = false) String countryCode,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam(required = false) @Schema(description = "yyyy-MM-dd") @DateTimeFormat( pattern = "yyyy-MM-dd") LocalDate endDate,
+            @AuthenticationPrincipal @Parameter(hidden = true) AuthenticatedUser authenticatedUser ){
+
+
+        ExportResult response = transactionUseCases.downloadPayoutReport(startDate, endDate, countryCode, authenticatedUser);
+
+        return ResponseEntity.ok(new ApiResponseJSON<>("Processed successfully", response));
     }
 
     @GetMapping(value = "/payout/{id}")

@@ -3,10 +3,7 @@ package com.afrione.africoinservice.usecases.feature.customer.transaction;
 import com.afrione.africoinservice.infrastructure.security.AuthenticatedUser;
 import com.afrione.africoinservice.usecases.ExternalRequestUseCases;
 import com.afrione.africoinservice.usecases.data.response.PagedResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.AmountSummaryResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinFundingTransactionResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinPayoutTransactionResponse;
-import com.afrione.africoinservice.usecases.data.response.otc.CoinTransferTransactionResponse;
+import com.afrione.africoinservice.usecases.data.response.otc.*;
 
 import java.time.LocalDate;
 
@@ -30,4 +27,10 @@ public interface TransactionUseCases extends ExternalRequestUseCases {
     CoinFundingTransactionResponse fetchFundTransactionDetails(Long id, AuthenticatedUser authenticatedUser);
 
     CoinTransferTransactionResponse fetchTransferTransactionDetails(Long id, AuthenticatedUser authenticatedUser);
+
+    ExportResult downloadCoinFundingReport(LocalDate startDate, LocalDate endDate, String countryCode, AuthenticatedUser authenticatedUser);
+
+    ExportResult downloadTransferReport(LocalDate startDate, LocalDate endDate, String countryCode,  AuthenticatedUser authenticatedUser);
+
+    ExportResult downloadPayoutReport(LocalDate startDate, LocalDate endDate, String countryCode, AuthenticatedUser authenticatedUser);
 }
